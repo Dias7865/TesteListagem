@@ -1,9 +1,9 @@
-<!DOCTYPE html> V2
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor de Dados - Árvores e Metais</title>
+    <title>Leitor de Dados Seguro - Árvores e Metais</title>
     <style>
         * {
             margin: 0;
@@ -21,6 +21,84 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+        }
+
+        /* Tela de Login */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-box h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-box button:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-box button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            color: #c33;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* Conteúdo Principal */
+        .main-content {
+            display: none;
         }
 
         h1 {
@@ -68,10 +146,6 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0);
         }
 
         .btn:disabled {
@@ -173,67 +247,161 @@
             font-size: 0.9rem;
             opacity: 0.9;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌳 Leitor de Dados Supabase 🪨</h1>
-
-        <!-- Seção de Árvores -->
-        <div class="section">
-            <div class="section-header">
-                <h2>🌳 Árvores</h2>
-                <button class="btn" onclick="buscarArvores()" id="btnArvores">
-                    Carregar Árvores
-                </button>
-            </div>
-            <div id="arvoresStats" class="stats" style="display: none;"></div>
-            <div id="arvoresLoading" class="loading" style="display: none;">
-                Carregando árvores...
-            </div>
-            <div id="arvoresError" class="error" style="display: none;"></div>
-            <div id="arvoresContainer" class="cards-container"></div>
-            <div id="arvoresEmpty" class="empty-state" style="display: none;">
-                Nenhuma árvore encontrada. Clique em "Carregar Árvores" para começar.
+        <!-- Tela de Login com Palavra-Chave -->
+        <div id="loginScreen" class="login-screen">
+            <div class="login-box">
+                <h2>🔐 Acesso Restrito</h2>
+                <p>Digite a palavra-chave para acessar os dados</p>
+                <input type="password" id="palavraChave" placeholder="Digite a palavra-chave..." autocomplete="off">
+                <button onclick="verificarAcesso()" id="btnLogin">Acessar</button>
+                <div id="loginError" class="login-error">❌ Palavra-chave incorreta!</div>
             </div>
         </div>
 
-        <!-- Seção de Metais -->
-        <div class="section">
-            <div class="section-header">
-                <h2>🪨 Metais</h2>
-                <button class="btn" onclick="buscarMetais()" id="btnMetais">
-                    Carregar Metais
-                </button>
+        <!-- Conteúdo Principal (inicialmente oculto) -->
+        <div id="mainContent" class="main-content">
+            <h1>🌳 Leitor de Dados Supabase 🪨</h1>
+
+            <!-- Seção de Árvores -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>🌳 Árvores</h2>
+                    <button class="btn" onclick="buscarArvores()" id="btnArvores">
+                        Carregar Árvores
+                    </button>
+                </div>
+                <div id="arvoresStats" class="stats" style="display: none;"></div>
+                <div id="arvoresLoading" class="loading" style="display: none;">
+                    Carregando árvores...
+                </div>
+                <div id="arvoresError" class="error" style="display: none;"></div>
+                <div id="arvoresContainer" class="cards-container"></div>
+                <div id="arvoresEmpty" class="empty-state" style="display: none;">
+                    Nenhuma árvore encontrada. Clique em "Carregar Árvores" para começar.
+                </div>
             </div>
-            <div id="metaisStats" class="stats" style="display: none;"></div>
-            <div id="metaisLoading" class="loading" style="display: none;">
-                Carregando metais...
-            </div>
-            <div id="metaisError" class="error" style="display: none;"></div>
-            <div id="metaisContainer" class="cards-container"></div>
-            <div id="metaisEmpty" class="empty-state" style="display: none;">
-                Nenhum metal encontrado. Clique em "Carregar Metais" para começar.
+
+            <!-- Seção de Metais -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>🪨 Metais</h2>
+                    <button class="btn" onclick="buscarMetais()" id="btnMetais">
+                        Carregar Metais
+                    </button>
+                </div>
+                <div id="metaisStats" class="stats" style="display: none;"></div>
+                <div id="metaisLoading" class="loading" style="display: none;">
+                    Carregando metais...
+                </div>
+                <div id="metaisError" class="error" style="display: none;"></div>
+                <div id="metaisContainer" class="cards-container"></div>
+                <div id="metaisEmpty" class="empty-state" style="display: none;">
+                    Nenhum metal encontrado. Clique em "Carregar Metais" para começar.
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         // Configuração do Supabase
-        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN'; // Substitua pela sua chave anon
+        const SUPABASE_URL = 'MYLINK';
+        const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
 
-        // Função genérica para fazer requisições ao Supabase
-        async function buscarDados(tabela) {
+        // Variável global para armazenar a palavra-chave validada
+        let palavraChaveValidada = null;
+
+        // Função para verificar a palavra-chave
+        async function verificarAcesso() {
+            const input = document.getElementById('palavraChave');
+            const palavraDigitada = input.value.trim();
+            const erro = document.getElementById('loginError');
+            const btn = document.getElementById('btnLogin');
+
+            if (!palavraDigitada) {
+                erro.textContent = '⚠️ Por favor, digite a palavra-chave!';
+                erro.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+            erro.style.display = 'none';
+
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
+                // Tenta buscar árvores com a palavra-chave fornecida
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rpc/buscar_arvores_seguro?palavra_chave=${encodeURIComponent(palavraDigitada)}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
                     }
-                });
+                );
+
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+
+                const data = await response.json();
+
+                // Se retornou dados, a palavra-chave está correta
+                if (data.length > 0) {
+                    palavraChaveValidada = palavraDigitada;
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    
+                    // Mostrar estados vazios iniciais
+                    document.getElementById('arvoresEmpty').style.display = 'block';
+                    document.getElementById('metaisEmpty').style.display = 'block';
+                } else {
+                    // Palavra-chave incorreta (retornou vazio)
+                    erro.textContent = '❌ Palavra-chave incorreta!';
+                    erro.style.display = 'block';
+                    input.value = '';
+                    input.focus();
+                }
+            } catch (err) {
+                erro.textContent = '❌ Erro ao verificar palavra-chave!';
+                erro.style.display = 'block';
+                console.error('Erro:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Acessar';
+            }
+        }
+
+        // Permitir pressionar Enter na tela de login
+        document.getElementById('palavraChave').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verificarAcesso();
+            }
+        });
+
+        // Função genérica para fazer requisições ao Supabase usando as funções seguras
+        async function buscarDadosSeguro(nomeFuncao) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rpc/${nomeFuncao}?palavra_chave=${encodeURIComponent(palavraChaveValidada)}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
 
                 if (!response.ok) {
                     throw new Error(`Erro na requisição: ${response.status}`);
@@ -242,7 +410,7 @@
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error(`Erro ao buscar ${tabela}:`, error);
+                console.error(`Erro ao buscar dados:`, error);
                 throw error;
             }
         }
@@ -256,7 +424,6 @@
             const stats = document.getElementById('arvoresStats');
             const btn = document.getElementById('btnArvores');
 
-            // Resetar estados
             error.style.display = 'none';
             container.innerHTML = '';
             empty.style.display = 'none';
@@ -265,13 +432,12 @@
             btn.disabled = true;
 
             try {
-                const arvores = await buscarDados('arvores');
+                const arvores = await buscarDadosSeguro('buscar_arvores_seguro');
                 loading.style.display = 'none';
 
                 if (arvores.length === 0) {
                     empty.style.display = 'block';
                 } else {
-                    // Mostrar estatísticas
                     stats.innerHTML = `
                         <div class="stat-box">
                             <span class="stat-number">${arvores.length}</span>
@@ -280,7 +446,6 @@
                     `;
                     stats.style.display = 'flex';
 
-                    // Criar cards
                     arvores.forEach(arvore => {
                         const card = document.createElement('div');
                         card.className = 'card';
@@ -312,7 +477,6 @@
             const stats = document.getElementById('metaisStats');
             const btn = document.getElementById('btnMetais');
 
-            // Resetar estados
             error.style.display = 'none';
             container.innerHTML = '';
             empty.style.display = 'none';
@@ -321,13 +485,12 @@
             btn.disabled = true;
 
             try {
-                const metais = await buscarDados('metais');
+                const metais = await buscarDadosSeguro('buscar_metais_seguro');
                 loading.style.display = 'none';
 
                 if (metais.length === 0) {
                     empty.style.display = 'block';
                 } else {
-                    // Mostrar estatísticas
                     stats.innerHTML = `
                         <div class="stat-box">
                             <span class="stat-number">${metais.length}</span>
@@ -336,7 +499,6 @@
                     `;
                     stats.style.display = 'flex';
 
-                    // Criar cards
                     metais.forEach(metal => {
                         const card = document.createElement('div');
                         card.className = 'card';
@@ -358,10 +520,6 @@
                 btn.disabled = false;
             }
         }
-
-        // Mostrar estado inicial vazio
-        document.getElementById('arvoresEmpty').style.display = 'block';
-        document.getElementById('metaisEmpty').style.display = 'block';
     </script>
 </body>
 </html>
