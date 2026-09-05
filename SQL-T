@@ -1,4 +1,4 @@
--- 1. Limpeza (Opcional: remove as tabelas se elas já existirem para evitar erros ao rodar novamente)
+-- 1. Limpeza (Opcional: remove as tabelas se elas já existirem para evitar erros ao rodar novamente) V2
 DROP TABLE IF EXISTS metais;
 DROP TABLE IF EXISTS arvores;
 
