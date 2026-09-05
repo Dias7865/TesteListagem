@@ -312,7 +312,7 @@
 
     <script>
         // Configuração do Supabase
-        const SUPABASE_URL = 'MYLINK';
+        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
         const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
 
         // Variável global para armazenar a palavra-chave validada
