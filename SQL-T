@@ -1,0 +1,63 @@
+-- 1. Limpeza (Opcional: remove as tabelas se elas já existirem para evitar erros ao rodar novamente)
+DROP TABLE IF EXISTS metais;
+DROP TABLE IF EXISTS arvores;
+
+
+-- 2. Criação da tabela de Árvores
+CREATE TABLE arvores (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(50) NOT NULL,
+    tipo varchar(50),
+    descricao text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. Criação da tabela de Metais
+CREATE TABLE metais (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(50) NOT NULL,
+    simbolo_quimico varchar(10),
+    descricao text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. Inserção dos dados das Árvores (3 elementos)
+INSERT INTO arvores (nome, tipo, descricao) VALUES
+('Macieira', 'Frutífera', 'Árvore conhecida por produzir maçãs, comum em climas temperados.'),
+('Carvalho', 'Madeira Nobre', 'Árvore de madeira resistente e durável, símbolo de força.'),
+('Pinheiro', 'Conífera', 'Árvore perene que produz pinhas e madeira macia.');
+
+-- 5. Inserção dos dados dos Metais (4 elementos)
+INSERT INTO metais (nome, simbolo_quimico, descricao) VALUES
+('Ferro', 'Fe', 'Metal magnético e essencial para a produção de aço.'),
+('Zinco', 'Zn', 'Metal usado principalmente para galvanização e prevenção de corrosão.'),
+('Estanho', 'Sn', 'Metal maleável, frequentemente usado em ligas como o bronze.'),
+('Alumínio', 'Al', 'Metal leve, resistente à corrosão e amplamente reciclável.');
+
+-- 6. Configuração de Segurança (Row Level Security - RLS)
+-- O Supabase ativa o RLS por padrão. Se não criarmos uma política, sua API retornará "0 resultados".
+-- Esta política permite que QUALQUER pessoa leia os dados (ideal para testes de integração).
+
+ALTER TABLE arvores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE metais ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Permitir leitura pública de arvores" 
+ON arvores FOR SELECT 
+USING (true);
+
+CREATE POLICY "Permitir leitura pública de metais" 
+ON metais FOR SELECT 
+USING (true);
+
+
+
+CREATE OR REPLACE FUNCTION buscar_arvores_seguro(palavra_chave text)
+RETURNS SETOF arvores AS $$
+BEGIN
+    IF palavra_chave = 'Certo' THEN
+        RETURN QUERY SELECT * FROM arvores;
+    ELSE
+        RAISE EXCEPTION 'Palavra-chave incorreta';
+    END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
