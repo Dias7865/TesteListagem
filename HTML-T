@@ -313,7 +313,7 @@
     <script>
         // Configuração do Supabase
         const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
         // Variável global para armazenar a palavra-chave validada
         let palavraChaveValidada = null;
