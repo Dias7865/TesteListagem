@@ -1,8 +1,21 @@
 -- 1. Limpeza
+DROP FUNCTION IF EXISTS verificar_senha(text);
 DROP TABLE IF EXISTS metais;
 DROP TABLE IF EXISTS arvores;
+DROP TABLE IF EXISTS configuracoes;
 
--- 2. Criação da tabela de Árvores
+-- 2. Criação da tabela de configurações (armazena a senha)
+CREATE TABLE configuracoes (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    chave varchar(50) NOT NULL,
+    valor varchar(100) NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. Insere a senha secreta
+INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
+
+-- 4. Criação da tabela de Árvores
 CREATE TABLE arvores (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
@@ -11,7 +24,7 @@ CREATE TABLE arvores (
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. Criação da tabela de Metais
+-- 5. Criação da tabela de Metais
 CREATE TABLE metais (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
@@ -20,23 +33,25 @@ CREATE TABLE metais (
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. Inserção dos dados das Árvores (3 elementos)
+-- 6. Inserção dos dados das Árvores
 INSERT INTO arvores (nome, tipo, descricao) VALUES
 ('Macieira', 'Frutífera', 'Árvore conhecida por produzir maçãs, comum em climas temperados.'),
 ('Carvalho', 'Madeira Nobre', 'Árvore de madeira resistente e durável, símbolo de força.'),
 ('Pinheiro', 'Conífera', 'Árvore perene que produz pinhas e madeira macia.');
 
--- 5. Inserção dos dados dos Metais (4 elementos)
+-- 7. Inserção dos dados dos Metais
 INSERT INTO metais (nome, simbolo_quimico, descricao) VALUES
 ('Ferro', 'Fe', 'Metal magnético e essencial para a produção de aço.'),
 ('Zinco', 'Zn', 'Metal usado principalmente para galvanização e prevenção de corrosão.'),
 ('Estanho', 'Sn', 'Metal maleável, frequentemente usado em ligas como o bronze.'),
 ('Alumínio', 'Al', 'Metal leve, resistente à corrosão e amplamente reciclável.');
 
--- 6. Configuração de Segurança (RLS)
+-- 8. Configuração de Segurança (RLS)
+ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE arvores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE metais ENABLE ROW LEVEL SECURITY;
 
+-- Políticas das tabelas de dados
 CREATE POLICY "Permitir leitura pública de arvores" 
 ON arvores FOR SELECT 
 USING (true);
@@ -44,3 +59,31 @@ USING (true);
 CREATE POLICY "Permitir leitura pública de metais" 
 ON metais FOR SELECT 
 USING (true);
+
+-- Política da tabela de configurações: ninguém lê diretamente
+CREATE POLICY "Bloquear leitura direta de configuracoes" 
+ON configuracoes FOR SELECT 
+USING (false);
+
+-- 9. Função para verificar a senha (retorna true/false)
+CREATE OR REPLACE FUNCTION verificar_senha(texto_inserido text)
+RETURNS boolean 
+LANGUAGE plpgsql 
+SECURITY DEFINER
+AS $$
+DECLARE
+    senha_correta text;
+BEGIN
+    -- Busca a senha armazenada no banco
+    SELECT valor INTO senha_correta 
+    FROM configuracoes 
+    WHERE chave = 'senha_verificacao' 
+    LIMIT 1;
+    
+    -- Compara e retorna true se estiver correta, false caso contrário
+    RETURN texto_inserido = senha_correta;
+END;
+$$;
+
+-- 10. Permite que usuários anônimos executem a função
+GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
