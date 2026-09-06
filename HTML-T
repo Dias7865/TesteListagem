@@ -294,66 +294,69 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
         // --- LÓGICA DA CAIXA DE VERIFICAÇÃO (CONSULTA O BANCO) ---
-        async function verificarCodigo() {
-            const input = document.getElementById('inputVerificacao');
-            const texto = input.value;
-            const mensagem = document.getElementById('mensagemResultado');
-            const btn = document.getElementById('btnVerificar');
+async function verificarCodigo() {
+    const input = document.getElementById('inputVerificacao');
+    const texto = input.value;
+    const mensagem = document.getElementById('mensagemResultado');
+    const btn = document.getElementById('btnVerificar');
 
-            if (!texto) {
-                mensagem.textContent = '⚠️ Por favor, digite algo!';
-                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
-                mensagem.classList.add('mensagem-erro');
-                mensagem.style.display = 'block';
-                return;
+    if (!texto) {
+        mensagem.textContent = '⚠️ Por favor, digite algo!';
+        mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+        mensagem.classList.add('mensagem-erro');
+        mensagem.style.display = 'block';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    try {
+        // ✅ CORREÇÃO: parâmetros no body, não na URL
+        const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/verificar_senha`,
+            {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ texto_inserido: texto })
             }
+        );
 
-            btn.disabled = true;
-            btn.textContent = 'Verificando...';
-
-            try {
-                // Chama a função do Supabase que compara com a senha armazenada
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rpc/verificar_senha?texto_inserido=${encodeURIComponent(texto)}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Erro na requisição');
-                }
-
-                const resultado = await response.json(); // retorna true ou false
-
-                // Remove classes anteriores
-                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
-
-                if (resultado === true) {
-                    mensagem.textContent = '✅ Tudo certo';
-                    mensagem.classList.add('mensagem-sucesso');
-                } else {
-                    mensagem.textContent = '❌ Deu Errado';
-                    mensagem.classList.add('mensagem-erro');
-                }
-
-                mensagem.style.display = 'block';
-            } catch (err) {
-                mensagem.textContent = '❌ Erro ao verificar no servidor!';
-                mensagem.classList.remove('mensagem-sucesso');
-                mensagem.classList.add('mensagem-erro');
-                mensagem.style.display = 'block';
-                console.error('Erro:', err);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Verificar';
-            }
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Erro do servidor:', response.status, errorText);
+            throw new Error(`Erro ${response.status}: ${errorText}`);
         }
+
+        const resultado = await response.json(); // retorna true ou false
+
+        // Remove classes anteriores
+        mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+
+        if (resultado === true) {
+            mensagem.textContent = '✅ Tudo certo';
+            mensagem.classList.add('mensagem-sucesso');
+        } else {
+            mensagem.textContent = '❌ Deu Errado';
+            mensagem.classList.add('mensagem-erro');
+        }
+
+        mensagem.style.display = 'block';
+    } catch (err) {
+        mensagem.textContent = '❌ Erro ao verificar no servidor!';
+        mensagem.classList.remove('mensagem-sucesso');
+        mensagem.classList.add('mensagem-erro');
+        mensagem.style.display = 'block';
+        console.error('Erro completo:', err);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verificar';
+    }
+}
 
         // Permite verificar pressionando Enter
         document.getElementById('inputVerificacao').addEventListener('keypress', function(e) {
