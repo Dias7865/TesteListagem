@@ -272,7 +272,7 @@
             </div>
         </div>
 
-        <!-- Seção de Verificação (NOVA) -->
+        <!-- Seção de Verificação -->
         <div class="section">
             <div class="section-header">
                 <h2>🔍 Verificação</h2>
@@ -282,7 +282,7 @@
             </p>
             <div class="verificacao-container">
                 <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
-                <button class="btn" onclick="verificarCodigo()">Verificar</button>
+                <button class="btn" onclick="verificarCodigo()" id="btnVerificar">Verificar</button>
             </div>
             <div id="mensagemResultado" class="mensagem-resultado"></div>
         </div>
@@ -293,24 +293,66 @@
         const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
-        // --- LÓGICA DA CAIXA DE VERIFICAÇÃO (NOVA) ---
-        function verificarCodigo() {
+        // --- LÓGICA DA CAIXA DE VERIFICAÇÃO (CONSULTA O BANCO) ---
+        async function verificarCodigo() {
             const input = document.getElementById('inputVerificacao');
-            const texto = input.value.trim();
+            const texto = input.value;
             const mensagem = document.getElementById('mensagemResultado');
+            const btn = document.getElementById('btnVerificar');
 
-            // Remove classes anteriores
-            mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
-
-            if (texto === 'jkl') {
-                mensagem.textContent = '✅ Tudo certo';
-                mensagem.classList.add('mensagem-sucesso');
-            } else {
-                mensagem.textContent = '❌ Deu Errado';
+            if (!texto) {
+                mensagem.textContent = '⚠️ Por favor, digite algo!';
+                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
                 mensagem.classList.add('mensagem-erro');
+                mensagem.style.display = 'block';
+                return;
             }
 
-            mensagem.style.display = 'block';
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+
+            try {
+                // Chama a função do Supabase que compara com a senha armazenada
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rpc/verificar_senha?texto_inserido=${encodeURIComponent(texto)}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Erro na requisição');
+                }
+
+                const resultado = await response.json(); // retorna true ou false
+
+                // Remove classes anteriores
+                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+
+                if (resultado === true) {
+                    mensagem.textContent = '✅ Tudo certo';
+                    mensagem.classList.add('mensagem-sucesso');
+                } else {
+                    mensagem.textContent = '❌ Deu Errado';
+                    mensagem.classList.add('mensagem-erro');
+                }
+
+                mensagem.style.display = 'block';
+            } catch (err) {
+                mensagem.textContent = '❌ Erro ao verificar no servidor!';
+                mensagem.classList.remove('mensagem-sucesso');
+                mensagem.classList.add('mensagem-erro');
+                mensagem.style.display = 'block';
+                console.error('Erro:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verificar';
+            }
         }
 
         // Permite verificar pressionando Enter
@@ -320,7 +362,7 @@
             }
         });
 
-        // --- LÓGICA ORIGINAL DO SUPABASE ---
+        // --- LÓGICA ORIGINAL DO SUPABASE (ÁRVORES E METAIS) ---
         async function buscarDados(tabela) {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
