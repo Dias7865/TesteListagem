@@ -17,7 +17,7 @@ CREATE TABLE configuracoes (
 -- 3. Insere a senha secreta
 INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
 
--- 4. Criação da tabela de Árvores
+-- 4. Criação da tabela dos itens
 CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
@@ -28,12 +28,11 @@ CREATE TABLE tarefas (
 
 -- Adiciona a coluna status (com valores permitidos)
 ALTER TABLE tarefas 
-ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando fertilizante', 'não iniciado'));
+ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
 -- Adiciona a coluna data_para_plantio
 ALTER TABLE tarefas 
 ADD COLUMN data_para_plantio date;
--- Atualiza os dados existentes com valores padrão (opcional)
-UPDATE tarefas SET status = 'não iniciado' WHERE status IS NULL;
+
 
 
 -- 5. Criação da tabela de Metais
