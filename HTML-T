@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor de Dados - Árvores e Metais</title>
+    <title>Leitor de Dados - Matssa</title>
     <style>
         * {
             margin: 0;
@@ -298,7 +298,7 @@
             margin-left: 8px;
         }
 
-        .status-plantado {
+        .status-em-progresso {
             background: #4caf50;
             color: white;
         }
@@ -308,7 +308,7 @@
             color: white;
         }
 
-        .status-nao-plantado {
+        .status-nao-iniciado {
             background: #f44336;
             color: white;
         }
@@ -480,14 +480,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>🌳 Leitor de Dados Supabase 🪨</h1>
+        <h1>📌 Leitor de Dados Supabase 🪨</h1>
 
         <div id="secaoVerificacao" class="section">
             <div class="section-header">
                 <h2>🔍 Verificação</h2>
             </div>
             <p style="color: #666; margin-bottom: 10px;">
-                Digite o código secreto e pressione Enter ou clique em "Verificar" para liberar o acesso às listas:
+                Digite o código e clique em Verificar para liberar o acesso:
             </p>
             <div class="verificacao-container">
                 <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
@@ -498,16 +498,16 @@
 
         <div id="secaoTarefas" class="section hidden">
             <div class="section-header">
-                <h2>🌳 Árvores</h2>
+                <h2>📌 Tarefas</h2>
             </div>
             <div class="seletor-container">
-                <label for="selectTarefas">Selecione uma árvore:</label>
+                <label for="selectTarefas">Selecione uma tarefa:</label>
                 <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
-                    <option value="">-- Escolha uma árvore --</option>
+                    <option value="">-- Escolha uma tarefa --</option>
                 </select>
             </div>
             <div id="tarefasLoading" class="loading" style="display: none;">
-                Carregando árvores...
+                Carregando tarefas...
             </div>
             <div id="tarefasError" class="error" style="display: none;"></div>
             <div id="detalhesTarefa" class="detalhes-card" style="display: none;"></div>
@@ -535,10 +535,10 @@
                 <h2>📊 Dashboard</h2>
             </div>
             <p style="color: #666; margin-bottom: 20px;">
-                Visualize todas as árvores em um carrossel animado em tela cheia:
+                Visualize todas as tarefas cadastradas em tela cheia:
             </p>
             <button class="btn btn-dashboard" onclick="abrirDashboard()">
-                🎬 Abrir Dashboard de Árvores
+                🎬 Abrir Dashboard de Tarefas
             </button>
         </div>
 
@@ -554,39 +554,39 @@
                 <label for="tipoElemento">Tipo de Elemento:</label>
                 <select id="tipoElemento" onchange="atualizarFormulario()">
                     <option value="">-- Selecione o tipo --</option>
-                    <option value="tarefa">🌳 Árvore</option>
+                    <option value="tarefa">📌 Tarefa</option>
                     <option value="metal">🪨 Metal</option>
                 </select>
             </div>
 
             <div id="formTarefa" class="hidden">
                 <div class="form-group">
-                    <label for="nomeTarefa">Nome da Árvore:</label>
-                    <input type="text" id="nomeTarefa" placeholder="Ex: Mangueira">
+                    <label for="nomeTarefa">Nome da Tarefa:</label>
+                    <input type="text" id="nomeTarefa" placeholder="Ex: Edifício da Matssa">
                 </div>
                 <div class="form-group">
                     <label for="tipoTarefa">Tipo:</label>
-                    <input type="text" id="tipoTarefa" placeholder="Ex: Frutífera">
+                    <input type="text" id="tipoTarefa" placeholder="Ex: Nova Instalação Solar">
                 </div>
                 <div class="form-group">
                     <label for="statusTarefa">Status:</label>
                     <select id="statusTarefa">
                         <option value="">-- Selecione o status --</option>
-                        <option value="plantado">🌱 Plantado</option>
-                        <option value="aguardando fertilizante">⏳ Aguardando Fertilizante</option>
+                        <option value="em progresso">⏩ Em progresso</option>
+                        <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
                         <option value="não iniciado">❌ não iniciado</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="dataPlantioTarefa">Data Para Plantio:</label>
-                    <input type="date" id="dataPlantioTarefa">
+                    <label for="dataEsperadaTarefa">Data Esperada:</label>
+                    <input type="date" id="dataEsperadaTarefa">
                 </div>
                 <div class="form-group">
                     <label for="descricaoTarefa">Descrição:</label>
-                    <textarea id="descricaoTarefa" placeholder="Descreva a árvore..."></textarea>
+                    <textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea>
                 </div>
                 <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">
-                    Adicionar Árvore
+                    Adicionar Tarefa
                 </button>
             </div>
 
@@ -614,7 +614,7 @@
 
     <div id="dashboardOverlay" class="dashboard-overlay">
         <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
-        <h1 class="dashboard-title">🌳 Dashboard de Árvores</h1>
+        <h1 class="dashboard-title">📌 Dashboard de Tarefas</h1>
         <div class="dashboard-container">
             <div id="dashboardTrack" class="dashboard-track"></div>
         </div>
@@ -760,7 +760,7 @@
                 dadosTarefas = await buscarDados('tarefas');
                 loading.style.display = 'none';
 
-                select.innerHTML = '<option value="">-- Escolha uma árvore --</option>';
+                select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
 
                 dadosTarefas.forEach((tarefa, index) => {
                     const option = document.createElement('option');
@@ -770,7 +770,7 @@
                 });
             } catch (err) {
                 loading.style.display = 'none';
-                error.textContent = `❌ Erro ao carregar árvores: ${err.message}`;
+                error.textContent = `❌ Erro ao carregar tarefas: ${err.message}`;
                 error.style.display = 'block';
             }
         }
@@ -812,15 +812,15 @@
         }
 
         function getStatusBadge(status) {
-            if (!status) return '<span class="status-badge status-nao-plantado">Não definido</span>';
+            if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
             
             const statusLower = status.toLowerCase();
-            if (statusLower === 'plantado') {
-                return `<span class="status-badge status-plantado">🌱 ${status}</span>`;
-            } else if (statusLower === 'aguardando fertilizante') {
+            if (statusLower === 'em progresso') {
+                return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
+            } else if (statusLower === 'aguardando equatorial') {
                 return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
             } else {
-                return `<span class="status-badge status-nao-plantado">❌ ${status}</span>`;
+                return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
             }
         }
 
@@ -839,7 +839,7 @@
                 <h3>${tarefa.nome}</h3>
                 <p><span class="label">Tipo:</span> ${tarefa.tipo || 'Não informado'}</p>
                 <p><span class="label">Status:</span> ${getStatusBadge(tarefa.status)}</p>
-                <p><span class="label">Data Para Plantio:</span> ${formatarData(tarefa.data_para_plantio)}</p>
+                <p><span class="label">Data Esperada:</span> ${formatarData(tarefa.data_para_termino)}</p>
                 <p><span class="label">Descrição:</span> ${tarefa.descricao || 'Sem descrição'}</p>
                 <p><span class="label">ID:</span> <code>${tarefa.id}</code></p>
                 <p><span class="label">Criado em:</span> ${new Date(tarefa.created_at).toLocaleString('pt-BR')}</p>
@@ -882,7 +882,7 @@
             const tarefa = dadosTarefas[index];
             const editFormDiv = document.getElementById('editFormTarefa');
 
-            const dataISO = tarefa.data_para_plantio ? new Date(tarefa.data_para_plantio).toISOString().split('T')[0] : '';
+            const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
 
             editFormDiv.innerHTML = `
                 <div class="edit-form">
@@ -899,14 +899,14 @@
                         <label for="editStatusTarefa">Status:</label>
                         <select id="editStatusTarefa">
                             <option value="">-- Selecione o status --</option>
-                            <option value="plantado" ${tarefa.status === 'plantado' ? 'selected' : ''}>🌱 Plantado</option>
-                            <option value="aguardando fertilizante" ${tarefa.status === 'aguardando fertilizante' ? 'selected' : ''}>⏳ Aguardando Fertilizante</option>
+                            <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
+                            <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Fertilizante</option>
                             <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ não iniciado</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="editDataPlantioTarefa">Data Para Plantio:</label>
-                        <input type="date" id="editDataPlantioTarefa" value="${dataISO}">
+                        <label for="editDataEsperadaTarefa">Data Para Esperada:</label>
+                        <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
                     </div>
                     <div class="form-group">
                         <label for="editDescricaoTarefa">Descrição:</label>
@@ -930,7 +930,7 @@
             const nome = document.getElementById('editNomeTarefa').value.trim();
             const tipo = document.getElementById('editTipoTarefa').value.trim();
             const status = document.getElementById('editStatusTarefa').value;
-            const dataPlantio = document.getElementById('editDataPlantioTarefa').value;
+            const dataEsperada = document.getElementById('editDataEsperadaTarefa').value;
             const descricao = document.getElementById('editDescricaoTarefa').value.trim();
             const msgDiv = document.getElementById('editMsgTarefa');
 
@@ -952,7 +952,7 @@
                         nome: nome,
                         tipo: tipo || null,
                         status: status || null,
-                        data_para_plantio: dataPlantio || null,
+                        data_para_termino: dataEsperada || null,
                         descricao: descricao || null
                     })
                 });
@@ -1056,7 +1056,7 @@
         async function removerTarefa(index) {
             const tarefa = dadosTarefas[index];
             
-            if (!confirm(`Tem certeza que deseja remover a árvore "${tarefa.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
+            if (!confirm(`Tem certeza que deseja remover a tarefa "${tarefa.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
                 return;
             }
 
@@ -1076,7 +1076,7 @@
                 dadosTarefas.splice(index, 1);
                 
                 const select = document.getElementById('selectTarefas');
-                select.innerHTML = '<option value="">-- Escolha uma árvore --</option>';
+                select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
                 dadosTarefas.forEach((a, i) => {
                     const option = document.createElement('option');
                     option.value = i;
@@ -1086,7 +1086,7 @@
 
                 document.getElementById('detalhesTarefa').style.display = 'none';
                 
-                alert(`✅ Árvore "${tarefa.nome}" removida com sucesso!`);
+                alert(`✅ Tarefa "${tarefa.nome}" removida com sucesso!`);
             } catch (err) {
                 alert(`❌ Erro ao remover: ${err.message}`);
                 console.error('Erro:', err);
@@ -1154,7 +1154,7 @@
             const nome = document.getElementById('nomeTarefa').value.trim();
             const tipo = document.getElementById('tipoTarefa').value.trim();
             const status = document.getElementById('statusTarefa').value;
-            const dataPlantio = document.getElementById('dataPlantioTarefa').value;
+            const dataEsperada = document.getElementById('dataEsperadaTarefa').value;
             const descricao = document.getElementById('descricaoTarefa').value.trim();
             const mensagem = document.getElementById('mensagemAdicionar');
             const btn = document.getElementById('btnAdicionarTarefa');
@@ -1180,13 +1180,13 @@
                         nome: nome,
                         tipo: tipo || null,
                         status: status || null,
-                        data_para_plantio: dataPlantio || null,
+                        data_para_termino: dataEsperada || null,
                         descricao: descricao || null
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error('Erro ao adicionar árvore');
+                    throw new Error('Erro ao adicionar tarefa');
                 }
 
                 const novaTarefa = await response.json();
@@ -1205,16 +1205,16 @@
                 document.getElementById('nomeTarefa').value = '';
                 document.getElementById('tipoTarefa').value = '';
                 document.getElementById('statusTarefa').value = '';
-                document.getElementById('dataPlantioTarefa').value = '';
+                document.getElementById('dataEsperadaTarefa').value = '';
                 document.getElementById('descricaoTarefa').value = '';
 
-                mensagem.innerHTML = `<div class="success">✅ Árvore "${novaTarefa[0].nome}" adicionada com sucesso!</div>`;
+                mensagem.innerHTML = `<div class="success">✅ Tarefa "${novaTarefa[0].nome}" adicionada com sucesso!</div>`;
             } catch (err) {
-                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar árvore: ${err.message}</div>`;
+                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar tarefa: ${err.message}</div>`;
                 console.error('Erro:', err);
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Adicionar Árvore';
+                btn.textContent = 'Adicionar Tarefa';
             }
         }
 
@@ -1282,7 +1282,7 @@
 
         function abrirDashboard() {
             if (dadosTarefas.length === 0) {
-                alert('⚠️ Não há árvores para exibir no dashboard!');
+                alert('⚠️ Não há tarefas para exibir no dashboard!');
                 return;
             }
         
@@ -1294,7 +1294,7 @@
                 <div class="dashboard-card">
                     <h3>${tarefa.nome}</h3>
                     <p><span class="label">Status:</span> ${getStatusBadge(tarefa.status)}</p>
-                    <p><span class="label">Data Para Plantio:</span> ${formatarData(tarefa.data_para_plantio)}</p>
+                    <p><span class="label">Data Esperada:</span> ${formatarData(tarefa.data_para_termino)}</p>
                     <p><span class="label">Descrição:</span> ${tarefa.descricao || 'Sem descrição'}</p>
                     <p><span class="label">Criado em:</span> ${new Date(tarefa.created_at).toLocaleString('pt-BR')}</p>
                 </div>
