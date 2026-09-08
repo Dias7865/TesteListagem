@@ -596,12 +596,8 @@
                     <input type="text" id="nomeIntegrador" placeholder="Ex: Cobre">
                 </div>
                 <div class="form-group">
-                    <label for="simboloIntegrador">Símbolo Químico:</label>
-                    <input type="text" id="simboloIntegrador" placeholder="Ex: Cu" maxlength="10">
-                </div>
-                <div class="form-group">
-                    <label for="descricaoIntegrador">Descrição:</label>
-                    <textarea id="descricaoIntegrador" placeholder="Descreva o integrador..."></textarea>
+                    <label for="ncpfIntegrador">nº do CPF:</label>
+                    <input type="text" id="ncpfIntegrador" placeholder="Ex: 01010101010" maxlength="15">
                 </div>
                 <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">
                     Adicionar Integrador
@@ -865,8 +861,7 @@
             const integrador = dadosIntegradores[index];
             detalhesDiv.innerHTML = `
                 <h3>${integrador.nome}</h3>
-                <p><span class="label">Símbolo Químico:</span> <span class="badge">${integrador.integrador_nome || 'N/A'}</span></p>
-                <p><span class="label">Descrição:</span> ${integrador.descricao || 'Sem descrição'}</p>
+                <p><span class="label">nº do CPF:</span> <span class="badge">${integrador.integrador_cpf || 'N/A'}</span></p>
                 <p><span class="label">ID:</span> <code>${integrador.id}</code></p>
                 <p><span class="label">Criado em:</span> ${new Date(integrador.created_at).toLocaleString('pt-BR')}</p>
                 <div class="action-buttons">
@@ -987,12 +982,8 @@
                         <input type="text" id="editNomeIntegrador" value="${integrador.nome || ''}">
                     </div>
                     <div class="form-group">
-                        <label for="editSimboloIntegrador">Símbolo Químico:</label>
-                        <input type="text" id="editSimboloIntegrador" value="${integrador.integrador_nome || ''}" maxlength="10">
-                    </div>
-                    <div class="form-group">
-                        <label for="editDescricaoIntegrador">Descrição:</label>
-                        <textarea id="editDescricaoIntegrador">${integrador.descricao || ''}</textarea>
+                        <label for="editNCPFIntegrador">nº do CPF:</label>
+                        <input type="text" id="editNCPFIntegrador" value="${integrador.integrador_cpf || ''}" maxlength="10">
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-success" onclick="salvarEdicaoIntegrador(${index})">💾 Salvar</button>
@@ -1010,8 +1001,7 @@
         async function salvarEdicaoIntegrador(index) {
             const integrador = dadosIntegradores[index];
             const nome = document.getElementById('editNomeIntegrador').value.trim();
-            const simbolo = document.getElementById('editSimboloIntegrador').value.trim();
-            const descricao = document.getElementById('editDescricaoIntegrador').value.trim();
+            const ncpf = document.getElementById('editNCPFIntegrador').value.trim();
             const msgDiv = document.getElementById('editMsgIntegrador');
 
             if (!nome) {
@@ -1030,8 +1020,7 @@
                     },
                     body: JSON.stringify({
                         nome: nome,
-                        integrador_nome: simbolo || null,
-                        descricao: descricao || null
+                        integrador_cpf: ncpf || null,
                     })
                 });
 
@@ -1220,8 +1209,7 @@
 
         async function adicionarIntegrador() {
             const nome = document.getElementById('nomeIntegrador').value.trim();
-            const simbolo = document.getElementById('simboloIntegrador').value.trim();
-            const descricao = document.getElementById('descricaoIntegrador').value.trim();
+            const ncpf = document.getElementById('ncpfIntegrador').value.trim();
             const mensagem = document.getElementById('mensagemAdicionar');
             const btn = document.getElementById('btnAdicionarIntegrador');
 
@@ -1244,8 +1232,7 @@
                     },
                     body: JSON.stringify({
                         nome: nome,
-                        integrador_nome: simbolo || null,
-                        descricao: descricao || null
+                        integrador_cpf: ncpf || null,
                     })
                 });
 
@@ -1267,8 +1254,7 @@
                 document.getElementById('formIntegrador').classList.add('hidden');
 
                 document.getElementById('nomeIntegrador').value = '';
-                document.getElementById('simboloIntegrador').value = '';
-                document.getElementById('descricaoIntegrador').value = '';
+                document.getElementById('ncpfIntegrador').value = '';
 
                 mensagem.innerHTML = `<div class="success">✅ Integrador "${novoIntegrador[0].nome}" adicionado com sucesso!</div>`;
             } catch (err) {
