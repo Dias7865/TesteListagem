@@ -29,9 +29,9 @@ CREATE TABLE tarefas (
 -- Adiciona a coluna status (com valores permitidos)
 ALTER TABLE tarefas 
 ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
--- Adiciona a coluna data_para_plantio
+-- Adiciona a coluna data_para_termino
 ALTER TABLE tarefas 
-ADD COLUMN data_para_plantio date;
+ADD COLUMN data_para_termino date;
 
 
 
@@ -46,9 +46,9 @@ CREATE TABLE metais (
 
 -- 6. Inserção dos dados das Árvores
 INSERT INTO tarefas (nome, tipo, descricao) VALUES
-('Macieira', 'Frutífera', 'Árvore conhecida por produzir maçãs, comum em climas temperados.'),
-('Carvalho', 'Madeira Nobre', 'Árvore de madeira resistente e durável, símbolo de força.'),
-('Pinheiro', 'Conífera', 'Árvore perene que produz pinhas e madeira macia.');
+('CASA 1', 'Instalação solar', 'Feito, aguardando vistoria da Equatorial'),
+('CASA 5', 'Subestação', 'Faltam enviar documentos essenciais'),
+('CASA 9', 'Rateio', 'todos os documentos forma enviados, em progresso');
 
 
 
