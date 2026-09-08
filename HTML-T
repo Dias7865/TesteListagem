@@ -1,171 +1,860 @@
--- 1. Limpeza
-DROP FUNCTION IF EXISTS verificar_senha(text);
-DROP TABLE IF EXISTS integradores;
-DROP TABLE IF EXISTS tarefas;
-DROP TABLE IF EXISTS configuracoes;
-DROP TABLE IF EXISTS intensidades;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leitor de Dados - Matssa</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+.container { max-width: 800px; margin: 0 auto; }
+h1 {
+    text-align: center; color: white; margin-bottom: 30px;
+    font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.section {
+    background: white; border-radius: 12px; padding: 30px;
+    margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;
+}
+h2 { color: #333; font-size: 1.8rem; }
+.btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 16px; font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-success { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); }
+.btn-warning { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
+.btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+.btn-secondary { background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%); }
+.btn-dashboard {
+    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+    width: 100%; padding: 15px; font-size: 18px;
+}
+.loading { text-align: center; padding: 20px; color: #667eea; font-size: 1.1rem; }
+.error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
+.success { background: #e8f5e9; border: 1px solid #4caf50; color: #2e7d32; padding: 15px; border-radius: 8px; margin-top: 15px; }
+.verificacao-container { display: flex; gap: 10px; align-items: center; margin-top: 15px; }
+.verificacao-container input {
+    flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-size: 16px;
+}
+.mensagem-resultado {
+    margin-top: 15px; padding: 15px 20px; border-radius: 8px;
+    font-size: 1.2rem; font-weight: bold; text-align: center; display: none;
+}
+.mensagem-sucesso { background: #e8f5e9; border: 2px solid #4caf50; color: #2e7d32; }
+.mensagem-erro { background: #fce4ec; border: 2px solid #f44336; color: #c62828; }
+.seletor-container { margin-bottom: 20px; }
+.seletor-container label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+.seletor-container select {
+    width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-size: 16px; background-color: white; cursor: pointer;
+}
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-size: 16px; font-family: inherit;
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+.detalhes-card {
+    background: #f9f9f9; border-radius: 10px; padding: 25px;
+    border-left: 4px solid #667eea; margin-top: 20px;
+}
+.detalhes-card h3 { color: #333; margin-bottom: 15px; font-size: 1.6rem; }
+.detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
+.detalhes-card .label { font-weight: bold; color: #764ba2; }
+.detalhes-card .badge {
+    display: inline-block; background: #667eea; color: white;
+    padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px;
+}
+.status-badge, .intensidade-badge {
+    display: inline-block; padding: 6px 14px; border-radius: 20px;
+    font-size: 0.9rem; font-weight: bold; margin-left: 8px;
+}
+.status-em-progresso { background: #4caf50; color: white; }
+.status-aguardando { background: #ff9800; color: white; }
+.status-nao-iniciado { background: #f44336; color: white; }
+.intensidade-alta { background: #d32f2f; color: white; }
+.intensidade-media { background: #f57c00; color: white; }
+.intensidade-baixa { background: #388e3c; color: white; }
+.action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.action-buttons .btn { flex: 1; min-width: 150px; }
+.edit-form {
+    background: #fff8e1; border: 2px solid #ff9800; border-radius: 10px;
+    padding: 20px; margin-top: 20px;
+}
+.edit-form h4 { color: #f57c00; margin-bottom: 15px; font-size: 1.3rem; }
+.dashboard-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    z-index: 9999; display: none; overflow: hidden;
+}
+.dashboard-overlay.active { display: block; }
+.dashboard-close {
+    position: absolute; top: 30px; right: 30px; width: 50px; height: 50px;
+    background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%; color: white; font-size: 28px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; z-index: 10000;
+}
+.dashboard-close:hover { background: rgba(244,67,54,0.8); }
+.dashboard-title {
+    position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+    color: white; font-size: 2.5rem; z-index: 10;
+}
+.dashboard-container {
+    position: absolute; top: 50%; left: 0; width: 100%; height: 450px;
+    transform: translateY(-50%); overflow: hidden;
+}
+.dashboard-track { display: flex; gap: 40px; animation: scrollLeft 30s linear infinite; height: 100%; }
+.dashboard-card {
+    flex-shrink: 0; width: 400px; height: 100%;
+    background: linear-gradient(135deg, rgba(102,126,234,0.9), rgba(118,75,162,0.9));
+    border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    display: flex; flex-direction: column; justify-content: center; color: white;
+    overflow-y: auto;
+}
+.dashboard-card h3 { font-size: 2rem; margin-bottom: 20px; }
+.dashboard-card p { font-size: 1.1rem; margin: 12px 0; line-height: 1.6; }
+.dashboard-card .label { font-weight: bold; font-size: 0.9rem; opacity: 0.8; text-transform: uppercase; }
+@keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-440px * var(--card-count))); }
+}
+.hidden { display: none !important; }
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.section-revealed { animation: slideIn 0.5s ease-out; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>📌 Leitor de Dados Supabase 🪨</h1>
 
--- 2. Criação da tabela de configurações
-CREATE TABLE configuracoes (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    chave varchar(50) NOT NULL,
-    valor varchar(100) NOT NULL,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+    <div id="secaoVerificacao" class="section">
+        <div class="section-header"><h2>🔍 Verificação</h2></div>
+        <p style="color:#666; margin-bottom:10px;">Digite o código e clique em Verificar para liberar o acesso:</p>
+        <div class="verificacao-container">
+            <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
+            <button class="btn" onclick="verificarCodigo()" id="btnVerificar">Verificar</button>
+        </div>
+        <div id="mensagemResultado" class="mensagem-resultado"></div>
+    </div>
 
+    <div id="secaoTarefas" class="section hidden">
+        <div class="section-header"><h2>📌 Tarefas</h2></div>
+        <div class="seletor-container">
+            <label for="selectTarefas">Selecione uma tarefa:</label>
+            <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
+                <option value="">-- Escolha uma tarefa --</option>
+            </select>
+        </div>
+        <div id="tarefasLoading" class="loading" style="display:none;">Carregando tarefas...</div>
+        <div id="tarefasError" class="error" style="display:none;"></div>
+        <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
+    </div>
 
+    <div id="secaoIntegradores" class="section hidden">
+        <div class="section-header"><h2>🪨 Integradores</h2></div>
+        <div class="seletor-container">
+            <label for="selectIntegradores">Selecione um integrador:</label>
+            <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
+                <option value="">-- Escolha um integrador --</option>
+            </select>
+        </div>
+        <div id="integradoresLoading" class="loading" style="display:none;">Carregando integradores...</div>
+        <div id="integradoresError" class="error" style="display:none;"></div>
+        <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
+    </div>
 
--- 3. Insere a senha secreta
-INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
+    <div id="secaoDashboard" class="section hidden">
+        <div class="section-header"><h2>📊 Dashboard</h2></div>
+        <p style="color:#666; margin-bottom:20px;">Visualize todas as tarefas cadastradas em tela cheia:</p>
+        <button class="btn btn-dashboard" onclick="abrirDashboard()">🎬 Abrir Dashboard de Tarefas</button>
+    </div>
 
--- 4. Criação da tabela dos itens
-CREATE TABLE tarefas (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    nome varchar(50) NOT NULL,
-    tipo varchar(30),
-    descricao text,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+    <div id="secaoAdicionar" class="section hidden">
+        <div class="section-header"><h2>➕ Adicionar Elemento</h2></div>
+        <p style="color:#666; margin-bottom:20px;">Crie um novo elemento para uma das listas existentes:</p>
+        <div class="form-group">
+            <label for="tipoElemento">Tipo de Elemento:</label>
+            <select id="tipoElemento" onchange="atualizarFormulario()">
+                <option value="">-- Selecione o tipo --</option>
+                <option value="tarefa">📌 Tarefa</option>
+                <option value="integrador">🪨 Integrador</option>
+            </select>
+        </div>
 
--- Adiciona a coluna status (com valores permitidos)
-ALTER TABLE tarefas 
-ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
+        <!-- Formulário Tarefa -->
+        <div id="formTarefa" class="hidden">
+            <div class="form-group">
+                <label for="nomeTarefa">Nome da Tarefa:</label>
+                <input type="text" id="nomeTarefa" placeholder="Ex: Edifício da Matssa">
+            </div>
+            <div class="form-group">
+                <label for="tipoTarefa">Tipo:</label>
+                <input type="text" id="tipoTarefa" placeholder="Ex: Nova Instalação Solar">
+            </div>
+            <div class="form-group">
+                <label for="statusTarefa">Status:</label>
+                <select id="statusTarefa">
+                    <option value="">-- Selecione o status --</option>
+                    <option value="em progresso">⏩ Em progresso</option>
+                    <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
+                    <option value="não iniciado">❌ não iniciado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dataEsperadaTarefa">Data Esperada:</label>
+                <input type="date" id="dataEsperadaTarefa">
+            </div>
+            
+            <!-- ✅ Select de Intensidade -->
+            <div class="form-group">
+                <label for="intensidadeTarefa">Intensidade:</label>
+                <select id="intensidadeTarefa">
+                    <option value="">-- Selecione a intensidade --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="descricaoTarefa">Descrição:</label>
+                <textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea>
+            </div>
+            <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
+        </div>
 
--- Adiciona a coluna data_para_termino
-ALTER TABLE tarefas 
-ADD COLUMN data_para_termino date;
+        <!-- Formulário Integrador -->
+        <div id="formIntegrador" class="hidden">
+            <div class="form-group">
+                <label for="nomeIntegrador">Nome do Integrador:</label>
+                <input type="text" id="nomeIntegrador" placeholder="Ex: João">
+            </div>
+            <div class="form-group">
+                <label for="ncpfIntegrador">nº do CPF:</label>
+                <input type="text" id="ncpfIntegrador" placeholder="Ex: 01010101010" maxlength="15">
+            </div>
+            <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
+        </div>
 
+        <div id="mensagemAdicionar" style="margin-top:15px;"></div>
+    </div>
+</div>
 
+<div id="dashboardOverlay" class="dashboard-overlay">
+    <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
+    <h1 class="dashboard-title">📌 Dashboard de Tarefas</h1>
+    <div class="dashboard-container">
+        <div id="dashboardTrack" class="dashboard-track"></div>
+    </div>
+</div>
 
+<script>
+const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
--- 5. Criação da tabela de Metais
-CREATE TABLE integradores (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    nome varchar(50) NOT NULL,
-    integrador_cpf varchar(15) NOT NULL,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+let dadosTarefas = [];
+let dadosIntegradores = [];
+let dadosIntensidades = []; // ✅ Array para armazenar as intensidades
 
--- 6. Inserção dos dados das Árvores
-INSERT INTO tarefas (nome, tipo, descricao) VALUES
-('CASA 1', 'Instalação solar', 'Feito, aguardando vistoria da Equatorial'),
-('CASA 5', 'Subestação', 'Faltam enviar documentos essenciais'),
-('CASA 9', 'Rateio', 'todos os documentos forma enviados, em progresso');
+// --- VERIFICAÇÃO ---
+async function verificarCodigo() {
+    const input = document.getElementById('inputVerificacao');
+    const texto = input.value;
+    const mensagem = document.getElementById('mensagemResultado');
+    const btn = document.getElementById('btnVerificar');
 
+    if (!texto) {
+        mensagem.textContent = '⚠️ Por favor, digite algo!';
+        mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+        mensagem.classList.add('mensagem-erro');
+        mensagem.style.display = 'block';
+        return;
+    }
 
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
 
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/verificar_senha`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ texto_inserido: texto })
+        });
 
--- 7. Inserção dos dados dos Metais
-INSERT INTO integradores (nome, integrador_cpf) VALUES
-('Alisson', '21321322'),
-('Amarante', '98798979'),
-('Borges', '6546464465'),
-('Cláudio', '417711771');
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
 
--- 8. Configuração de Segurança (RLS)
-ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE integradores ENABLE ROW LEVEL SECURITY;
+        const resultado = await response.json();
+        mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
 
--- Políticas de SELECT
-CREATE POLICY "Permitir leitura pública de tarefas" 
-ON tarefas FOR SELECT 
-USING (true);
+        if (resultado === true) {
+            mensagem.textContent = '✅ Tudo certo — acesso liberado!';
+            mensagem.classList.add('mensagem-sucesso');
+            mensagem.style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('secaoVerificacao').classList.add('hidden');
+                revelarSecoes();
+                carregarDadosIniciais();
+            }, 1000);
+        } else {
+            mensagem.textContent = '❌ Deu Errado';
+            mensagem.classList.add('mensagem-erro');
+            mensagem.style.display = 'block';
+        }
+    } catch (err) {
+        mensagem.textContent = '❌ Erro ao verificar no servidor!';
+        mensagem.classList.add('mensagem-erro');
+        mensagem.style.display = 'block';
+        console.error('Erro completo:', err);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verificar';
+    }
+}
 
-CREATE POLICY "Permitir leitura pública de integradores" 
-ON integradores FOR SELECT 
-USING (true);
+function revelarSecoes() {
+    ['secaoTarefas', 'secaoIntegradores', 'secaoDashboard', 'secaoAdicionar'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('hidden');
+        el.classList.add('section-revealed');
+    });
+}
 
--- Políticas de INSERT (NOVAS)
-CREATE POLICY "Permitir inserção pública de tarefas" 
-ON tarefas FOR INSERT 
-WITH CHECK (true);
+async function carregarDadosIniciais() {
+    await carregarIntensidades(); // ✅ Carrega primeiro (para popular os selects)
+    await carregarTarefas();
+    await carregarIntegradores();
+}
 
-CREATE POLICY "Permitir inserção pública de integradores" 
-ON integradores FOR INSERT 
-WITH CHECK (true);
+document.getElementById('inputVerificacao').addEventListener('keypress', e => {
+    if (e.key === 'Enter') verificarCodigo();
+});
 
--- Política da tabela de configurações
-CREATE POLICY "Bloquear leitura direta de configuracoes" 
-ON configuracoes FOR SELECT 
-USING (false);
-
--- 9. Função para verificar a senha
-CREATE OR REPLACE FUNCTION verificar_senha(texto_inserido text)
-RETURNS boolean 
-LANGUAGE plpgsql 
-SECURITY DEFINER
-AS $$
-DECLARE
-    senha_correta text;
-BEGIN
-    SELECT valor INTO senha_correta 
-    FROM configuracoes 
-    WHERE chave = 'senha_verificacao' 
-    LIMIT 1;
+// --- BUSCAR DADOS ---
+async function buscarDados(tabela, orderBy = null) {
+    let url = `${SUPABASE_URL}/rest/v1/${tabela}?select=*`;
+    if (orderBy) url += `&order=${orderBy}`;
     
-    RETURN texto_inserido = senha_correta;
-END;
-$$;
+    const response = await fetch(url, {
+        headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+    });
+    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    return await response.json();
+}
 
--- 10. Permissões
-GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
+async function carregarTarefas() {
+    const loading = document.getElementById('tarefasLoading');
+    const error = document.getElementById('tarefasError');
+    const select = document.getElementById('selectTarefas');
+    error.style.display = 'none';
+    loading.style.display = 'block';
+    try {
+        dadosTarefas = await buscarDados('tarefas');
+        loading.style.display = 'none';
+        select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
+        dadosTarefas.forEach((t, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = t.nome;
+            select.appendChild(opt);
+        });
+    } catch (err) {
+        loading.style.display = 'none';
+        error.textContent = `❌ Erro: ${err.message}`;
+        error.style.display = 'block';
+    }
+}
 
--- Políticas de UPDATE
-CREATE POLICY "Permitir atualização pública de tarefas" 
-ON tarefas FOR UPDATE 
-USING (true)
-WITH CHECK (true);
+async function carregarIntegradores() {
+    const loading = document.getElementById('integradoresLoading');
+    const error = document.getElementById('integradoresError');
+    const select = document.getElementById('selectIntegradores');
+    error.style.display = 'none';
+    loading.style.display = 'block';
+    try {
+        dadosIntegradores = await buscarDados('integradores');
+        loading.style.display = 'none';
+        select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
+        dadosIntegradores.forEach((i, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = i.nome;
+            select.appendChild(opt);
+        });
+    } catch (err) {
+        loading.style.display = 'none';
+        error.textContent = `❌ Erro: ${err.message}`;
+        error.style.display = 'block';
+    }
+}
 
-CREATE POLICY "Permitir atualização pública de integradores" 
-ON integradores FOR UPDATE 
-USING (true)
-WITH CHECK (true);
+// ✅ Carrega as intensidades do Supabase
+async function carregarIntensidades() {
+    try {
+        dadosIntensidades = await buscarDados('intensidades', 'ordem.asc');
+        popularSelectIntensidade('intensidadeTarefa');
+        console.log('✅ Intensidades carregadas:', dadosIntensidades);
+    } catch (err) {
+        console.error('❌ Erro ao carregar intensidades:', err);
+    }
+}
 
--- Políticas de DELETE
-CREATE POLICY "Permitir remoção pública de tarefas" 
-ON tarefas FOR DELETE 
-USING (true);
+// ✅ Popula um select com as intensidades
+function popularSelectIntensidade(selectId, valorAtual = '') {
+    const select = document.getElementById(selectId);
+    if (!select) {
+        console.warn(`Elemento '${selectId}' não encontrado!`);
+        return;
+    }
+    
+    select.innerHTML = '<option value="">-- Selecione a intensidade --</option>';
+    
+    dadosIntensidades.forEach(intensidade => {
+        const opt = document.createElement('option');
+        opt.value = intensidade.id;
+        opt.textContent = intensidade.valor_intensidade.trim();
+        
+        if (valorAtual && valorAtual === intensidade.id) {
+            opt.selected = true;
+        }
+        
+        select.appendChild(opt);
+    });
+}
 
-CREATE POLICY "Permitir remoção pública de integradores" 
-ON integradores FOR DELETE 
-USING (true);
+// ✅ Busca o nome da intensidade pelo ID
+function buscarNomeIntensidade(intensidadeId) {
+    if (!intensidadeId) return null;
+    const intensidade = dadosIntensidades.find(i => i.id === intensidadeId);
+    return intensidade ? intensidade.valor_intensidade.trim() : null;
+}
 
+// ✅ Retorna o badge colorido para a intensidade
+function getIntensidadeBadge(intensidadeId) {
+    const nome = buscarNomeIntensidade(intensidadeId);
+    if (!nome) return '<span class="intensidade-badge" style="background:#9e9e9e; color:white;">Não definida</span>';
+    
+    const nomeLower = nome.toLowerCase();
+    if (nomeLower === 'alta') {
+        return `<span class="intensidade-badge intensidade-alta">🔥 ${nome}</span>`;
+    } else if (nomeLower === 'média' || nomeLower === 'media') {
+        return `<span class="intensidade-badge intensidade-media">⚡ ${nome}</span>`;
+    } else {
+        return `<span class="intensidade-badge intensidade-baixa">🌱 ${nome}</span>`;
+    }
+}
 
+function formatarData(dataISO) {
+    if (!dataISO) return 'Não definida';
+    const d = new Date(dataISO);
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
 
+function getStatusBadge(status) {
+    if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
+    const s = status.toLowerCase();
+    if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
+    if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
+    return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
+}
 
+function mostrarDetalhesTarefa() {
+    const select = document.getElementById('selectTarefas');
+    const div = document.getElementById('detalhesTarefa');
+    const idx = select.value;
+    if (idx === '') { div.style.display = 'none'; return; }
 
+    const t = dadosTarefas[idx];
+    
+    // ✅ Agora lê o intensidade_id diretamente do banco
+    div.innerHTML = `
+        <h3>${t.nome}</h3>
+        <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
+        <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
+        <p><span class="label">Data Esperada:</span> ${formatarData(t.data_para_termino)}</p>
+        <p><span class="label">Intensidade:</span> ${getIntensidadeBadge(t.intensidade_id)}</p>
+        <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
+        <p><span class="label">ID:</span> <code>${t.id}</code></p>
+        <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
+        <div class="action-buttons">
+            <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
+            <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
+        </div>
+        <div id="editFormTarefa"></div>
+    `;
+    div.style.display = 'block';
+}
 
+function mostrarDetalhesIntegrador() {
+    const select = document.getElementById('selectIntegradores');
+    const div = document.getElementById('detalhesIntegrador');
+    const idx = select.value;
+    if (idx === '') { div.style.display = 'none'; return; }
 
-CREATE TABLE intensidades (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    ordem char(5),
-    valor_intensidade char(15)
+    const i = dadosIntegradores[idx];
+    div.innerHTML = `
+        <h3>${i.nome}</h3>
+        <p><span class="label">nº do CPF:</span> <span class="badge">${i.integrador_cpf || 'N/A'}</span></p>
+        <p><span class="label">ID:</span> <code>${i.id}</code></p>
+        <p><span class="label">Criado em:</span> ${new Date(i.created_at).toLocaleString('pt-BR')}</p>
+        <div class="action-buttons">
+            <button class="btn btn-warning" onclick="abrirEdicaoIntegrador(${idx})">✏️ Modificar Elemento</button>
+            <button class="btn btn-danger" onclick="removerIntegrador(${idx})">🗑️ Remover Elemento</button>
+        </div>
+        <div id="editFormIntegrador"></div>
+    `;
+    div.style.display = 'block';
+}
 
-);
+// --- EDIÇÃO TAREFA ---
+function abrirEdicaoTarefa(index) {
+    const tarefa = dadosTarefas[index];
+    const editFormDiv = document.getElementById('editFormTarefa');
+    const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
 
-INSERT INTO intensidades (ordem, valor_intensidade) VALUES
-('1', 'Baixa'),
-('2', 'Média'),
-('3', 'Alta');
+    editFormDiv.innerHTML = `
+        <div class="edit-form">
+            <h4>✏️ Editando: ${tarefa.nome}</h4>
+            <div class="form-group">
+                <label for="editNomeTarefa">Nome:</label>
+                <input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}">
+            </div>
+            <div class="form-group">
+                <label for="editTipoTarefa">Tipo:</label>
+                <input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}">
+            </div>
+            <div class="form-group">
+                <label for="editStatusTarefa">Status:</label>
+                <select id="editStatusTarefa">
+                    <option value="">-- Selecione o status --</option>
+                    <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
+                    <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
+                    <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ não iniciado</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editDataEsperadaTarefa">Data Para Esperada:</label>
+                <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
+            </div>
+            
+            <!-- ✅ Select de Intensidade no formulário de edição -->
+            <div class="form-group">
+                <label for="editIntensidadeTarefa">Intensidade:</label>
+                <select id="editIntensidadeTarefa"></select>
+            </div>
+            
+            <div class="form-group">
+                <label for="editDescricaoTarefa">Descrição:</label>
+                <textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
+                <button class="btn btn-secondary" onclick="cancelarEdicaoTarefa()">❌ Cancelar</button>
+            </div>
+            <div id="editMsgTarefa" style="margin-top:10px;"></div>
+        </div>
+    `;
+    
+    // ✅ Popula o select com a intensidade atual pré-selecionada (vinda do banco)
+    popularSelectIntensidade('editIntensidadeTarefa', tarefa.intensidade_id);
+}
 
-ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Permitir leitura pública de intensidades" 
-ON intensidades FOR SELECT USING (true);
-GRANT SELECT ON intensidades TO anon;
+function cancelarEdicaoTarefa() {
+    document.getElementById('editFormTarefa').innerHTML = '';
+}
 
+async function salvarEdicaoTarefa(index) {
+    const tarefa = dadosTarefas[index];
+    const nome = document.getElementById('editNomeTarefa').value.trim();
+    const tipo = document.getElementById('editTipoTarefa').value.trim();
+    const status = document.getElementById('editStatusTarefa').value;
+    const dataEsperada = document.getElementById('editDataEsperadaTarefa').value;
+    const descricao = document.getElementById('editDescricaoTarefa').value.trim();
+    const intensidadeId = document.getElementById('editIntensidadeTarefa').value; // ✅ Captura a intensidade
+    const msgDiv = document.getElementById('editMsgTarefa');
 
--- 3. Adiciona a coluna intensidade_id na tabela tarefas
-ALTER TABLE tarefas 
-ADD COLUMN IF NOT EXISTS intensidade_id uuid REFERENCES intensidades(id);
+    if (!nome) {
+        msgDiv.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
+        return;
+    }
 
--- 4. Ativa RLS e cria políticas para a tabela intensidades
-ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                nome: nome,
+                tipo: tipo || null,
+                status: status || null,
+                data_para_termino: dataEsperada || null,
+                intensidade_id: intensidadeId || null, // ✅ ENVIA AO SUPABASE
+                descricao: descricao || null
+            })
+        });
 
-DROP POLICY IF EXISTS "Permitir leitura pública de intensidades" ON intensidades;
-CREATE POLICY "Permitir leitura pública de intensidades" 
-ON intensidades FOR SELECT 
-USING (true);
+        if (!response.ok) throw new Error('Erro ao atualizar');
+        const atualizada = await response.json();
+        
+        dadosTarefas[index] = atualizada[0];
+        
+        const select = document.getElementById('selectTarefas');
+        select.options[select.selectedIndex].textContent = nome;
+        mostrarDetalhesTarefa();
+    } catch (err) {
+        msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
+        console.error('Erro:', err);
+    }
+}
 
--- 5. Garante permissões
-GRANT SELECT ON intensidades TO anon;
+// --- EDIÇÃO INTEGRADOR ---
+function abrirEdicaoIntegrador(index) {
+    const integrador = dadosIntegradores[index];
+    const editFormDiv = document.getElementById('editFormIntegrador');
+    editFormDiv.innerHTML = `
+        <div class="edit-form">
+            <h4>✏️ Editando: ${integrador.nome}</h4>
+            <div class="form-group">
+                <label for="editNomeIntegrador">Nome:</label>
+                <input type="text" id="editNomeIntegrador" value="${integrador.nome || ''}">
+            </div>
+            <div class="form-group">
+                <label for="editNCPFIntegrador">nº do CPF:</label>
+                <input type="text" id="editNCPFIntegrador" value="${integrador.integrador_cpf || ''}" maxlength="10">
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="salvarEdicaoIntegrador(${index})">💾 Salvar</button>
+                <button class="btn btn-secondary" onclick="cancelarEdicaoIntegrador()">❌ Cancelar</button>
+            </div>
+            <div id="editMsgIntegrador" style="margin-top:10px;"></div>
+        </div>
+    `;
+}
+
+function cancelarEdicaoIntegrador() {
+    document.getElementById('editFormIntegrador').innerHTML = '';
+}
+
+async function salvarEdicaoIntegrador(index) {
+    const integrador = dadosIntegradores[index];
+    const nome = document.getElementById('editNomeIntegrador').value.trim();
+    const ncpf = document.getElementById('editNCPFIntegrador').value.trim();
+
+    if (!nome) {
+        document.getElementById('editMsgIntegrador').innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
+        return;
+    }
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${integrador.id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({ nome: nome, integrador_cpf: ncpf || null })
+        });
+
+        if (!response.ok) throw new Error('Erro ao atualizar');
+        const atualizado = await response.json();
+        dadosIntegradores[index] = atualizado[0];
+        document.getElementById('selectIntegradores').options[document.getElementById('selectIntegradores').selectedIndex].textContent = nome;
+        mostrarDetalhesIntegrador();
+    } catch (err) {
+        document.getElementById('editMsgIntegrador').innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
+    }
+}
+
+// --- REMOÇÃO ---
+async function removerTarefa(index) {
+    const t = dadosTarefas[index];
+    if (!confirm(`Remover "${t.nome}"?`)) return;
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${t.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        dadosTarefas.splice(index, 1);
+        const select = document.getElementById('selectTarefas');
+        select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
+        dadosTarefas.forEach((ta, i) => {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = ta.nome;
+            select.appendChild(opt);
+        });
+        document.getElementById('detalhesTarefa').style.display = 'none';
+        alert(`✅ Removida!`);
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+async function removerIntegrador(index) {
+    const i = dadosIntegradores[index];
+    if (!confirm(`Remover "${i.nome}"?`)) return;
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${i.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        dadosIntegradores.splice(index, 1);
+        const select = document.getElementById('selectIntegradores');
+        select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
+        dadosIntegradores.forEach((it, j) => {
+            const opt = document.createElement('option');
+            opt.value = j; opt.textContent = it.nome;
+            select.appendChild(opt);
+        });
+        document.getElementById('detalhesIntegrador').style.display = 'none';
+        alert(`✅ Removido!`);
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+// --- ADICIONAR ---
+function atualizarFormulario() {
+    const tipo = document.getElementById('tipoElemento').value;
+    document.getElementById('formTarefa').classList.add('hidden');
+    document.getElementById('formIntegrador').classList.add('hidden');
+    document.getElementById('mensagemAdicionar').innerHTML = '';
+    if (tipo === 'tarefa') document.getElementById('formTarefa').classList.remove('hidden');
+    else if (tipo === 'integrador') document.getElementById('formIntegrador').classList.remove('hidden');
+}
+
+async function adicionarTarefa() {
+    const nome = document.getElementById('nomeTarefa').value.trim();
+    const intensidadeId = document.getElementById('intensidadeTarefa').value; // ✅ Captura a intensidade
+    const msg = document.getElementById('mensagemAdicionar');
+    const btn = document.getElementById('btnAdicionarTarefa');
+    if (!nome) { msg.innerHTML = '<div class="error">⚠️ Nome obrigatório!</div>'; return; }
+
+    btn.disabled = true; btn.textContent = 'Adicionando...';
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                nome: nome,
+                tipo: document.getElementById('tipoTarefa').value.trim() || null,
+                status: document.getElementById('statusTarefa').value || null,
+                data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
+                intensidade_id: intensidadeId || null, // ✅ ENVIA AO SUPABASE
+                descricao: document.getElementById('descricaoTarefa').value.trim() || null
+            })
+        });
+        if (!response.ok) throw new Error('Erro ao adicionar');
+        const nova = await response.json();
+        dadosTarefas.push(nova[0]);
+        const select = document.getElementById('selectTarefas');
+        const opt = document.createElement('option');
+        opt.value = dadosTarefas.length - 1;
+        opt.textContent = nova[0].nome;
+        select.appendChild(opt);
+
+        document.getElementById('tipoElemento').value = '';
+        document.getElementById('formTarefa').classList.add('hidden');
+        ['nomeTarefa','tipoTarefa','statusTarefa','dataEsperadaTarefa','intensidadeTarefa','descricaoTarefa'].forEach(id => document.getElementById(id).value = '');
+        msg.innerHTML = `<div class="success">✅ Tarefa "${nova[0].nome}" adicionada!</div>`;
+    } catch (err) {
+        msg.innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
+    } finally {
+        btn.disabled = false; btn.textContent = 'Adicionar Tarefa';
+    }
+}
+
+async function adicionarIntegrador() {
+    const nome = document.getElementById('nomeIntegrador').value.trim();
+    const msg = document.getElementById('mensagemAdicionar');
+    const btn = document.getElementById('btnAdicionarIntegrador');
+    if (!nome) { msg.innerHTML = '<div class="error">⚠️ Nome obrigatório!</div>'; return; }
+
+    btn.disabled = true; btn.textContent = 'Adicionando...';
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                nome: nome,
+                integrador_cpf: document.getElementById('ncpfIntegrador').value.trim() || null
+            })
+        });
+        if (!response.ok) throw new Error('Erro ao adicionar');
+        const novo = await response.json();
+        dadosIntegradores.push(novo[0]);
+        const select = document.getElementById('selectIntegradores');
+        const opt = document.createElement('option');
+        opt.value = dadosIntegradores.length - 1;
+        opt.textContent = novo[0].nome;
+        select.appendChild(opt);
+
+        document.getElementById('tipoElemento').value = '';
+        document.getElementById('formIntegrador').classList.add('hidden');
+        ['nomeIntegrador','ncpfIntegrador'].forEach(id => document.getElementById(id).value = '');
+        msg.innerHTML = `<div class="success">✅ Integrador "${novo[0].nome}" adicionado!</div>`;
+    } catch (err) {
+        msg.innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
+    } finally {
+        btn.disabled = false; btn.textContent = 'Adicionar Integrador';
+    }
+}
+
+// --- DASHBOARD ---
+function abrirDashboard() {
+    if (dadosTarefas.length === 0) { alert('⚠️ Sem tarefas!'); return; }
+    const track = document.getElementById('dashboardTrack');
+    const cardsHTML = dadosTarefas.map(t => `
+        <div class="dashboard-card">
+            <h3>${t.nome}</h3>
+            <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
+            <p><span class="label">Intensidade:</span> ${getIntensidadeBadge(t.intensidade_id)}</p>
+            <p><span class="label">Data Esperada:</span> ${formatarData(t.data_para_termino)}</p>
+            <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
+            <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
+        </div>
+    `).join('');
+    track.innerHTML = cardsHTML + cardsHTML;
+    track.style.setProperty('--card-count', dadosTarefas.length);
+    document.getElementById('dashboardOverlay').classList.add('active');
+}
+
+function fecharDashboard() {
+    document.getElementById('dashboardOverlay').classList.remove('active');
+}
+</script>
+</body>
+</html>
