@@ -143,7 +143,6 @@
             margin-top: 15px;
         }
 
-        /* Estilos da caixa de verificação */
         .verificacao-container {
             display: flex;
             gap: 10px;
@@ -188,7 +187,6 @@
             color: #c62828;
         }
 
-        /* Estilos dos seletores */
         .seletor-container {
             margin-bottom: 20px;
         }
@@ -217,7 +215,6 @@
             border-color: #667eea;
         }
 
-        /* Estilos do formulário de adição/edição */
         .form-group {
             margin-bottom: 20px;
         }
@@ -254,7 +251,6 @@
             border-color: #667eea;
         }
 
-        /* Card de detalhes */
         .detalhes-card {
             background: #f9f9f9;
             border-radius: 10px;
@@ -293,7 +289,30 @@
             margin-left: 8px;
         }
 
-        /* Botões de ação (Modificar/Remover) */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .status-plantado {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-aguardando {
+            background: #ff9800;
+            color: white;
+        }
+
+        .status-nao-plantado {
+            background: #f44336;
+            color: white;
+        }
+
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -306,7 +325,6 @@
             min-width: 150px;
         }
 
-        /* Formulário de edição inline */
         .edit-form {
             background: #fff8e1;
             border: 2px solid #ff9800;
@@ -322,7 +340,6 @@
             font-size: 1.3rem;
         }
 
-        /* Dashboard Overlay */
         .dashboard-overlay {
             position: fixed;
             top: 0;
@@ -435,12 +452,10 @@
             }
         }
 
-        /* Classe para esconder seções */
         .hidden {
             display: none !important;
         }
 
-        /* Animação de entrada das seções */
         @keyframes slideIn {
             from { 
                 opacity: 0; 
@@ -466,7 +481,6 @@
     <div class="container">
         <h1>🌳 Leitor de Dados Supabase 🪨</h1>
 
-        <!-- Seção de Verificação -->
         <div id="secaoVerificacao" class="section">
             <div class="section-header">
                 <h2>🔍 Verificação</h2>
@@ -481,7 +495,6 @@
             <div id="mensagemResultado" class="mensagem-resultado"></div>
         </div>
 
-        <!-- Seção de Árvores -->
         <div id="secaoArvores" class="section hidden">
             <div class="section-header">
                 <h2>🌳 Árvores</h2>
@@ -499,7 +512,6 @@
             <div id="detalhesArvore" class="detalhes-card" style="display: none;"></div>
         </div>
 
-        <!-- Seção de Metais -->
         <div id="secaoMetais" class="section hidden">
             <div class="section-header">
                 <h2>🪨 Metais</h2>
@@ -517,7 +529,6 @@
             <div id="detalhesMetal" class="detalhes-card" style="display: none;"></div>
         </div>
 
-        <!-- Seção de Dashboard (NOVA) -->
         <div id="secaoDashboard" class="section hidden">
             <div class="section-header">
                 <h2>📊 Dashboard</h2>
@@ -530,7 +541,6 @@
             </button>
         </div>
 
-        <!-- Seção de Adicionar Elemento -->
         <div id="secaoAdicionar" class="section hidden">
             <div class="section-header">
                 <h2>➕ Adicionar Elemento</h2>
@@ -548,7 +558,6 @@
                 </select>
             </div>
 
-            <!-- Formulário para Árvore -->
             <div id="formArvore" class="hidden">
                 <div class="form-group">
                     <label for="nomeArvore">Nome da Árvore:</label>
@@ -559,6 +568,19 @@
                     <input type="text" id="tipoArvore" placeholder="Ex: Frutífera">
                 </div>
                 <div class="form-group">
+                    <label for="statusArvore">Status:</label>
+                    <select id="statusArvore">
+                        <option value="">-- Selecione o status --</option>
+                        <option value="plantado">🌱 Plantado</option>
+                        <option value="aguardando fertilizante">⏳ Aguardando Fertilizante</option>
+                        <option value="não plantado">❌ Não Plantado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dataPlantioArvore">Data Para Plantio:</label>
+                    <input type="date" id="dataPlantioArvore">
+                </div>
+                <div class="form-group">
                     <label for="descricaoArvore">Descrição:</label>
                     <textarea id="descricaoArvore" placeholder="Descreva a árvore..."></textarea>
                 </div>
@@ -567,7 +589,6 @@
                 </button>
             </div>
 
-            <!-- Formulário para Metal -->
             <div id="formMetal" class="hidden">
                 <div class="form-group">
                     <label for="nomeMetal">Nome do Metal:</label>
@@ -590,7 +611,6 @@
         </div>
     </div>
 
-    <!-- Dashboard Overlay -->
     <div id="dashboardOverlay" class="dashboard-overlay">
         <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
         <h1 class="dashboard-title">🌳 Dashboard de Árvores</h1>
@@ -600,15 +620,12 @@
     </div>
 
     <script>
-        // Configuração do Supabase
         const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
-        // Variáveis para armazenar os dados
         let dadosArvores = [];
         let dadosMetais = [];
 
-        // --- LÓGICA DA CAIXA DE VERIFICAÇÃO ---
         async function verificarCodigo() {
             const input = document.getElementById('inputVerificacao');
             const texto = input.value;
@@ -707,7 +724,6 @@
             }
         });
 
-        // --- LÓGICA DO SUPABASE (ÁRVORES E METAIS) ---
         async function buscarDados(tabela) {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
@@ -785,6 +801,28 @@
             }
         }
 
+        function formatarData(dataISO) {
+            if (!dataISO) return 'Não definida';
+            const data = new Date(dataISO);
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        function getStatusBadge(status) {
+            if (!status) return '<span class="status-badge status-nao-plantado">Não definido</span>';
+            
+            const statusLower = status.toLowerCase();
+            if (statusLower === 'plantado') {
+                return `<span class="status-badge status-plantado">🌱 ${status}</span>`;
+            } else if (statusLower === 'aguardando fertilizante') {
+                return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
+            } else {
+                return `<span class="status-badge status-nao-plantado">❌ ${status}</span>`;
+            }
+        }
+
         function mostrarDetalhesArvore() {
             const select = document.getElementById('selectArvores');
             const detalhesDiv = document.getElementById('detalhesArvore');
@@ -799,6 +837,8 @@
             detalhesDiv.innerHTML = `
                 <h3>${arvore.nome}</h3>
                 <p><span class="label">Tipo:</span> ${arvore.tipo || 'Não informado'}</p>
+                <p><span class="label">Status:</span> ${getStatusBadge(arvore.status)}</p>
+                <p><span class="label">Data Para Plantio:</span> ${formatarData(arvore.data_para_plantio)}</p>
                 <p><span class="label">Descrição:</span> ${arvore.descricao || 'Sem descrição'}</p>
                 <p><span class="label">ID:</span> <code>${arvore.id}</code></p>
                 <p><span class="label">Criado em:</span> ${new Date(arvore.created_at).toLocaleString('pt-BR')}</p>
@@ -837,10 +877,11 @@
             detalhesDiv.style.display = 'block';
         }
 
-        // --- FUNÇÕES DE EDIÇÃO ---
         function abrirEdicaoArvore(index) {
             const arvore = dadosArvores[index];
             const editFormDiv = document.getElementById('editFormArvore');
+
+            const dataISO = arvore.data_para_plantio ? new Date(arvore.data_para_plantio).toISOString().split('T')[0] : '';
 
             editFormDiv.innerHTML = `
                 <div class="edit-form">
@@ -852,6 +893,19 @@
                     <div class="form-group">
                         <label for="editTipoArvore">Tipo:</label>
                         <input type="text" id="editTipoArvore" value="${arvore.tipo || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatusArvore">Status:</label>
+                        <select id="editStatusArvore">
+                            <option value="">-- Selecione o status --</option>
+                            <option value="plantado" ${arvore.status === 'plantado' ? 'selected' : ''}>🌱 Plantado</option>
+                            <option value="aguardando fertilizante" ${arvore.status === 'aguardando fertilizante' ? 'selected' : ''}>⏳ Aguardando Fertilizante</option>
+                            <option value="não plantado" ${arvore.status === 'não plantado' ? 'selected' : ''}>❌ Não Plantado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDataPlantioArvore">Data Para Plantio:</label>
+                        <input type="date" id="editDataPlantioArvore" value="${dataISO}">
                     </div>
                     <div class="form-group">
                         <label for="editDescricaoArvore">Descrição:</label>
@@ -874,6 +928,8 @@
             const arvore = dadosArvores[index];
             const nome = document.getElementById('editNomeArvore').value.trim();
             const tipo = document.getElementById('editTipoArvore').value.trim();
+            const status = document.getElementById('editStatusArvore').value;
+            const dataPlantio = document.getElementById('editDataPlantioArvore').value;
             const descricao = document.getElementById('editDescricaoArvore').value.trim();
             const msgDiv = document.getElementById('editMsgArvore');
 
@@ -894,6 +950,8 @@
                     body: JSON.stringify({
                         nome: nome,
                         tipo: tipo || null,
+                        status: status || null,
+                        data_para_plantio: dataPlantio || null,
                         descricao: descricao || null
                     })
                 });
@@ -994,7 +1052,6 @@
             }
         }
 
-        // --- FUNÇÕES DE REMOÇÃO ---
         async function removerArvore(index) {
             const arvore = dadosArvores[index];
             
@@ -1075,7 +1132,6 @@
             }
         }
 
-        // --- LÓGICA DE ADICIONAR ELEMENTOS ---
         function atualizarFormulario() {
             const tipo = document.getElementById('tipoElemento').value;
             const formArvore = document.getElementById('formArvore');
@@ -1096,6 +1152,8 @@
         async function adicionarArvore() {
             const nome = document.getElementById('nomeArvore').value.trim();
             const tipo = document.getElementById('tipoArvore').value.trim();
+            const status = document.getElementById('statusArvore').value;
+            const dataPlantio = document.getElementById('dataPlantioArvore').value;
             const descricao = document.getElementById('descricaoArvore').value.trim();
             const mensagem = document.getElementById('mensagemAdicionar');
             const btn = document.getElementById('btnAdicionarArvore');
@@ -1120,6 +1178,8 @@
                     body: JSON.stringify({
                         nome: nome,
                         tipo: tipo || null,
+                        status: status || null,
+                        data_para_plantio: dataPlantio || null,
                         descricao: descricao || null
                     })
                 });
@@ -1143,6 +1203,8 @@
 
                 document.getElementById('nomeArvore').value = '';
                 document.getElementById('tipoArvore').value = '';
+                document.getElementById('statusArvore').value = '';
+                document.getElementById('dataPlantioArvore').value = '';
                 document.getElementById('descricaoArvore').value = '';
 
                 mensagem.innerHTML = `<div class="success">✅ Árvore "${novaArvore[0].nome}" adicionada com sucesso!</div>`;
@@ -1217,7 +1279,6 @@
             }
         }
 
-        // --- LÓGICA DO DASHBOARD ---
         function abrirDashboard() {
             if (dadosArvores.length === 0) {
                 alert('⚠️ Não há árvores para exibir no dashboard!');
@@ -1227,7 +1288,6 @@
             const overlay = document.getElementById('dashboardOverlay');
             const track = document.getElementById('dashboardTrack');
 
-            // Cria os cards duplicados para loop infinito
             track.innerHTML = '';
             const cardsHTML = dadosArvores.map(arvore => `
                 <div class="dashboard-card">
@@ -1239,10 +1299,8 @@
                 </div>
             `).join('');
 
-            // Duplica os cards para criar loop contínuo
             track.innerHTML = cardsHTML + cardsHTML;
 
-            // Define a variável CSS para a animação
             const cardCount = dadosArvores.length;
             track.style.setProperty('--card-count', cardCount);
 
