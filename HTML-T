@@ -107,6 +107,17 @@
             background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
         }
 
+        .btn-dashboard {
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+        }
+
+        .btn-dashboard:hover {
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
+        }
+
         .loading {
             text-align: center;
             padding: 20px;
@@ -311,6 +322,119 @@
             font-size: 1.3rem;
         }
 
+        /* Dashboard Overlay */
+        .dashboard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 9999;
+            display: none;
+            overflow: hidden;
+        }
+
+        .dashboard-overlay.active {
+            display: block;
+        }
+
+        .dashboard-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 10000;
+        }
+
+        .dashboard-close:hover {
+            background: rgba(244, 67, 54, 0.8);
+            border-color: #f44336;
+            transform: rotate(90deg);
+        }
+
+        .dashboard-title {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .dashboard-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            transform: translateY(-50%);
+            overflow: hidden;
+        }
+
+        .dashboard-track {
+            display: flex;
+            gap: 40px;
+            animation: scrollLeft 30s linear infinite;
+            height: 100%;
+        }
+
+        .dashboard-card {
+            flex-shrink: 0;
+            width: 400px;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+
+        .dashboard-card h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .dashboard-card p {
+            font-size: 1.1rem;
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+
+        .dashboard-card .label {
+            font-weight: bold;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes scrollLeft {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-440px * var(--card-count)));
+            }
+        }
+
         /* Classe para esconder seções */
         .hidden {
             display: none !important;
@@ -340,7 +464,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🌳 Leitor de Dados Supabase ​🔳</h1>
+        <h1>🌳 Leitor de Dados Supabase 🪨</h1>
 
         <!-- Seção de Verificação -->
         <div id="secaoVerificacao" class="section">
@@ -378,7 +502,7 @@
         <!-- Seção de Metais -->
         <div id="secaoMetais" class="section hidden">
             <div class="section-header">
-                <h2>​🔳 Metais</h2>
+                <h2>🪨 Metais</h2>
             </div>
             <div class="seletor-container">
                 <label for="selectMetais">Selecione um metal:</label>
@@ -391,6 +515,19 @@
             </div>
             <div id="metaisError" class="error" style="display: none;"></div>
             <div id="detalhesMetal" class="detalhes-card" style="display: none;"></div>
+        </div>
+
+        <!-- Seção de Dashboard (NOVA) -->
+        <div id="secaoDashboard" class="section hidden">
+            <div class="section-header">
+                <h2>📊 Dashboard</h2>
+            </div>
+            <p style="color: #666; margin-bottom: 20px;">
+                Visualize todas as árvores em um carrossel animado em tela cheia:
+            </p>
+            <button class="btn btn-dashboard" onclick="abrirDashboard()">
+                🎬 Abrir Dashboard de Árvores
+            </button>
         </div>
 
         <!-- Seção de Adicionar Elemento -->
@@ -407,7 +544,7 @@
                 <select id="tipoElemento" onchange="atualizarFormulario()">
                     <option value="">-- Selecione o tipo --</option>
                     <option value="arvore">🌳 Árvore</option>
-                    <option value="metal">​🔳 Metal</option>
+                    <option value="metal">🪨 Metal</option>
                 </select>
             </div>
 
@@ -450,6 +587,15 @@
             </div>
 
             <div id="mensagemAdicionar" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Overlay -->
+    <div id="dashboardOverlay" class="dashboard-overlay">
+        <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
+        <h1 class="dashboard-title">🌳 Dashboard de Árvores</h1>
+        <div class="dashboard-container">
+            <div id="dashboardTrack" class="dashboard-track"></div>
         </div>
     </div>
 
@@ -534,6 +680,7 @@
         function revelarSecoes() {
             const secaoArvores = document.getElementById('secaoArvores');
             const secaoMetais = document.getElementById('secaoMetais');
+            const secaoDashboard = document.getElementById('secaoDashboard');
             const secaoAdicionar = document.getElementById('secaoAdicionar');
 
             secaoArvores.classList.remove('hidden');
@@ -541,6 +688,9 @@
 
             secaoMetais.classList.remove('hidden');
             secaoMetais.classList.add('section-revealed');
+
+            secaoDashboard.classList.remove('hidden');
+            secaoDashboard.classList.add('section-revealed');
 
             secaoAdicionar.classList.remove('hidden');
             secaoAdicionar.classList.add('section-revealed');
@@ -754,14 +904,11 @@
 
                 const atualizada = await response.json();
                 
-                // Atualiza o array local
                 dadosArvores[index] = atualizada[0];
                 
-                // Atualiza o texto no select
                 const select = document.getElementById('selectArvores');
                 select.options[select.selectedIndex].textContent = nome;
                 
-                // Atualiza a visualização de detalhes
                 mostrarDetalhesArvore();
             } catch (err) {
                 msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
@@ -835,14 +982,11 @@
 
                 const atualizado = await response.json();
                 
-                // Atualiza o array local
                 dadosMetais[index] = atualizado[0];
                 
-                // Atualiza o texto no select
                 const select = document.getElementById('selectMetais');
                 select.options[select.selectedIndex].textContent = nome;
                 
-                // Atualiza a visualização de detalhes
                 mostrarDetalhesMetal();
             } catch (err) {
                 msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
@@ -871,10 +1015,8 @@
                     throw new Error('Erro ao remover');
                 }
 
-                // Remove do array local
                 dadosArvores.splice(index, 1);
                 
-                // Reconstrói o select
                 const select = document.getElementById('selectArvores');
                 select.innerHTML = '<option value="">-- Escolha uma árvore --</option>';
                 dadosArvores.forEach((a, i) => {
@@ -884,7 +1026,6 @@
                     select.appendChild(option);
                 });
 
-                // Esconde os detalhes
                 document.getElementById('detalhesArvore').style.display = 'none';
                 
                 alert(`✅ Árvore "${arvore.nome}" removida com sucesso!`);
@@ -914,10 +1055,8 @@
                     throw new Error('Erro ao remover');
                 }
 
-                // Remove do array local
                 dadosMetais.splice(index, 1);
                 
-                // Reconstrói o select
                 const select = document.getElementById('selectMetais');
                 select.innerHTML = '<option value="">-- Escolha um metal --</option>';
                 dadosMetais.forEach((m, i) => {
@@ -927,7 +1066,6 @@
                     select.appendChild(option);
                 });
 
-                // Esconde os detalhes
                 document.getElementById('detalhesMetal').style.display = 'none';
                 
                 alert(`✅ Metal "${metal.nome}" removido com sucesso!`);
@@ -1077,6 +1215,43 @@
                 btn.disabled = false;
                 btn.textContent = 'Adicionar Metal';
             }
+        }
+
+        // --- LÓGICA DO DASHBOARD ---
+        function abrirDashboard() {
+            if (dadosArvores.length === 0) {
+                alert('⚠️ Não há árvores para exibir no dashboard!');
+                return;
+            }
+
+            const overlay = document.getElementById('dashboardOverlay');
+            const track = document.getElementById('dashboardTrack');
+
+            // Cria os cards duplicados para loop infinito
+            track.innerHTML = '';
+            const cardsHTML = dadosArvores.map(arvore => `
+                <div class="dashboard-card">
+                    <h3>${arvore.nome}</h3>
+                    <p><span class="label">Descrição:</span></p>
+                    <p>${arvore.descricao || 'Sem descrição'}</p>
+                    <p style="margin-top: 20px;"><span class="label">Criado em:</span></p>
+                    <p>${new Date(arvore.created_at).toLocaleString('pt-BR')}</p>
+                </div>
+            `).join('');
+
+            // Duplica os cards para criar loop contínuo
+            track.innerHTML = cardsHTML + cardsHTML;
+
+            // Define a variável CSS para a animação
+            const cardCount = dadosArvores.length;
+            track.style.setProperty('--card-count', cardCount);
+
+            overlay.classList.add('active');
+        }
+
+        function fecharDashboard() {
+            const overlay = document.getElementById('dashboardOverlay');
+            overlay.classList.remove('active');
         }
     </script>
 </body>
