@@ -17,13 +17,28 @@ CREATE TABLE configuracoes (
 -- 3. Insere a senha secreta
 INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
 
--- 4. Criação da tabela dos itens
+
+
+-- 4. Criação da tabela de Metais
+CREATE TABLE integradores (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(50) NOT NULL,
+    integrador_cpf varchar(15) NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+
+
+
+
+-- 5. Criação da tabela dos itens
 CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
     tipo varchar(30),
     descricao text,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+    Intg_id uuid REFERENCES integradores(id)
 );
 
 -- Adiciona a coluna status (com valores permitidos)
@@ -37,13 +52,7 @@ ADD COLUMN data_para_termino date;
 
 
 
--- 5. Criação da tabela de Metais
-CREATE TABLE integradores (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    nome varchar(50) NOT NULL,
-    integrador_cpf varchar(15) NOT NULL,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+
 
 -- 6. Inserção dos dados das Árvores
 INSERT INTO tarefas (nome, tipo, descricao) VALUES
@@ -60,6 +69,8 @@ INSERT INTO integradores (nome, integrador_cpf) VALUES
 ('Amarante', '98798979'),
 ('Borges', '6546464465'),
 ('Cláudio', '417711771');
+
+
 
 -- 8. Configuração de Segurança (RLS)
 ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
