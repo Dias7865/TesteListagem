@@ -79,6 +79,14 @@
             cursor: not-allowed;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
         .loading {
             text-align: center;
             padding: 20px;
@@ -90,6 +98,15 @@
             background: #fee;
             border: 1px solid #fcc;
             color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .success {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
             padding: 15px;
             border-radius: 8px;
             margin-top: 15px;
@@ -169,6 +186,43 @@
             border-color: #667eea;
         }
 
+        /* Estilos do formulário de adição */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
         /* Card de detalhes */
         .detalhes-card {
             background: #f9f9f9;
@@ -208,12 +262,6 @@
             margin-left: 8px;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
         /* Classe para esconder seções */
         .hidden {
             display: none !important;
@@ -245,7 +293,7 @@
     <div class="container">
         <h1>🌳 Leitor de Dados Supabase 🪨</h1>
 
-        <!-- Seção de Verificação (sempre visível inicialmente) -->
+        <!-- Seção de Verificação -->
         <div id="secaoVerificacao" class="section">
             <div class="section-header">
                 <h2>🔍 Verificação</h2>
@@ -260,7 +308,7 @@
             <div id="mensagemResultado" class="mensagem-resultado"></div>
         </div>
 
-        <!-- Seção de Árvores (inicialmente oculta) -->
+        <!-- Seção de Árvores -->
         <div id="secaoArvores" class="section hidden">
             <div class="section-header">
                 <h2>🌳 Árvores</h2>
@@ -278,7 +326,7 @@
             <div id="detalhesArvore" class="detalhes-card" style="display: none;"></div>
         </div>
 
-        <!-- Seção de Metais (inicialmente oculta) -->
+        <!-- Seção de Metais -->
         <div id="secaoMetais" class="section hidden">
             <div class="section-header">
                 <h2>🪨 Metais</h2>
@@ -295,12 +343,71 @@
             <div id="metaisError" class="error" style="display: none;"></div>
             <div id="detalhesMetal" class="detalhes-card" style="display: none;"></div>
         </div>
+
+        <!-- Seção de Adicionar Elemento (NOVA) -->
+        <div id="secaoAdicionar" class="section hidden">
+            <div class="section-header">
+                <h2>➕ Adicionar Elemento</h2>
+            </div>
+            <p style="color: #666; margin-bottom: 20px;">
+                Crie um novo elemento para uma das listas existentes:
+            </p>
+
+            <div class="form-group">
+                <label for="tipoElemento">Tipo de Elemento:</label>
+                <select id="tipoElemento" onchange="atualizarFormulario()">
+                    <option value="">-- Selecione o tipo --</option>
+                    <option value="arvore">🌳 Árvore</option>
+                    <option value="metal">🪨 Metal</option>
+                </select>
+            </div>
+
+            <!-- Formulário para Árvore -->
+            <div id="formArvore" class="hidden">
+                <div class="form-group">
+                    <label for="nomeArvore">Nome da Árvore:</label>
+                    <input type="text" id="nomeArvore" placeholder="Ex: Mangueira">
+                </div>
+                <div class="form-group">
+                    <label for="tipoArvore">Tipo:</label>
+                    <input type="text" id="tipoArvore" placeholder="Ex: Frutífera">
+                </div>
+                <div class="form-group">
+                    <label for="descricaoArvore">Descrição:</label>
+                    <textarea id="descricaoArvore" placeholder="Descreva a árvore..."></textarea>
+                </div>
+                <button class="btn btn-success" onclick="adicionarArvore()" id="btnAdicionarArvore">
+                    Adicionar Árvore
+                </button>
+            </div>
+
+            <!-- Formulário para Metal -->
+            <div id="formMetal" class="hidden">
+                <div class="form-group">
+                    <label for="nomeMetal">Nome do Metal:</label>
+                    <input type="text" id="nomeMetal" placeholder="Ex: Cobre">
+                </div>
+                <div class="form-group">
+                    <label for="simboloMetal">Símbolo Químico:</label>
+                    <input type="text" id="simboloMetal" placeholder="Ex: Cu" maxlength="10">
+                </div>
+                <div class="form-group">
+                    <label for="descricaoMetal">Descrição:</label>
+                    <textarea id="descricaoMetal" placeholder="Descreva o metal..."></textarea>
+                </div>
+                <button class="btn btn-success" onclick="adicionarMetal()" id="btnAdicionarMetal">
+                    Adicionar Metal
+                </button>
+            </div>
+
+            <div id="mensagemAdicionar" style="margin-top: 15px;"></div>
+        </div>
     </div>
 
     <script>
         // Configuração do Supabase
-        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
+        const SUPABASE_URL = 'MYLINK';
+        const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
 
         // Variáveis para armazenar os dados
         let dadosArvores = [];
@@ -353,7 +460,6 @@
                     mensagem.classList.add('mensagem-sucesso');
                     mensagem.style.display = 'block';
                     
-                    // Esconde a seção de verificação e revela as outras seções
                     setTimeout(() => {
                         document.getElementById('secaoVerificacao').classList.add('hidden');
                         revelarSecoes();
@@ -376,25 +482,26 @@
             }
         }
 
-        // Função para revelar as seções de Árvores e Metais com animação
         function revelarSecoes() {
             const secaoArvores = document.getElementById('secaoArvores');
             const secaoMetais = document.getElementById('secaoMetais');
+            const secaoAdicionar = document.getElementById('secaoAdicionar');
 
             secaoArvores.classList.remove('hidden');
             secaoArvores.classList.add('section-revealed');
 
             secaoMetais.classList.remove('hidden');
             secaoMetais.classList.add('section-revealed');
+
+            secaoAdicionar.classList.remove('hidden');
+            secaoAdicionar.classList.add('section-revealed');
         }
 
-        // Função para carregar os dados iniciais
         async function carregarDadosIniciais() {
             await carregarArvores();
             await carregarMetais();
         }
 
-        // Permite verificar pressionando Enter
         document.getElementById('inputVerificacao').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 verificarCodigo();
@@ -437,10 +544,8 @@
                 dadosArvores = await buscarDados('arvores');
                 loading.style.display = 'none';
 
-                // Limpa o select
                 select.innerHTML = '<option value="">-- Escolha uma árvore --</option>';
 
-                // Popula o select com as árvores
                 dadosArvores.forEach((arvore, index) => {
                     const option = document.createElement('option');
                     option.value = index;
@@ -466,10 +571,8 @@
                 dadosMetais = await buscarDados('metais');
                 loading.style.display = 'none';
 
-                // Limpa o select
                 select.innerHTML = '<option value="">-- Escolha um metal --</option>';
 
-                // Popula o select com os metais
                 dadosMetais.forEach((metal, index) => {
                     const option = document.createElement('option');
                     option.value = index;
@@ -483,7 +586,6 @@
             }
         }
 
-        // Função para mostrar detalhes da árvore selecionada
         function mostrarDetalhesArvore() {
             const select = document.getElementById('selectArvores');
             const detalhesDiv = document.getElementById('detalhesArvore');
@@ -505,7 +607,6 @@
             detalhesDiv.style.display = 'block';
         }
 
-        // Função para mostrar detalhes do metal selecionado
         function mostrarDetalhesMetal() {
             const select = document.getElementById('selectMetais');
             const detalhesDiv = document.getElementById('detalhesMetal');
@@ -525,6 +626,150 @@
                 <p><span class="label">Criado em:</span> ${new Date(metal.created_at).toLocaleString('pt-BR')}</p>
             `;
             detalhesDiv.style.display = 'block';
+        }
+
+        // --- LÓGICA DE ADICIONAR ELEMENTOS (NOVA) ---
+        function atualizarFormulario() {
+            const tipo = document.getElementById('tipoElemento').value;
+            const formArvore = document.getElementById('formArvore');
+            const formMetal = document.getElementById('formMetal');
+            const mensagem = document.getElementById('mensagemAdicionar');
+
+            // Esconde ambos os formulários e limpa mensagem
+            formArvore.classList.add('hidden');
+            formMetal.classList.add('hidden');
+            mensagem.innerHTML = '';
+
+            // Mostra o formulário correspondente
+            if (tipo === 'arvore') {
+                formArvore.classList.remove('hidden');
+            } else if (tipo === 'metal') {
+                formMetal.classList.remove('hidden');
+            }
+        }
+
+        async function adicionarArvore() {
+            const nome = document.getElementById('nomeArvore').value.trim();
+            const tipo = document.getElementById('tipoArvore').value.trim();
+            const descricao = document.getElementById('descricaoArvore').value.trim();
+            const mensagem = document.getElementById('mensagemAdicionar');
+            const btn = document.getElementById('btnAdicionarArvore');
+
+            if (!nome) {
+                mensagem.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Adicionando...';
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/arvores`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        nome: nome,
+                        tipo: tipo || null,
+                        descricao: descricao || null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao adicionar árvore');
+                }
+
+                const novaArvore = await response.json();
+                
+                // Adiciona ao array local
+                dadosArvores.push(novaArvore[0]);
+                
+                // Atualiza o select
+                const select = document.getElementById('selectArvores');
+                const option = document.createElement('option');
+                option.value = dadosArvores.length - 1;
+                option.textContent = novaArvore[0].nome;
+                select.appendChild(option);
+
+                // Limpa o formulário
+                document.getElementById('nomeArvore').value = '';
+                document.getElementById('tipoArvore').value = '';
+                document.getElementById('descricaoArvore').value = '';
+
+                mensagem.innerHTML = `<div class="success">✅ Árvore "${novaArvore[0].nome}" adicionada com sucesso!</div>`;
+            } catch (err) {
+                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar árvore: ${err.message}</div>`;
+                console.error('Erro:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Adicionar Árvore';
+            }
+        }
+
+        async function adicionarMetal() {
+            const nome = document.getElementById('nomeMetal').value.trim();
+            const simbolo = document.getElementById('simboloMetal').value.trim();
+            const descricao = document.getElementById('descricaoMetal').value.trim();
+            const mensagem = document.getElementById('mensagemAdicionar');
+            const btn = document.getElementById('btnAdicionarMetal');
+
+            if (!nome) {
+                mensagem.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Adicionando...';
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/metais`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        nome: nome,
+                        simbolo_quimico: simbolo || null,
+                        descricao: descricao || null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao adicionar metal');
+                }
+
+                const novoMetal = await response.json();
+                
+                // Adiciona ao array local
+                dadosMetais.push(novoMetal[0]);
+                
+                // Atualiza o select
+                const select = document.getElementById('selectMetais');
+                const option = document.createElement('option');
+                option.value = dadosMetais.length - 1;
+                option.textContent = novoMetal[0].nome;
+                select.appendChild(option);
+
+                // Limpa o formulário
+                document.getElementById('nomeMetal').value = '';
+                document.getElementById('simboloMetal').value = '';
+                document.getElementById('descricaoMetal').value = '';
+
+                mensagem.innerHTML = `<div class="success">✅ Metal "${novoMetal[0].nome}" adicionado com sucesso!</div>`;
+            } catch (err) {
+                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar metal: ${err.message}</div>`;
+                console.error('Erro:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Adicionar Metal';
+            }
         }
     </script>
 </body>
