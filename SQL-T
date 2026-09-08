@@ -28,12 +28,12 @@ CREATE TABLE tarefas (
 
 -- Adiciona a coluna status (com valores permitidos)
 ALTER TABLE tarefas 
-ADD COLUMN status varchar(30) CHECK (status IN ('plantado', 'aguardando fertilizante', 'não plantado'));
+ADD COLUMN status varchar(30) CHECK (status IN ('plantado', 'aguardando fertilizante', 'não iniciado'));
 -- Adiciona a coluna data_para_plantio
 ALTER TABLE tarefas 
 ADD COLUMN data_para_plantio date;
 -- Atualiza os dados existentes com valores padrão (opcional)
-UPDATE tarefas SET status = 'não plantado' WHERE status IS NULL;
+UPDATE tarefas SET status = 'não iniciado' WHERE status IS NULL;
 
 
 -- 5. Criação da tabela de Metais
