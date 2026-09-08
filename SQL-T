@@ -12,6 +12,8 @@ CREATE TABLE configuracoes (
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+
+
 -- 3. Insere a senha secreta
 INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
 
@@ -23,6 +25,16 @@ CREATE TABLE arvores (
     descricao text,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Adiciona a coluna status (com valores permitidos)
+ALTER TABLE arvores 
+ADD COLUMN status varchar(30) CHECK (status IN ('plantado', 'aguardando fertilizante', 'não plantado'));
+-- Adiciona a coluna data_para_plantio
+ALTER TABLE arvores 
+ADD COLUMN data_para_plantio date;
+-- Atualiza os dados existentes com valores padrão (opcional)
+UPDATE arvores SET status = 'não plantado' WHERE status IS NULL;
+
 
 -- 5. Criação da tabela de Metais
 CREATE TABLE metais (
@@ -38,6 +50,9 @@ INSERT INTO arvores (nome, tipo, descricao) VALUES
 ('Macieira', 'Frutífera', 'Árvore conhecida por produzir maçãs, comum em climas temperados.'),
 ('Carvalho', 'Madeira Nobre', 'Árvore de madeira resistente e durável, símbolo de força.'),
 ('Pinheiro', 'Conífera', 'Árvore perene que produz pinhas e madeira macia.');
+
+
+
 
 -- 7. Inserção dos dados dos Metais
 INSERT INTO metais (nome, simbolo_quimico, descricao) VALUES
