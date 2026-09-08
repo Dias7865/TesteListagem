@@ -224,6 +224,27 @@
             color: #c62828;
         }
 
+        /* Classe para esconder seções */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Animação de entrada das seções */
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .section-revealed {
+            animation: slideIn 0.5s ease-out;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
@@ -234,8 +255,23 @@
     <div class="container">
         <h1>🌳 Leitor de Dados Supabase 🪨</h1>
 
-        <!-- Seção de Árvores -->
+        <!-- Seção de Verificação (sempre visível) -->
         <div class="section">
+            <div class="section-header">
+                <h2>🔍 Verificação</h2>
+            </div>
+            <p style="color: #666; margin-bottom: 10px;">
+                Digite o código secreto e pressione Enter ou clique em "Verificar" para liberar o acesso às listas:
+            </p>
+            <div class="verificacao-container">
+                <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
+                <button class="btn" onclick="verificarCodigo()" id="btnVerificar">Verificar</button>
+            </div>
+            <div id="mensagemResultado" class="mensagem-resultado"></div>
+        </div>
+
+        <!-- Seção de Árvores (inicialmente oculta) -->
+        <div id="secaoArvores" class="section hidden">
             <div class="section-header">
                 <h2>🌳 Árvores</h2>
                 <button class="btn" onclick="buscarArvores()" id="btnArvores">
@@ -253,8 +289,8 @@
             </div>
         </div>
 
-        <!-- Seção de Metais -->
-        <div class="section">
+        <!-- Seção de Metais (inicialmente oculta) -->
+        <div id="secaoMetais" class="section hidden">
             <div class="section-header">
                 <h2>🪨 Metais</h2>
                 <button class="btn" onclick="buscarMetais()" id="btnMetais">
@@ -271,92 +307,102 @@
                 Nenhum metal encontrado. Clique em "Carregar Metais" para começar.
             </div>
         </div>
-
-        <!-- Seção de Verificação -->
-        <div class="section">
-            <div class="section-header">
-                <h2>🔍 Verificação</h2>
-            </div>
-            <p style="color: #666; margin-bottom: 10px;">
-                Digite o código secreto e pressione Enter ou clique em "Verificar":
-            </p>
-            <div class="verificacao-container">
-                <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
-                <button class="btn" onclick="verificarCodigo()" id="btnVerificar">Verificar</button>
-            </div>
-            <div id="mensagemResultado" class="mensagem-resultado"></div>
-        </div>
     </div>
 
     <script>
         // Configuração do Supabase
-        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
+        const SUPABASE_URL = 'MYLINK';
+        const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
 
-        // --- LÓGICA DA CAIXA DE VERIFICAÇÃO (CONSULTA O BANCO) ---
-async function verificarCodigo() {
-    const input = document.getElementById('inputVerificacao');
-    const texto = input.value;
-    const mensagem = document.getElementById('mensagemResultado');
-    const btn = document.getElementById('btnVerificar');
+        // Variável para rastrear se o acesso já foi liberado
+        let acessoLiberado = false;
 
-    if (!texto) {
-        mensagem.textContent = '⚠️ Por favor, digite algo!';
-        mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
-        mensagem.classList.add('mensagem-erro');
-        mensagem.style.display = 'block';
-        return;
-    }
+        // --- LÓGICA DA CAIXA DE VERIFICAÇÃO ---
+        async function verificarCodigo() {
+            const input = document.getElementById('inputVerificacao');
+            const texto = input.value;
+            const mensagem = document.getElementById('mensagemResultado');
+            const btn = document.getElementById('btnVerificar');
 
-    btn.disabled = true;
-    btn.textContent = 'Verificando...';
-
-    try {
-        // ✅ CORREÇÃO: parâmetros no body, não na URL
-        const response = await fetch(
-            `${SUPABASE_URL}/rest/v1/rpc/verificar_senha`,
-            {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ texto_inserido: texto })
+            if (!texto) {
+                mensagem.textContent = '⚠️ Por favor, digite algo!';
+                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+                mensagem.classList.add('mensagem-erro');
+                mensagem.style.display = 'block';
+                return;
             }
-        );
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Erro do servidor:', response.status, errorText);
-            throw new Error(`Erro ${response.status}: ${errorText}`);
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rpc/verificar_senha`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ texto_inserido: texto })
+                    }
+                );
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Erro do servidor:', response.status, errorText);
+                    throw new Error(`Erro ${response.status}: ${errorText}`);
+                }
+
+                const resultado = await response.json();
+
+                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+
+                if (resultado === true) {
+                    mensagem.textContent = '✅ Tudo certo — acesso liberado!';
+                    mensagem.classList.add('mensagem-sucesso');
+                    
+                    // Libera as seções de Árvores e Metais
+                    if (!acessoLiberado) {
+                        revelarSecoes();
+                        acessoLiberado = true;
+                    }
+                } else {
+                    mensagem.textContent = '❌ Deu Errado';
+                    mensagem.classList.add('mensagem-erro');
+                }
+
+                mensagem.style.display = 'block';
+            } catch (err) {
+                mensagem.textContent = '❌ Erro ao verificar no servidor!';
+                mensagem.classList.remove('mensagem-sucesso');
+                mensagem.classList.add('mensagem-erro');
+                mensagem.style.display = 'block';
+                console.error('Erro completo:', err);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Verificar';
+            }
         }
 
-        const resultado = await response.json(); // retorna true ou false
+        // Função para revelar as seções de Árvores e Metais com animação
+        function revelarSecoes() {
+            const secaoArvores = document.getElementById('secaoArvores');
+            const secaoMetais = document.getElementById('secaoMetais');
 
-        // Remove classes anteriores
-        mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
+            // Remove a classe hidden e adiciona animação
+            secaoArvores.classList.remove('hidden');
+            secaoArvores.classList.add('section-revealed');
 
-        if (resultado === true) {
-            mensagem.textContent = '✅ Tudo certo';
-            mensagem.classList.add('mensagem-sucesso');
-        } else {
-            mensagem.textContent = '❌ Deu Errado';
-            mensagem.classList.add('mensagem-erro');
+            secaoMetais.classList.remove('hidden');
+            secaoMetais.classList.add('section-revealed');
+
+            // Faz scroll suave até a seção de Árvores
+            setTimeout(() => {
+                secaoArvores.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
-
-        mensagem.style.display = 'block';
-    } catch (err) {
-        mensagem.textContent = '❌ Erro ao verificar no servidor!';
-        mensagem.classList.remove('mensagem-sucesso');
-        mensagem.classList.add('mensagem-erro');
-        mensagem.style.display = 'block';
-        console.error('Erro completo:', err);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Verificar';
-    }
-}
 
         // Permite verificar pressionando Enter
         document.getElementById('inputVerificacao').addEventListener('keypress', function(e) {
@@ -365,7 +411,7 @@ async function verificarCodigo() {
             }
         });
 
-        // --- LÓGICA ORIGINAL DO SUPABASE (ÁRVORES E METAIS) ---
+        // --- LÓGICA DO SUPABASE (ÁRVORES E METAIS) ---
         async function buscarDados(tabela) {
             try {
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
