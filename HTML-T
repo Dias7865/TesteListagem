@@ -513,21 +513,21 @@
             <div id="detalhesTarefa" class="detalhes-card" style="display: none;"></div>
         </div>
 
-        <div id="secaoMetais" class="section hidden">
+        <div id="secaoIntegradores" class="section hidden">
             <div class="section-header">
-                <h2>🪨 Metais</h2>
+                <h2>🪨 Integradores</h2>
             </div>
             <div class="seletor-container">
-                <label for="selectMetais">Selecione um metal:</label>
-                <select id="selectMetais" onchange="mostrarDetalhesMetal()">
-                    <option value="">-- Escolha um metal --</option>
+                <label for="selectIntegradores">Selecione um integrador:</label>
+                <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
+                    <option value="">-- Escolha um integrador --</option>
                 </select>
             </div>
-            <div id="metaisLoading" class="loading" style="display: none;">
-                Carregando metais...
+            <div id="integradoresLoading" class="loading" style="display: none;">
+                Carregando integradores...
             </div>
-            <div id="metaisError" class="error" style="display: none;"></div>
-            <div id="detalhesMetal" class="detalhes-card" style="display: none;"></div>
+            <div id="integradoresError" class="error" style="display: none;"></div>
+            <div id="detalhesIntegrador" class="detalhes-card" style="display: none;"></div>
         </div>
 
         <div id="secaoDashboard" class="section hidden">
@@ -555,7 +555,7 @@
                 <select id="tipoElemento" onchange="atualizarFormulario()">
                     <option value="">-- Selecione o tipo --</option>
                     <option value="tarefa">📌 Tarefa</option>
-                    <option value="metal">🪨 Metal</option>
+                    <option value="integrador">🪨 Integrador</option>
                 </select>
             </div>
 
@@ -590,21 +590,21 @@
                 </button>
             </div>
 
-            <div id="formMetal" class="hidden">
+            <div id="formIntegrador" class="hidden">
                 <div class="form-group">
-                    <label for="nomeMetal">Nome do Metal:</label>
-                    <input type="text" id="nomeMetal" placeholder="Ex: Cobre">
+                    <label for="nomeIntegrador">Nome do Integrador:</label>
+                    <input type="text" id="nomeIntegrador" placeholder="Ex: Cobre">
                 </div>
                 <div class="form-group">
-                    <label for="simboloMetal">Símbolo Químico:</label>
-                    <input type="text" id="simboloMetal" placeholder="Ex: Cu" maxlength="10">
+                    <label for="simboloIntegrador">Símbolo Químico:</label>
+                    <input type="text" id="simboloIntegrador" placeholder="Ex: Cu" maxlength="10">
                 </div>
                 <div class="form-group">
-                    <label for="descricaoMetal">Descrição:</label>
-                    <textarea id="descricaoMetal" placeholder="Descreva o metal..."></textarea>
+                    <label for="descricaoIntegrador">Descrição:</label>
+                    <textarea id="descricaoIntegrador" placeholder="Descreva o integrador..."></textarea>
                 </div>
-                <button class="btn btn-success" onclick="adicionarMetal()" id="btnAdicionarMetal">
-                    Adicionar Metal
+                <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">
+                    Adicionar Integrador
                 </button>
             </div>
 
@@ -625,7 +625,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
         let dadosTarefas = [];
-        let dadosMetais = [];
+        let dadosIntegradores = [];
 
         async function verificarCodigo() {
             const input = document.getElementById('inputVerificacao');
@@ -697,15 +697,15 @@
 
         function revelarSecoes() {
             const secaoTarefas = document.getElementById('secaoTarefas');
-            const secaoMetais = document.getElementById('secaoMetais');
+            const secaoIntegradores = document.getElementById('secaoIntegradores');
             const secaoDashboard = document.getElementById('secaoDashboard');
             const secaoAdicionar = document.getElementById('secaoAdicionar');
 
             secaoTarefas.classList.remove('hidden');
             secaoTarefas.classList.add('section-revealed');
 
-            secaoMetais.classList.remove('hidden');
-            secaoMetais.classList.add('section-revealed');
+            secaoIntegradores.classList.remove('hidden');
+            secaoIntegradores.classList.add('section-revealed');
 
             secaoDashboard.classList.remove('hidden');
             secaoDashboard.classList.add('section-revealed');
@@ -716,7 +716,7 @@
 
         async function carregarDadosIniciais() {
             await carregarTarefas();
-            await carregarMetais();
+            await carregarIntegradores();
         }
 
         document.getElementById('inputVerificacao').addEventListener('keypress', function(e) {
@@ -775,29 +775,29 @@
             }
         }
 
-        async function carregarMetais() {
-            const loading = document.getElementById('metaisLoading');
-            const error = document.getElementById('metaisError');
-            const select = document.getElementById('selectMetais');
+        async function carregarIntegradores() {
+            const loading = document.getElementById('integradoresLoading');
+            const error = document.getElementById('integradoresError');
+            const select = document.getElementById('selectIntegradores');
 
             error.style.display = 'none';
             loading.style.display = 'block';
 
             try {
-                dadosMetais = await buscarDados('metais');
+                dadosIntegradores = await buscarDados('integradores');
                 loading.style.display = 'none';
 
-                select.innerHTML = '<option value="">-- Escolha um metal --</option>';
+                select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
 
-                dadosMetais.forEach((metal, index) => {
+                dadosIntegradores.forEach((integrador, index) => {
                     const option = document.createElement('option');
                     option.value = index;
-                    option.textContent = metal.nome;
+                    option.textContent = integrador.nome;
                     select.appendChild(option);
                 });
             } catch (err) {
                 loading.style.display = 'none';
-                error.textContent = `❌ Erro ao carregar metais: ${err.message}`;
+                error.textContent = `❌ Erro ao carregar integradores: ${err.message}`;
                 error.style.display = 'block';
             }
         }
@@ -852,9 +852,9 @@
             detalhesDiv.style.display = 'block';
         }
 
-        function mostrarDetalhesMetal() {
-            const select = document.getElementById('selectMetais');
-            const detalhesDiv = document.getElementById('detalhesMetal');
+        function mostrarDetalhesIntegrador() {
+            const select = document.getElementById('selectIntegradores');
+            const detalhesDiv = document.getElementById('detalhesIntegrador');
             const index = select.value;
 
             if (index === '') {
@@ -862,18 +862,18 @@
                 return;
             }
 
-            const metal = dadosMetais[index];
+            const integrador = dadosIntegradores[index];
             detalhesDiv.innerHTML = `
-                <h3>${metal.nome}</h3>
-                <p><span class="label">Símbolo Químico:</span> <span class="badge">${metal.simbolo_quimico || 'N/A'}</span></p>
-                <p><span class="label">Descrição:</span> ${metal.descricao || 'Sem descrição'}</p>
-                <p><span class="label">ID:</span> <code>${metal.id}</code></p>
-                <p><span class="label">Criado em:</span> ${new Date(metal.created_at).toLocaleString('pt-BR')}</p>
+                <h3>${integrador.nome}</h3>
+                <p><span class="label">Símbolo Químico:</span> <span class="badge">${integrador.integrador_nome || 'N/A'}</span></p>
+                <p><span class="label">Descrição:</span> ${integrador.descricao || 'Sem descrição'}</p>
+                <p><span class="label">ID:</span> <code>${integrador.id}</code></p>
+                <p><span class="label">Criado em:</span> ${new Date(integrador.created_at).toLocaleString('pt-BR')}</p>
                 <div class="action-buttons">
-                    <button class="btn btn-warning" onclick="abrirEdicaoMetal(${index})">✏️ Modificar Elemento</button>
-                    <button class="btn btn-danger" onclick="removerMetal(${index})">🗑️ Remover Elemento</button>
+                    <button class="btn btn-warning" onclick="abrirEdicaoIntegrador(${index})">✏️ Modificar Elemento</button>
+                    <button class="btn btn-danger" onclick="removerIntegrador(${index})">🗑️ Remover Elemento</button>
                 </div>
-                <div id="editFormMetal"></div>
+                <div id="editFormIntegrador"></div>
             `;
             detalhesDiv.style.display = 'block';
         }
@@ -975,44 +975,44 @@
             }
         }
 
-        function abrirEdicaoMetal(index) {
-            const metal = dadosMetais[index];
-            const editFormDiv = document.getElementById('editFormMetal');
+        function abrirEdicaoIntegrador(index) {
+            const integrador = dadosIntegradores[index];
+            const editFormDiv = document.getElementById('editFormIntegrador');
 
             editFormDiv.innerHTML = `
                 <div class="edit-form">
-                    <h4>✏️ Editando: ${metal.nome}</h4>
+                    <h4>✏️ Editando: ${integrador.nome}</h4>
                     <div class="form-group">
-                        <label for="editNomeMetal">Nome:</label>
-                        <input type="text" id="editNomeMetal" value="${metal.nome || ''}">
+                        <label for="editNomeIntegrador">Nome:</label>
+                        <input type="text" id="editNomeIntegrador" value="${integrador.nome || ''}">
                     </div>
                     <div class="form-group">
-                        <label for="editSimboloMetal">Símbolo Químico:</label>
-                        <input type="text" id="editSimboloMetal" value="${metal.simbolo_quimico || ''}" maxlength="10">
+                        <label for="editSimboloIntegrador">Símbolo Químico:</label>
+                        <input type="text" id="editSimboloIntegrador" value="${integrador.integrador_nome || ''}" maxlength="10">
                     </div>
                     <div class="form-group">
-                        <label for="editDescricaoMetal">Descrição:</label>
-                        <textarea id="editDescricaoMetal">${metal.descricao || ''}</textarea>
+                        <label for="editDescricaoIntegrador">Descrição:</label>
+                        <textarea id="editDescricaoIntegrador">${integrador.descricao || ''}</textarea>
                     </div>
                     <div class="action-buttons">
-                        <button class="btn btn-success" onclick="salvarEdicaoMetal(${index})">💾 Salvar</button>
-                        <button class="btn btn-secondary" onclick="cancelarEdicaoMetal()">❌ Cancelar</button>
+                        <button class="btn btn-success" onclick="salvarEdicaoIntegrador(${index})">💾 Salvar</button>
+                        <button class="btn btn-secondary" onclick="cancelarEdicaoIntegrador()">❌ Cancelar</button>
                     </div>
-                    <div id="editMsgMetal" style="margin-top: 10px;"></div>
+                    <div id="editMsgIntegrador" style="margin-top: 10px;"></div>
                 </div>
             `;
         }
 
-        function cancelarEdicaoMetal() {
-            document.getElementById('editFormMetal').innerHTML = '';
+        function cancelarEdicaoIntegrador() {
+            document.getElementById('editFormIntegrador').innerHTML = '';
         }
 
-        async function salvarEdicaoMetal(index) {
-            const metal = dadosMetais[index];
-            const nome = document.getElementById('editNomeMetal').value.trim();
-            const simbolo = document.getElementById('editSimboloMetal').value.trim();
-            const descricao = document.getElementById('editDescricaoMetal').value.trim();
-            const msgDiv = document.getElementById('editMsgMetal');
+        async function salvarEdicaoIntegrador(index) {
+            const integrador = dadosIntegradores[index];
+            const nome = document.getElementById('editNomeIntegrador').value.trim();
+            const simbolo = document.getElementById('editSimboloIntegrador').value.trim();
+            const descricao = document.getElementById('editDescricaoIntegrador').value.trim();
+            const msgDiv = document.getElementById('editMsgIntegrador');
 
             if (!nome) {
                 msgDiv.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
@@ -1020,7 +1020,7 @@
             }
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/metais?id=eq.${metal.id}`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${integrador.id}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -1030,7 +1030,7 @@
                     },
                     body: JSON.stringify({
                         nome: nome,
-                        simbolo_quimico: simbolo || null,
+                        integrador_nome: simbolo || null,
                         descricao: descricao || null
                     })
                 });
@@ -1041,12 +1041,12 @@
 
                 const atualizado = await response.json();
                 
-                dadosMetais[index] = atualizado[0];
+                dadosIntegradores[index] = atualizado[0];
                 
-                const select = document.getElementById('selectMetais');
+                const select = document.getElementById('selectIntegradores');
                 select.options[select.selectedIndex].textContent = nome;
                 
-                mostrarDetalhesMetal();
+                mostrarDetalhesIntegrador();
             } catch (err) {
                 msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
                 console.error('Erro:', err);
@@ -1093,15 +1093,15 @@
             }
         }
 
-        async function removerMetal(index) {
-            const metal = dadosMetais[index];
+        async function removerIntegrador(index) {
+            const integrador = dadosIntegradores[index];
             
-            if (!confirm(`Tem certeza que deseja remover o metal "${metal.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
+            if (!confirm(`Tem certeza que deseja remover o integrador "${integrador.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
                 return;
             }
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/metais?id=eq.${metal.id}`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${integrador.id}`, {
                     method: 'DELETE',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -1113,20 +1113,20 @@
                     throw new Error('Erro ao remover');
                 }
 
-                dadosMetais.splice(index, 1);
+                dadosIntegradores.splice(index, 1);
                 
-                const select = document.getElementById('selectMetais');
-                select.innerHTML = '<option value="">-- Escolha um metal --</option>';
-                dadosMetais.forEach((m, i) => {
+                const select = document.getElementById('selectIntegradores');
+                select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
+                dadosIntegradores.forEach((m, i) => {
                     const option = document.createElement('option');
                     option.value = i;
                     option.textContent = m.nome;
                     select.appendChild(option);
                 });
 
-                document.getElementById('detalhesMetal').style.display = 'none';
+                document.getElementById('detalhesIntegrador').style.display = 'none';
                 
-                alert(`✅ Metal "${metal.nome}" removido com sucesso!`);
+                alert(`✅ Integrador "${integrador.nome}" removido com sucesso!`);
             } catch (err) {
                 alert(`❌ Erro ao remover: ${err.message}`);
                 console.error('Erro:', err);
@@ -1136,17 +1136,17 @@
         function atualizarFormulario() {
             const tipo = document.getElementById('tipoElemento').value;
             const formTarefa = document.getElementById('formTarefa');
-            const formMetal = document.getElementById('formMetal');
+            const formIntegrador = document.getElementById('formIntegrador');
             const mensagem = document.getElementById('mensagemAdicionar');
 
             formTarefa.classList.add('hidden');
-            formMetal.classList.add('hidden');
+            formIntegrador.classList.add('hidden');
             mensagem.innerHTML = '';
 
             if (tipo === 'tarefa') {
                 formTarefa.classList.remove('hidden');
-            } else if (tipo === 'metal') {
-                formMetal.classList.remove('hidden');
+            } else if (tipo === 'integrador') {
+                formIntegrador.classList.remove('hidden');
             }
         }
 
@@ -1218,12 +1218,12 @@
             }
         }
 
-        async function adicionarMetal() {
-            const nome = document.getElementById('nomeMetal').value.trim();
-            const simbolo = document.getElementById('simboloMetal').value.trim();
-            const descricao = document.getElementById('descricaoMetal').value.trim();
+        async function adicionarIntegrador() {
+            const nome = document.getElementById('nomeIntegrador').value.trim();
+            const simbolo = document.getElementById('simboloIntegrador').value.trim();
+            const descricao = document.getElementById('descricaoIntegrador').value.trim();
             const mensagem = document.getElementById('mensagemAdicionar');
-            const btn = document.getElementById('btnAdicionarMetal');
+            const btn = document.getElementById('btnAdicionarIntegrador');
 
             if (!nome) {
                 mensagem.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
@@ -1234,7 +1234,7 @@
             btn.textContent = 'Adicionando...';
 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/metais`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores`, {
                     method: 'POST',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -1244,39 +1244,39 @@
                     },
                     body: JSON.stringify({
                         nome: nome,
-                        simbolo_quimico: simbolo || null,
+                        integrador_nome: simbolo || null,
                         descricao: descricao || null
                     })
                 });
 
                 if (!response.ok) {
-                    throw new Error('Erro ao adicionar metal');
+                    throw new Error('Erro ao adicionar integrador');
                 }
 
-                const novoMetal = await response.json();
+                const novoIntegrador = await response.json();
                 
-                dadosMetais.push(novoMetal[0]);
+                dadosIntegradores.push(novoIntegrador[0]);
                 
-                const select = document.getElementById('selectMetais');
+                const select = document.getElementById('selectIntegradores');
                 const option = document.createElement('option');
-                option.value = dadosMetais.length - 1;
-                option.textContent = novoMetal[0].nome;
+                option.value = dadosIntegradores.length - 1;
+                option.textContent = novoIntegrador[0].nome;
                 select.appendChild(option);
 
                 document.getElementById('tipoElemento').value = '';
-                document.getElementById('formMetal').classList.add('hidden');
+                document.getElementById('formIntegrador').classList.add('hidden');
 
-                document.getElementById('nomeMetal').value = '';
-                document.getElementById('simboloMetal').value = '';
-                document.getElementById('descricaoMetal').value = '';
+                document.getElementById('nomeIntegrador').value = '';
+                document.getElementById('simboloIntegrador').value = '';
+                document.getElementById('descricaoIntegrador').value = '';
 
-                mensagem.innerHTML = `<div class="success">✅ Metal "${novoMetal[0].nome}" adicionado com sucesso!</div>`;
+                mensagem.innerHTML = `<div class="success">✅ Integrador "${novoIntegrador[0].nome}" adicionado com sucesso!</div>`;
             } catch (err) {
-                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar metal: ${err.message}</div>`;
+                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar integrador: ${err.message}</div>`;
                 console.error('Erro:', err);
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Adicionar Metal';
+                btn.textContent = 'Adicionar Integrador';
             }
         }
 
