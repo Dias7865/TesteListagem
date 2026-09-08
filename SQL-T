@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS metais;
 DROP TABLE IF EXISTS arvores;
 DROP TABLE IF EXISTS configuracoes;
 
--- 2. Criação da tabela de configurações (armazena a senha)
+-- 2. Criação da tabela de configurações
 CREATE TABLE configuracoes (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     chave varchar(50) NOT NULL,
@@ -51,7 +51,7 @@ ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE arvores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE metais ENABLE ROW LEVEL SECURITY;
 
--- Políticas das tabelas de dados
+-- Políticas de SELECT
 CREATE POLICY "Permitir leitura pública de arvores" 
 ON arvores FOR SELECT 
 USING (true);
@@ -60,12 +60,21 @@ CREATE POLICY "Permitir leitura pública de metais"
 ON metais FOR SELECT 
 USING (true);
 
--- Política da tabela de configurações: ninguém lê diretamente
+-- Políticas de INSERT (NOVAS)
+CREATE POLICY "Permitir inserção pública de arvores" 
+ON arvores FOR INSERT 
+WITH CHECK (true);
+
+CREATE POLICY "Permitir inserção pública de metais" 
+ON metais FOR INSERT 
+WITH CHECK (true);
+
+-- Política da tabela de configurações
 CREATE POLICY "Bloquear leitura direta de configuracoes" 
 ON configuracoes FOR SELECT 
 USING (false);
 
--- 9. Função para verificar a senha (retorna true/false)
+-- 9. Função para verificar a senha
 CREATE OR REPLACE FUNCTION verificar_senha(texto_inserido text)
 RETURNS boolean 
 LANGUAGE plpgsql 
@@ -74,16 +83,14 @@ AS $$
 DECLARE
     senha_correta text;
 BEGIN
-    -- Busca a senha armazenada no banco
     SELECT valor INTO senha_correta 
     FROM configuracoes 
     WHERE chave = 'senha_verificacao' 
     LIMIT 1;
     
-    -- Compara e retorna true se estiver correta, false caso contrário
     RETURN texto_inserido = senha_correta;
 END;
 $$;
 
--- 10. Permite que usuários anônimos executem a função
+-- 10. Permissões
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
