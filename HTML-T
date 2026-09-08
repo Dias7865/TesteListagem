@@ -87,6 +87,26 @@
             box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
         }
 
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+
+        .btn-warning:hover {
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
+        }
+
         .loading {
             text-align: center;
             padding: 20px;
@@ -186,7 +206,7 @@
             border-color: #667eea;
         }
 
-        /* Estilos do formulário de adição */
+        /* Estilos do formulário de adição/edição */
         .form-group {
             margin-bottom: 20px;
         }
@@ -260,6 +280,35 @@
             border-radius: 20px;
             font-size: 0.85rem;
             margin-left: 8px;
+        }
+
+        /* Botões de ação (Modificar/Remover) */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* Formulário de edição inline */
+        .edit-form {
+            background: #fff8e1;
+            border: 2px solid #ff9800;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .edit-form h4 {
+            color: #f57c00;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
         }
 
         /* Classe para esconder seções */
@@ -344,7 +393,7 @@
             <div id="detalhesMetal" class="detalhes-card" style="display: none;"></div>
         </div>
 
-        <!-- Seção de Adicionar Elemento (NOVA) -->
+        <!-- Seção de Adicionar Elemento -->
         <div id="secaoAdicionar" class="section hidden">
             <div class="section-header">
                 <h2>➕ Adicionar Elemento</h2>
@@ -406,8 +455,8 @@
 
     <script>
         // Configuração do Supabase
-        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
+        const SUPABASE_URL = 'MYLINK';
+        const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
 
         // Variáveis para armazenar os dados
         let dadosArvores = [];
@@ -603,6 +652,11 @@
                 <p><span class="label">Descrição:</span> ${arvore.descricao || 'Sem descrição'}</p>
                 <p><span class="label">ID:</span> <code>${arvore.id}</code></p>
                 <p><span class="label">Criado em:</span> ${new Date(arvore.created_at).toLocaleString('pt-BR')}</p>
+                <div class="action-buttons">
+                    <button class="btn btn-warning" onclick="abrirEdicaoArvore(${index})">✏️ Modificar Elemento</button>
+                    <button class="btn btn-danger" onclick="removerArvore(${index})">🗑️ Remover Elemento</button>
+                </div>
+                <div id="editFormArvore"></div>
             `;
             detalhesDiv.style.display = 'block';
         }
@@ -624,23 +678,276 @@
                 <p><span class="label">Descrição:</span> ${metal.descricao || 'Sem descrição'}</p>
                 <p><span class="label">ID:</span> <code>${metal.id}</code></p>
                 <p><span class="label">Criado em:</span> ${new Date(metal.created_at).toLocaleString('pt-BR')}</p>
+                <div class="action-buttons">
+                    <button class="btn btn-warning" onclick="abrirEdicaoMetal(${index})">✏️ Modificar Elemento</button>
+                    <button class="btn btn-danger" onclick="removerMetal(${index})">🗑️ Remover Elemento</button>
+                </div>
+                <div id="editFormMetal"></div>
             `;
             detalhesDiv.style.display = 'block';
         }
 
-        // --- LÓGICA DE ADICIONAR ELEMENTOS (NOVA) ---
+        // --- FUNÇÕES DE EDIÇÃO ---
+        function abrirEdicaoArvore(index) {
+            const arvore = dadosArvores[index];
+            const editFormDiv = document.getElementById('editFormArvore');
+
+            editFormDiv.innerHTML = `
+                <div class="edit-form">
+                    <h4>✏️ Editando: ${arvore.nome}</h4>
+                    <div class="form-group">
+                        <label for="editNomeArvore">Nome:</label>
+                        <input type="text" id="editNomeArvore" value="${arvore.nome || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTipoArvore">Tipo:</label>
+                        <input type="text" id="editTipoArvore" value="${arvore.tipo || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editDescricaoArvore">Descrição:</label>
+                        <textarea id="editDescricaoArvore">${arvore.descricao || ''}</textarea>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="salvarEdicaoArvore(${index})">💾 Salvar</button>
+                        <button class="btn btn-secondary" onclick="cancelarEdicaoArvore()">❌ Cancelar</button>
+                    </div>
+                    <div id="editMsgArvore" style="margin-top: 10px;"></div>
+                </div>
+            `;
+        }
+
+        function cancelarEdicaoArvore() {
+            document.getElementById('editFormArvore').innerHTML = '';
+        }
+
+        async function salvarEdicaoArvore(index) {
+            const arvore = dadosArvores[index];
+            const nome = document.getElementById('editNomeArvore').value.trim();
+            const tipo = document.getElementById('editTipoArvore').value.trim();
+            const descricao = document.getElementById('editDescricaoArvore').value.trim();
+            const msgDiv = document.getElementById('editMsgArvore');
+
+            if (!nome) {
+                msgDiv.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/arvores?id=eq.${arvore.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        nome: nome,
+                        tipo: tipo || null,
+                        descricao: descricao || null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao atualizar');
+                }
+
+                const atualizada = await response.json();
+                
+                // Atualiza o array local
+                dadosArvores[index] = atualizada[0];
+                
+                // Atualiza o texto no select
+                const select = document.getElementById('selectArvores');
+                select.options[select.selectedIndex].textContent = nome;
+                
+                // Atualiza a visualização de detalhes
+                mostrarDetalhesArvore();
+            } catch (err) {
+                msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
+                console.error('Erro:', err);
+            }
+        }
+
+        function abrirEdicaoMetal(index) {
+            const metal = dadosMetais[index];
+            const editFormDiv = document.getElementById('editFormMetal');
+
+            editFormDiv.innerHTML = `
+                <div class="edit-form">
+                    <h4>✏️ Editando: ${metal.nome}</h4>
+                    <div class="form-group">
+                        <label for="editNomeMetal">Nome:</label>
+                        <input type="text" id="editNomeMetal" value="${metal.nome || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editSimboloMetal">Símbolo Químico:</label>
+                        <input type="text" id="editSimboloMetal" value="${metal.simbolo_quimico || ''}" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="editDescricaoMetal">Descrição:</label>
+                        <textarea id="editDescricaoMetal">${metal.descricao || ''}</textarea>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="salvarEdicaoMetal(${index})">💾 Salvar</button>
+                        <button class="btn btn-secondary" onclick="cancelarEdicaoMetal()">❌ Cancelar</button>
+                    </div>
+                    <div id="editMsgMetal" style="margin-top: 10px;"></div>
+                </div>
+            `;
+        }
+
+        function cancelarEdicaoMetal() {
+            document.getElementById('editFormMetal').innerHTML = '';
+        }
+
+        async function salvarEdicaoMetal(index) {
+            const metal = dadosMetais[index];
+            const nome = document.getElementById('editNomeMetal').value.trim();
+            const simbolo = document.getElementById('editSimboloMetal').value.trim();
+            const descricao = document.getElementById('editDescricaoMetal').value.trim();
+            const msgDiv = document.getElementById('editMsgMetal');
+
+            if (!nome) {
+                msgDiv.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPabase_URL}/rest/v1/metais?id=eq.${metal.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify({
+                        nome: nome,
+                        simbolo_quimico: simbolo || null,
+                        descricao: descricao || null
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao atualizar');
+                }
+
+                const atualizado = await response.json();
+                
+                // Atualiza o array local
+                dadosMetais[index] = atualizado[0];
+                
+                // Atualiza o texto no select
+                const select = document.getElementById('selectMetais');
+                select.options[select.selectedIndex].textContent = nome;
+                
+                // Atualiza a visualização de detalhes
+                mostrarDetalhesMetal();
+            } catch (err) {
+                msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
+                console.error('Erro:', err);
+            }
+        }
+
+        // --- FUNÇÕES DE REMOÇÃO ---
+        async function removerArvore(index) {
+            const arvore = dadosArvores[index];
+            
+            if (!confirm(`Tem certeza que deseja remover a árvore "${arvore.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/arvores?id=eq.${arvore.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao remover');
+                }
+
+                // Remove do array local
+                dadosArvores.splice(index, 1);
+                
+                // Reconstrói o select
+                const select = document.getElementById('selectArvores');
+                select.innerHTML = '<option value="">-- Escolha uma árvore --</option>';
+                dadosArvores.forEach((a, i) => {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = a.nome;
+                    select.appendChild(option);
+                });
+
+                // Esconde os detalhes
+                document.getElementById('detalhesArvore').style.display = 'none';
+                
+                alert(`✅ Árvore "${arvore.nome}" removida com sucesso!`);
+            } catch (err) {
+                alert(`❌ Erro ao remover: ${err.message}`);
+                console.error('Erro:', err);
+            }
+        }
+
+        async function removerMetal(index) {
+            const metal = dadosMetais[index];
+            
+            if (!confirm(`Tem certeza que deseja remover o metal "${metal.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/metais?id=eq.${metal.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao remover');
+                }
+
+                // Remove do array local
+                dadosMetais.splice(index, 1);
+                
+                // Reconstrói o select
+                const select = document.getElementById('selectMetais');
+                select.innerHTML = '<option value="">-- Escolha um metal --</option>';
+                dadosMetais.forEach((m, i) => {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = m.nome;
+                    select.appendChild(option);
+                });
+
+                // Esconde os detalhes
+                document.getElementById('detalhesMetal').style.display = 'none';
+                
+                alert(`✅ Metal "${metal.nome}" removido com sucesso!`);
+            } catch (err) {
+                alert(`❌ Erro ao remover: ${err.message}`);
+                console.error('Erro:', err);
+            }
+        }
+
+        // --- LÓGICA DE ADICIONAR ELEMENTOS ---
         function atualizarFormulario() {
             const tipo = document.getElementById('tipoElemento').value;
             const formArvore = document.getElementById('formArvore');
             const formMetal = document.getElementById('formMetal');
             const mensagem = document.getElementById('mensagemAdicionar');
 
-            // Esconde ambos os formulários e limpa mensagem
             formArvore.classList.add('hidden');
             formMetal.classList.add('hidden');
             mensagem.innerHTML = '';
 
-            // Mostra o formulário correspondente
             if (tipo === 'arvore') {
                 formArvore.classList.remove('hidden');
             } else if (tipo === 'metal') {
@@ -685,17 +992,17 @@
 
                 const novaArvore = await response.json();
                 
-                // Adiciona ao array local
                 dadosArvores.push(novaArvore[0]);
                 
-                // Atualiza o select
                 const select = document.getElementById('selectArvores');
                 const option = document.createElement('option');
                 option.value = dadosArvores.length - 1;
                 option.textContent = novaArvore[0].nome;
                 select.appendChild(option);
 
-                // Limpa o formulário
+                document.getElementById('tipoElemento').value = '';
+                document.getElementById('formArvore').classList.add('hidden');
+
                 document.getElementById('nomeArvore').value = '';
                 document.getElementById('tipoArvore').value = '';
                 document.getElementById('descricaoArvore').value = '';
@@ -747,17 +1054,17 @@
 
                 const novoMetal = await response.json();
                 
-                // Adiciona ao array local
                 dadosMetais.push(novoMetal[0]);
                 
-                // Atualiza o select
                 const select = document.getElementById('selectMetais');
                 const option = document.createElement('option');
                 option.value = dadosMetais.length - 1;
                 option.textContent = novoMetal[0].nome;
                 select.appendChild(option);
 
-                // Limpa o formulário
+                document.getElementById('tipoElemento').value = '';
+                document.getElementById('formMetal').classList.add('hidden');
+
                 document.getElementById('nomeMetal').value = '';
                 document.getElementById('simboloMetal').value = '';
                 document.getElementById('descricaoMetal').value = '';
