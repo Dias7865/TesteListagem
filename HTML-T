@@ -1,1334 +1,171 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor de Dados - Matssa</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
- 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 15px;
-        }
-
-        h2 {
-            color: #333;
-            font-size: 1.8rem;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-        }
-
-        .btn-warning:hover {
-            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
-        }
-
-        .btn-dashboard {
-            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
-        }
-
-        .btn-dashboard:hover {
-            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #667eea;
-            font-size: 1.1rem;
-        }
-
-        .error {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .success {
-            background: #e8f5e9;
-            border: 1px solid #4caf50;
-            color: #2e7d32;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-
-        .verificacao-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .verificacao-container input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .verificacao-container input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .mensagem-resultado {
-            margin-top: 15px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-            display: none;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .mensagem-sucesso {
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
-            color: #2e7d32;
-        }
-
-        .mensagem-erro {
-            background: #fce4ec;
-            border: 2px solid #f44336;
-            color: #c62828;
-        }
-
-        .seletor-container {
-            margin-bottom: 20px;
-        }
-
-        .seletor-container label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-            font-size: 1rem;
-        }
-
-        .seletor-container select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            background-color: white;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-
-        .seletor-container select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-            font-size: 1rem;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            font-family: inherit;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .detalhes-card {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 25px;
-            border-left: 4px solid #667eea;
-            margin-top: 20px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .detalhes-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.6rem;
-            text-transform: capitalize;
-        }
-
-        .detalhes-card p {
-            color: #666;
-            margin: 10px 0;
-            line-height: 1.6;
-            font-size: 1rem;
-        }
-
-        .detalhes-card .label {
-            font-weight: bold;
-            color: #764ba2;
-        }
-
-        .detalhes-card .badge {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-left: 8px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-left: 8px;
-        }
-
-        .status-em-progresso {
-            background: #4caf50;
-            color: white;
-        }
-
-        .status-aguardando {
-            background: #ff9800;
-            color: white;
-        }
-
-        .status-nao-iniciado {
-            background: #f44336;
-            color: white;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .action-buttons .btn {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .edit-form {
-            background: #fff8e1;
-            border: 2px solid #ff9800;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .edit-form h4 {
-            color: #f57c00;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .dashboard-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            z-index: 9999;
-            display: none;
-            overflow: hidden;
-        }
-
-        .dashboard-overlay.active {
-            display: block;
-        }
-
-        .dashboard-close {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            z-index: 10000;
-        }
-
-        .dashboard-close:hover {
-            background: rgba(244, 67, 54, 0.8);
-            border-color: #f44336;
-            transform: rotate(90deg);
-        }
-
-        .dashboard-title {
-            position: absolute;
-            top: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-
-        .dashboard-container {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 450px;   /* ← aumentado para 450px */
-            transform: translateY(-50%);
-            overflow: hidden;
-        }
-
-        .dashboard-track {
-            display: flex;
-            gap: 40px;
-            animation: scrollLeft 30s linear infinite;
-            height: 100%;
-        }
-
-        .dashboard-card {
-            flex-shrink: 0;
-            width: 400px;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            color: white;
-            overflow-y: auto;   /* ← adicionado para rolagem interna se precisar */
-        }
-
-        .dashboard-card h3 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .dashboard-card p {
-            font-size: 1.1rem;
-            margin: 12px 0;
-            line-height: 1.6;
-        }
-
-        .dashboard-card .label {
-            font-weight: bold;
-            font-size: 0.9rem;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @keyframes scrollLeft {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(calc(-440px * var(--card-count)));
-            }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        .section-revealed {
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>📌 Leitor de Dados Supabase 🪨</h1>
-
-        <div id="secaoVerificacao" class="section">
-            <div class="section-header">
-                <h2>🔍 Verificação</h2>
-            </div>
-            <p style="color: #666; margin-bottom: 10px;">
-                Digite o código e clique em Verificar para liberar o acesso:
-            </p>
-            <div class="verificacao-container">
-                <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
-                <button class="btn" onclick="verificarCodigo()" id="btnVerificar">Verificar</button>
-            </div>
-            <div id="mensagemResultado" class="mensagem-resultado"></div>
-        </div>
-
-        <div id="secaoTarefas" class="section hidden">
-            <div class="section-header">
-                <h2>📌 Tarefas</h2>
-            </div>
-            <div class="seletor-container">
-                <label for="selectTarefas">Selecione uma tarefa:</label>
-                <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
-                    <option value="">-- Escolha uma tarefa --</option>
-                </select>
-            </div>
-            <div id="tarefasLoading" class="loading" style="display: none;">
-                Carregando tarefas...
-            </div>
-            <div id="tarefasError" class="error" style="display: none;"></div>
-            <div id="detalhesTarefa" class="detalhes-card" style="display: none;"></div>
-        </div>
-
-        <div id="secaoIntegradores" class="section hidden">
-            <div class="section-header">
-                <h2>🪨 Integradores</h2>
-            </div>
-            <div class="seletor-container">
-                <label for="selectIntegradores">Selecione um integrador:</label>
-                <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
-                    <option value="">-- Escolha um integrador --</option>
-                </select>
-            </div>
-            <div id="integradoresLoading" class="loading" style="display: none;">
-                Carregando integradores...
-            </div>
-            <div id="integradoresError" class="error" style="display: none;"></div>
-            <div id="detalhesIntegrador" class="detalhes-card" style="display: none;"></div>
-        </div>
-
-        <div id="secaoDashboard" class="section hidden">
-            <div class="section-header">
-                <h2>📊 Dashboard</h2>
-            </div>
-            <p style="color: #666; margin-bottom: 20px;">
-                Visualize todas as tarefas cadastradas em tela cheia:
-            </p>
-            <button class="btn btn-dashboard" onclick="abrirDashboard()">
-                🎬 Abrir Dashboard de Tarefas
-            </button>
-        </div>
-
-        <div id="secaoAdicionar" class="section hidden">
-            <div class="section-header">
-                <h2>➕ Adicionar Elemento</h2>
-            </div>
-            <p style="color: #666; margin-bottom: 20px;">
-                Crie um novo elemento para uma das listas existentes:
-            </p>
-
-            <div class="form-group">
-                <label for="tipoElemento">Tipo de Elemento:</label>
-                <select id="tipoElemento" onchange="atualizarFormulario()">
-                    <option value="">-- Selecione o tipo --</option>
-                    <option value="tarefa">📌 Tarefa</option>
-                    <option value="integrador">🪨 Integrador</option>
-                </select>
-            </div>
-
-            <div id="formTarefa" class="hidden">
-                <div class="form-group">
-                    <label for="intgTarefa">Metal Associado:</label>
-                    <select id="intTarefa">
-                        <option value="">-- Nenhum integrador --</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="nomeTarefa">Nome da Tarefa:</label>
-                    <input type="text" id="nomeTarefa" placeholder="Ex: Edifício da Matssa">
-                </div>
-                <div class="form-group">
-                    <label for="tipoTarefa">Tipo:</label>
-                    <input type="text" id="tipoTarefa" placeholder="Ex: Nova Instalação Solar">
-                </div>
-                <div class="form-group">
-                    <label for="statusTarefa">Status:</label>
-                    <select id="statusTarefa">
-                        <option value="">-- Selecione o status --</option>
-                        <option value="em progresso">⏩ Em progresso</option>
-                        <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
-                        <option value="não iniciado">❌ não iniciado</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="dataEsperadaTarefa">Data Esperada:</label>
-                    <input type="date" id="dataEsperadaTarefa">
-                </div>
-                <div class="form-group">
-                    <label for="descricaoTarefa">Descrição:</label>
-                    <textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea>
-                </div>
-                <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">
-                    Adicionar Tarefa
-                </button>
-            </div>
-
-            <div id="formIntegrador" class="hidden">
-                <div class="form-group">
-                    <label for="nomeIntegrador">Nome do Integrador:</label>
-                    <input type="text" id="nomeIntegrador" placeholder="Ex: Cobre">
-                </div>
-                <div class="form-group">
-                    <label for="ncpfIntegrador">nº do CPF:</label>
-                    <input type="text" id="ncpfIntegrador" placeholder="Ex: 01010101010" maxlength="15">
-                </div>
-                <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">
-                    Adicionar Integrador
-                </button>
-            </div>
-
-            <div id="mensagemAdicionar" style="margin-top: 15px;"></div>
-        </div>
-    </div>
-
-    <div id="dashboardOverlay" class="dashboard-overlay">
-        <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
-        <h1 class="dashboard-title">📌 Dashboard de Tarefas</h1>
-        <div class="dashboard-container">
-            <div id="dashboardTrack" class="dashboard-track"></div>
-        </div>
-    </div>
-
-    <script>
-        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
-
-        let dadosTarefas = [];
-        let dadosIntegradores = [];
-
-        async function verificarCodigo() {
-            const input = document.getElementById('inputVerificacao');
-            const texto = input.value;
-            const mensagem = document.getElementById('mensagemResultado');
-            const btn = document.getElementById('btnVerificar');
-
-            if (!texto) {
-                mensagem.textContent = '⚠️ Por favor, digite algo!';
-                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
-                mensagem.classList.add('mensagem-erro');
-                mensagem.style.display = 'block';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = 'Verificando...';
-
-            try {
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rpc/verificar_senha`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'apikey': SUPABASE_ANON_KEY,
-                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ texto_inserido: texto })
-                    }
-                );
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Erro do servidor:', response.status, errorText);
-                    throw new Error(`Erro ${response.status}: ${errorText}`);
-                }
-
-                const resultado = await response.json();
-
-                mensagem.classList.remove('mensagem-sucesso', 'mensagem-erro');
-
-                if (resultado === true) {
-                    mensagem.textContent = '✅ Tudo certo — acesso liberado!';
-                    mensagem.classList.add('mensagem-sucesso');
-                    mensagem.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        document.getElementById('secaoVerificacao').classList.add('hidden');
-                        revelarSecoes();
-                        carregarDadosIniciais();
-                    }, 1000);
-                } else {
-                    mensagem.textContent = '❌ Deu Errado';
-                    mensagem.classList.add('mensagem-erro');
-                    mensagem.style.display = 'block';
-                }
-            } catch (err) {
-                mensagem.textContent = '❌ Erro ao verificar no servidor!';
-                mensagem.classList.remove('mensagem-sucesso');
-                mensagem.classList.add('mensagem-erro');
-                mensagem.style.display = 'block';
-                console.error('Erro completo:', err);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Verificar';
-            }
-        }
-
-        function revelarSecoes() {
-            const secaoTarefas = document.getElementById('secaoTarefas');
-            const secaoIntegradores = document.getElementById('secaoIntegradores');
-            const secaoDashboard = document.getElementById('secaoDashboard');
-            const secaoAdicionar = document.getElementById('secaoAdicionar');
-
-            secaoTarefas.classList.remove('hidden');
-            secaoTarefas.classList.add('section-revealed');
-
-            secaoIntegradores.classList.remove('hidden');
-            secaoIntegradores.classList.add('section-revealed');
-
-            secaoDashboard.classList.remove('hidden');
-            secaoDashboard.classList.add('section-revealed');
-
-            secaoAdicionar.classList.remove('hidden');
-            secaoAdicionar.classList.add('section-revealed');
-        }
-
-        async function carregarDadosIniciais() {
-            await carregarTarefas();
-            await carregarIntegradores();
-        }
-
-        document.getElementById('inputVerificacao').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                verificarCodigo();
-            }
-        });
-
-        async function buscarDados(tabela) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error(`Erro ao buscar ${tabela}:`, error);
-                throw error;
-            }
-        }
-
-        async function carregarTarefas() {
-            const loading = document.getElementById('tarefasLoading');
-            const error = document.getElementById('tarefasError');
-            const select = document.getElementById('selectTarefas');
-
-            error.style.display = 'none';
-            loading.style.display = 'block';
-
-            try {
-                dadosTarefas = await buscarDados('tarefas');
-                loading.style.display = 'none';
-
-                select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
-
-                dadosTarefas.forEach((tarefa, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = tarefa.nome;
-                    select.appendChild(option);
-                });
-            } catch (err) {
-                loading.style.display = 'none';
-                error.textContent = `❌ Erro ao carregar tarefas: ${err.message}`;
-                error.style.display = 'block';
-            }
-        }
-
-        async function carregarIntegradores() {
-            const loading = document.getElementById('integradoresLoading');
-            const error = document.getElementById('integradoresError');
-            const select = document.getElementById('selectIntegradores');
-
-            error.style.display = 'none';
-            loading.style.display = 'block';
-
-            try {
-                dadosIntegradores = await buscarDados('integradores');
-                loading.style.display = 'none';
-
-                select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
-                dadosIntegradores.forEach((integrador, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = integrador.nome;
-                    select.appendChild(option);
-                });
-
-                popularSelectIntegradores();
-
-                dadosIntegradores.forEach((integrador, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    option.textContent = integrador.nome;
-                    select.appendChild(option);
-                });
-            } catch (err) {
-                loading.style.display = 'none';
-                error.textContent = `❌ Erro ao carregar integradores: ${err.message}`;
-                error.style.display = 'block';
-            }
-        }
-
-        function formatarData(dataISO) {
-            if (!dataISO) return 'Não definida';
-            const data = new Date(dataISO);
-            const dia = String(data.getDate()).padStart(2, '0');
-            const mes = String(data.getMonth() + 1).padStart(2, '0');
-            const ano = data.getFullYear();
-            return `${dia}/${mes}/${ano}`;
-        }
-
-        function getStatusBadge(status) {
-            if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
-            
-            const statusLower = status.toLowerCase();
-            if (statusLower === 'em progresso') {
-                return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
-            } else if (statusLower === 'aguardando equatorial') {
-                return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
-            } else {
-                return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
-            }
-        }
-
-        function mostrarDetalhesTarefa() {
-            const select = document.getElementById('selectTarefas');
-            const detalhesDiv = document.getElementById('detalhesTarefa');
-            const index = select.value;
-
-            if (index === '') {
-                detalhesDiv.style.display = 'none';
-                return;
-            }
-
-            const tarefa = dadosTarefas[index];
-            detalhesDiv.innerHTML = `
-                <h3>${tarefa.nome}</h3>
-                <p><span class="label">Tipo:</span> ${tarefa.tipo || 'Não informado'}</p>
-                <p><span class="label">Status:</span> ${getStatusBadge(tarefa.status)}</p>
-                <p><span class="label">Data Esperada:</span> ${formatarData(tarefa.data_para_termino)}</p>
-                <p><span class="label">Descrição:</span> ${tarefa.descricao || 'Sem descrição'}</p>
-                <p><span class="label">ID:</span> <code>${tarefa.id}</code></p>
-                <p><span class="label">Criado em:</span> ${new Date(tarefa.created_at).toLocaleString('pt-BR')}</p>
-                <div class="action-buttons">
-                    <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${index})">✏️ Modificar Elemento</button>
-                    <button class="btn btn-danger" onclick="removerTarefa(${index})">🗑️ Remover Elemento</button>
-                </div>
-                <div id="editFormTarefa"></div>
-            `;
-            detalhesDiv.style.display = 'block';
-        }
-
-        function mostrarDetalhesIntegrador() {
-            const select = document.getElementById('selectIntegradores');
-            const detalhesDiv = document.getElementById('detalhesIntegrador');
-            const index = select.value;
-
-            if (index === '') {
-                detalhesDiv.style.display = 'none';
-                return;
-            }
-
-            const integrador = dadosIntegradores[index];
-            detalhesDiv.innerHTML = `
-                <h3>${integrador.nome}</h3>
-                <p><span class="label">nº do CPF:</span> <span class="badge">${integrador.integrador_cpf || 'N/A'}</span></p>
-                <p><span class="label">ID:</span> <code>${integrador.id}</code></p>
-                <p><span class="label">Criado em:</span> ${new Date(integrador.created_at).toLocaleString('pt-BR')}</p>
-                <div class="action-buttons">
-                    <button class="btn btn-warning" onclick="abrirEdicaoIntegrador(${index})">✏️ Modificar Elemento</button>
-                    <button class="btn btn-danger" onclick="removerIntegrador(${index})">🗑️ Remover Elemento</button>
-                </div>
-                <div id="editFormIntegrador"></div>
-            `;
-            detalhesDiv.style.display = 'block';
-        }
-
-        function abrirEdicaoTarefa(index) {
-            const tarefa = dadosTarefas[index];
-            const editFormDiv = document.getElementById('editFormTarefa');
-
-            const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
-
-            editFormDiv.innerHTML = `
-                <div class="edit-form">
-                    <h4>✏️ Editando: ${tarefa.nome}</h4>
-                    <div class="form-group">
-                        <label for="editNomeTarefa">Nome:</label>
-                        <input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label for="editTipoTarefa">Tipo:</label>
-                        <input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label for="editStatusTarefa">Status:</label>
-                        <select id="editStatusTarefa">
-                            <option value="">-- Selecione o status --</option>
-                            <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
-                            <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
-                            <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ não iniciado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDataEsperadaTarefa">Data Para Esperada:</label>
-                        <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
-                    </div>
-                    <div class="form-group">
-                        <label for="editDescricaoTarefa">Descrição:</label>
-                        <textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea>
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
-                        <button class="btn btn-secondary" onclick="cancelarEdicaoTarefa()">❌ Cancelar</button>
-                    </div>
-                    <div id="editMsgTarefa" style="margin-top: 10px;"></div>
-                </div>
-            `;
-        }
-
-        function cancelarEdicaoTarefa() {
-            document.getElementById('editFormTarefa').innerHTML = '';
-        }
-
-        async function salvarEdicaoTarefa(index) {
-            const tarefa = dadosTarefas[index];
-            const nome = document.getElementById('editNomeTarefa').value.trim();
-            const tipo = document.getElementById('editTipoTarefa').value.trim();
-            const status = document.getElementById('editStatusTarefa').value;
-            const dataEsperada = document.getElementById('editDataEsperadaTarefa').value;
-            const descricao = document.getElementById('editDescricaoTarefa').value.trim();
-            const msgDiv = document.getElementById('editMsgTarefa');
-
-            if (!nome) {
-                msgDiv.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        nome: nome,
-                        tipo: tipo || null,
-                        status: status || null,
-                        data_para_termino: dataEsperada || null,
-                        descricao: descricao || null
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao atualizar');
-                }
-
-                const atualizada = await response.json();
-                
-                dadosTarefas[index] = atualizada[0];
-                
-                const select = document.getElementById('selectTarefas');
-                select.options[select.selectedIndex].textContent = nome;
-                
-                mostrarDetalhesTarefa();
-            } catch (err) {
-                msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
-                console.error('Erro:', err);
-            }
-        }
-
-        function abrirEdicaoIntegrador(index) {
-            const integrador = dadosIntegradores[index];
-            const editFormDiv = document.getElementById('editFormIntegrador');
-
-            editFormDiv.innerHTML = `
-                <div class="edit-form">
-                    <h4>✏️ Editando: ${integrador.nome}</h4>
-                    <div class="form-group">
-                        <label for="editNomeIntegrador">Nome:</label>
-                        <input type="text" id="editNomeIntegrador" value="${integrador.nome || ''}">
-                    </div>
-                    <div class="form-group">
-                        <label for="editNCPFIntegrador">nº do CPF:</label>
-                        <input type="text" id="editNCPFIntegrador" value="${integrador.integrador_cpf || ''}" maxlength="10">
-                    </div>
-                    <div class="action-buttons">
-                        <button class="btn btn-success" onclick="salvarEdicaoIntegrador(${index})">💾 Salvar</button>
-                        <button class="btn btn-secondary" onclick="cancelarEdicaoIntegrador()">❌ Cancelar</button>
-                    </div>
-                    <div id="editMsgIntegrador" style="margin-top: 10px;"></div>
-                </div>
-            `;
-        }
-
-        function cancelarEdicaoIntegrador() {
-            document.getElementById('editFormIntegrador').innerHTML = '';
-        }
-
-        async function salvarEdicaoIntegrador(index) {
-            const integrador = dadosIntegradores[index];
-            const nome = document.getElementById('editNomeIntegrador').value.trim();
-            const ncpf = document.getElementById('editNCPFIntegrador').value.trim();
-            const msgDiv = document.getElementById('editMsgIntegrador');
-
-            if (!nome) {
-                msgDiv.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
-                return;
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${integrador.id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        nome: nome,
-                        integrador_cpf: ncpf || null,
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao atualizar');
-                }
-
-                const atualizado = await response.json();
-                
-                dadosIntegradores[index] = atualizado[0];
-                
-                const select = document.getElementById('selectIntegradores');
-                select.options[select.selectedIndex].textContent = nome;
-                
-                mostrarDetalhesIntegrador();
-            } catch (err) {
-                msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
-                console.error('Erro:', err);
-            }
-        }
-
-        async function removerTarefa(index) {
-            const tarefa = dadosTarefas[index];
-            
-            if (!confirm(`Tem certeza que deseja remover a tarefa "${tarefa.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao remover');
-                }
-
-                dadosTarefas.splice(index, 1);
-                
-                const select = document.getElementById('selectTarefas');
-                select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
-                dadosTarefas.forEach((a, i) => {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = a.nome;
-                    select.appendChild(option);
-                });
-
-                document.getElementById('detalhesTarefa').style.display = 'none';
-                
-                alert(`✅ Tarefa "${tarefa.nome}" removida com sucesso!`);
-            } catch (err) {
-                alert(`❌ Erro ao remover: ${err.message}`);
-                console.error('Erro:', err);
-            }
-        }
-
-        async function removerIntegrador(index) {
-            const integrador = dadosIntegradores[index];
-            
-            if (!confirm(`Tem certeza que deseja remover o integrador "${integrador.nome}"?\n\nEssa ação não pode ser desfeita.`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${integrador.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao remover');
-                }
-
-                dadosIntegradores.splice(index, 1);
-                
-                const select = document.getElementById('selectIntegradores');
-                select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
-                dadosIntegradores.forEach((m, i) => {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = m.nome;
-                    select.appendChild(option);
-                });
-
-                document.getElementById('detalhesIntegrador').style.display = 'none';
-                
-                alert(`✅ Integrador "${integrador.nome}" removido com sucesso!`);
-            } catch (err) {
-                alert(`❌ Erro ao remover: ${err.message}`);
-                console.error('Erro:', err);
-            }
-        }
-
-        function atualizarFormulario() {
-            const tipo = document.getElementById('tipoElemento').value;
-            const formTarefa = document.getElementById('formTarefa');
-            const formIntegrador = document.getElementById('formIntegrador');
-            const mensagem = document.getElementById('mensagemAdicionar');
-
-            formTarefa.classList.add('hidden');
-            formIntegrador.classList.add('hidden');
-            mensagem.innerHTML = '';
-
-            if (tipo === 'tarefa') {
-                formTarefa.classList.remove('hidden');
-            } else if (tipo === 'integrador') {
-                formIntegrador.classList.remove('hidden');
-            }
-        }
-
-        async function adicionarTarefa() {
-            const nome = document.getElementById('nomeTarefa').value.trim();
-            const tipo = document.getElementById('tipoTarefa').value.trim();
-            const status = document.getElementById('statusTarefa').value;
-            const dataEsperada = document.getElementById('dataEsperadaTarefa').value;
-            const descricao = document.getElementById('descricaoTarefa').value.trim();
-            const mensagem = document.getElementById('mensagemAdicionar');
-            const btn = document.getElementById('btnAdicionarTarefa');
-
-            if (!nome) {
-                mensagem.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = 'Adicionando...';
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        nome: nome,
-                        tipo: tipo || null,
-                        status: status || null,
-                        data_para_termino: dataEsperada || null,
-                        descricao: descricao || null
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao adicionar tarefa');
-                }
-
-                const novaTarefa = await response.json();
-                
-                dadosTarefas.push(novaTarefa[0]);
-                
-                const select = document.getElementById('selectTarefas');
-                const option = document.createElement('option');
-                option.value = dadosTarefas.length - 1;
-                option.textContent = novaTarefa[0].nome;
-                select.appendChild(option);
-
-                document.getElementById('tipoElemento').value = '';
-                document.getElementById('formTarefa').classList.add('hidden');
-
-                document.getElementById('nomeTarefa').value = '';
-                document.getElementById('tipoTarefa').value = '';
-                document.getElementById('statusTarefa').value = '';
-                document.getElementById('dataEsperadaTarefa').value = '';
-                document.getElementById('descricaoTarefa').value = '';
-
-                mensagem.innerHTML = `<div class="success">✅ Tarefa "${novaTarefa[0].nome}" adicionada com sucesso!</div>`;
-            } catch (err) {
-                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar tarefa: ${err.message}</div>`;
-                console.error('Erro:', err);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Adicionar Tarefa';
-            }
-        }
-
-        async function adicionarIntegrador() {
-            const nome = document.getElementById('nomeIntegrador').value.trim();
-            const ncpf = document.getElementById('ncpfIntegrador').value.trim();
-            const mensagem = document.getElementById('mensagemAdicionar');
-            const btn = document.getElementById('btnAdicionarIntegrador');
-
-            if (!nome) {
-                mensagem.innerHTML = '<div class="error">⚠️ O nome é obrigatório!</div>';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = 'Adicionando...';
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        nome: nome,
-                        integrador_cpf: ncpf || null,
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erro ao adicionar integrador');
-                }
-
-                const novoIntegrador = await response.json();
-                
-                dadosIntegradores.push(novoIntegrador[0]);
-                
-                const select = document.getElementById('selectIntegradores');
-                const option = document.createElement('option');
-                option.value = dadosIntegradores.length - 1;
-                option.textContent = novoIntegrador[0].nome;
-                select.appendChild(option);
-
-                document.getElementById('tipoElemento').value = '';
-                document.getElementById('formIntegrador').classList.add('hidden');
-
-                document.getElementById('nomeIntegrador').value = '';
-                document.getElementById('ncpfIntegrador').value = '';
-
-                mensagem.innerHTML = `<div class="success">✅ Integrador "${novoIntegrador[0].nome}" adicionado com sucesso!</div>`;
-            } catch (err) {
-                mensagem.innerHTML = `<div class="error">❌ Erro ao adicionar integrador: ${err.message}</div>`;
-                console.error('Erro:', err);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Adicionar Integrador';
-            }
-        }
-
-        function abrirDashboard() {
-            if (dadosTarefas.length === 0) {
-                alert('⚠️ Não há tarefas para exibir no dashboard!');
-                return;
-            }
-        
-            const overlay = document.getElementById('dashboardOverlay');
-            const track = document.getElementById('dashboardTrack');
-        
-            track.innerHTML = '';
-            const cardsHTML = dadosTarefas.map(tarefa => `
-                <div class="dashboard-card">
-                    <h3>${tarefa.nome}</h3>
-                    <p><span class="label">Status:</span> ${getStatusBadge(tarefa.status)}</p>
-                    <p><span class="label">Data Esperada:</span> ${formatarData(tarefa.data_para_termino)}</p>
-                    <p><span class="label">Descrição:</span> ${tarefa.descricao || 'Sem descrição'}</p>
-                    <p><span class="label">Criado em:</span> ${new Date(tarefa.created_at).toLocaleString('pt-BR')}</p>
-                </div>
-            `).join('');
-        
-            track.innerHTML = cardsHTML + cardsHTML;
-        
-            const cardCount = dadosTarefas.length;
-            track.style.setProperty('--card-count', cardCount);
-        
-            overlay.classList.add('active');
-        }
-
-        function fecharDashboard() {
-            const overlay = document.getElementById('dashboardOverlay');
-            overlay.classList.remove('active');
-        }
-
-    // ✅ NOVA FUNÇÃO: Popula o select de integradores no formulário de adicionar
-    function popularSelectIntg() {
-        const select = document.getElementById('intgTarefa');
-        
-        // Limpa opções anteriores (mantém só a primeira "Nenhum integrador")
-        select.innerHTML = '<option value="">-- Nenhum integrador --</option>';
-        
-        // Itera sobre os integradores carregados e cria uma <option> para cada um
-        dadosMetais.forEach(integrador => {
-            const option = document.createElement('option');
-            option.value = integrador.id;  // O id será enviado como integrador_id
-            option.textContent = `${integrador.nome} (${integrador.integrador_cpf || 'N/A'})`;
-            select.appendChild(option);
-        });
-    }
-
-    </script>
-</body>
-</html>
+-- 1. Limpeza
+DROP FUNCTION IF EXISTS verificar_senha(text);
+DROP TABLE IF EXISTS integradores;
+DROP TABLE IF EXISTS tarefas;
+DROP TABLE IF EXISTS configuracoes;
+DROP TABLE IF EXISTS intensidades;
+
+-- 2. Criação da tabela de configurações
+CREATE TABLE configuracoes (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    chave varchar(50) NOT NULL,
+    valor varchar(100) NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+
+
+-- 3. Insere a senha secreta
+INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
+
+-- 4. Criação da tabela dos itens
+CREATE TABLE tarefas (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(50) NOT NULL,
+    tipo varchar(30),
+    descricao text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Adiciona a coluna status (com valores permitidos)
+ALTER TABLE tarefas 
+ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
+
+-- Adiciona a coluna data_para_termino
+ALTER TABLE tarefas 
+ADD COLUMN data_para_termino date;
+
+
+
+
+-- 5. Criação da tabela de Metais
+CREATE TABLE integradores (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(50) NOT NULL,
+    integrador_cpf varchar(15) NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 6. Inserção dos dados das Árvores
+INSERT INTO tarefas (nome, tipo, descricao) VALUES
+('CASA 1', 'Instalação solar', 'Feito, aguardando vistoria da Equatorial'),
+('CASA 5', 'Subestação', 'Faltam enviar documentos essenciais'),
+('CASA 9', 'Rateio', 'todos os documentos forma enviados, em progresso');
+
+
+
+
+-- 7. Inserção dos dados dos Metais
+INSERT INTO integradores (nome, integrador_cpf) VALUES
+('Alisson', '21321322'),
+('Amarante', '98798979'),
+('Borges', '6546464465'),
+('Cláudio', '417711771');
+
+-- 8. Configuração de Segurança (RLS)
+ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE integradores ENABLE ROW LEVEL SECURITY;
+
+-- Políticas de SELECT
+CREATE POLICY "Permitir leitura pública de tarefas" 
+ON tarefas FOR SELECT 
+USING (true);
+
+CREATE POLICY "Permitir leitura pública de integradores" 
+ON integradores FOR SELECT 
+USING (true);
+
+-- Políticas de INSERT (NOVAS)
+CREATE POLICY "Permitir inserção pública de tarefas" 
+ON tarefas FOR INSERT 
+WITH CHECK (true);
+
+CREATE POLICY "Permitir inserção pública de integradores" 
+ON integradores FOR INSERT 
+WITH CHECK (true);
+
+-- Política da tabela de configurações
+CREATE POLICY "Bloquear leitura direta de configuracoes" 
+ON configuracoes FOR SELECT 
+USING (false);
+
+-- 9. Função para verificar a senha
+CREATE OR REPLACE FUNCTION verificar_senha(texto_inserido text)
+RETURNS boolean 
+LANGUAGE plpgsql 
+SECURITY DEFINER
+AS $$
+DECLARE
+    senha_correta text;
+BEGIN
+    SELECT valor INTO senha_correta 
+    FROM configuracoes 
+    WHERE chave = 'senha_verificacao' 
+    LIMIT 1;
+    
+    RETURN texto_inserido = senha_correta;
+END;
+$$;
+
+-- 10. Permissões
+GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
+
+-- Políticas de UPDATE
+CREATE POLICY "Permitir atualização pública de tarefas" 
+ON tarefas FOR UPDATE 
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY "Permitir atualização pública de integradores" 
+ON integradores FOR UPDATE 
+USING (true)
+WITH CHECK (true);
+
+-- Políticas de DELETE
+CREATE POLICY "Permitir remoção pública de tarefas" 
+ON tarefas FOR DELETE 
+USING (true);
+
+CREATE POLICY "Permitir remoção pública de integradores" 
+ON integradores FOR DELETE 
+USING (true);
+
+
+
+
+
+
+
+CREATE TABLE intensidades (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    ordem char(5),
+    valor_intensidade char(15)
+
+);
+
+INSERT INTO intensidades (ordem, valor_intensidade) VALUES
+('1', 'Baixa'),
+('2', 'Média'),
+('3', 'Alta');
+
+ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Permitir leitura pública de intensidades" 
+ON intensidades FOR SELECT USING (true);
+GRANT SELECT ON intensidades TO anon;
+
+
+-- 3. Adiciona a coluna intensidade_id na tabela tarefas
+ALTER TABLE tarefas 
+ADD COLUMN IF NOT EXISTS intensidade_id uuid REFERENCES intensidades(id);
+
+-- 4. Ativa RLS e cria políticas para a tabela intensidades
+ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Permitir leitura pública de intensidades" ON intensidades;
+CREATE POLICY "Permitir leitura pública de intensidades" 
+ON intensidades FOR SELECT 
+USING (true);
+
+-- 5. Garante permissões
+GRANT SELECT ON intensidades TO anon;
