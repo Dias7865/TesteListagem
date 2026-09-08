@@ -1,7 +1,7 @@
 -- 1. Limpeza
 DROP FUNCTION IF EXISTS verificar_senha(text);
 DROP TABLE IF EXISTS metais;
-DROP TABLE IF EXISTS arvores;
+DROP TABLE IF EXISTS tarefas;
 DROP TABLE IF EXISTS configuracoes;
 
 -- 2. Criação da tabela de configurações
@@ -18,7 +18,7 @@ CREATE TABLE configuracoes (
 INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
 
 -- 4. Criação da tabela de Árvores
-CREATE TABLE arvores (
+CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
     tipo varchar(50),
@@ -27,13 +27,13 @@ CREATE TABLE arvores (
 );
 
 -- Adiciona a coluna status (com valores permitidos)
-ALTER TABLE arvores 
+ALTER TABLE tarefas 
 ADD COLUMN status varchar(30) CHECK (status IN ('plantado', 'aguardando fertilizante', 'não plantado'));
 -- Adiciona a coluna data_para_plantio
-ALTER TABLE arvores 
+ALTER TABLE tarefas 
 ADD COLUMN data_para_plantio date;
 -- Atualiza os dados existentes com valores padrão (opcional)
-UPDATE arvores SET status = 'não plantado' WHERE status IS NULL;
+UPDATE tarefas SET status = 'não plantado' WHERE status IS NULL;
 
 
 -- 5. Criação da tabela de Metais
@@ -46,7 +46,7 @@ CREATE TABLE metais (
 );
 
 -- 6. Inserção dos dados das Árvores
-INSERT INTO arvores (nome, tipo, descricao) VALUES
+INSERT INTO tarefas (nome, tipo, descricao) VALUES
 ('Macieira', 'Frutífera', 'Árvore conhecida por produzir maçãs, comum em climas temperados.'),
 ('Carvalho', 'Madeira Nobre', 'Árvore de madeira resistente e durável, símbolo de força.'),
 ('Pinheiro', 'Conífera', 'Árvore perene que produz pinhas e madeira macia.');
@@ -63,12 +63,12 @@ INSERT INTO metais (nome, simbolo_quimico, descricao) VALUES
 
 -- 8. Configuração de Segurança (RLS)
 ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE arvores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE metais ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de SELECT
-CREATE POLICY "Permitir leitura pública de arvores" 
-ON arvores FOR SELECT 
+CREATE POLICY "Permitir leitura pública de tarefas" 
+ON tarefas FOR SELECT 
 USING (true);
 
 CREATE POLICY "Permitir leitura pública de metais" 
@@ -76,8 +76,8 @@ ON metais FOR SELECT
 USING (true);
 
 -- Políticas de INSERT (NOVAS)
-CREATE POLICY "Permitir inserção pública de arvores" 
-ON arvores FOR INSERT 
+CREATE POLICY "Permitir inserção pública de tarefas" 
+ON tarefas FOR INSERT 
 WITH CHECK (true);
 
 CREATE POLICY "Permitir inserção pública de metais" 
@@ -111,8 +111,8 @@ $$;
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
 
 -- Políticas de UPDATE
-CREATE POLICY "Permitir atualização pública de arvores" 
-ON arvores FOR UPDATE 
+CREATE POLICY "Permitir atualização pública de tarefas" 
+ON tarefas FOR UPDATE 
 USING (true)
 WITH CHECK (true);
 
@@ -122,8 +122,8 @@ USING (true)
 WITH CHECK (true);
 
 -- Políticas de DELETE
-CREATE POLICY "Permitir remoção pública de arvores" 
-ON arvores FOR DELETE 
+CREATE POLICY "Permitir remoção pública de tarefas" 
+ON tarefas FOR DELETE 
 USING (true);
 
 CREATE POLICY "Permitir remoção pública de metais" 
