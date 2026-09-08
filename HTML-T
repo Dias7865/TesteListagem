@@ -340,7 +340,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🌳 Leitor de Dados Supabase 🪨</h1>
+        <h1>🌳 Leitor de Dados Supabase ​🔳</h1>
 
         <!-- Seção de Verificação -->
         <div id="secaoVerificacao" class="section">
@@ -378,7 +378,7 @@
         <!-- Seção de Metais -->
         <div id="secaoMetais" class="section hidden">
             <div class="section-header">
-                <h2>🪨 Metais</h2>
+                <h2>​🔳 Metais</h2>
             </div>
             <div class="seletor-container">
                 <label for="selectMetais">Selecione um metal:</label>
@@ -407,7 +407,7 @@
                 <select id="tipoElemento" onchange="atualizarFormulario()">
                     <option value="">-- Selecione o tipo --</option>
                     <option value="arvore">🌳 Árvore</option>
-                    <option value="metal">🪨 Metal</option>
+                    <option value="metal">​🔳 Metal</option>
                 </select>
             </div>
 
@@ -814,7 +814,7 @@
             }
 
             try {
-                const response = await fetch(`${SUPabase_URL}/rest/v1/metais?id=eq.${metal.id}`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/metais?id=eq.${metal.id}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
