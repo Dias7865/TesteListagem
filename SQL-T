@@ -1,6 +1,6 @@
 -- 1. Limpeza
 DROP FUNCTION IF EXISTS verificar_senha(text);
-DROP TABLE IF EXISTS metais;
+DROP TABLE IF EXISTS integradores;
 DROP TABLE IF EXISTS tarefas;
 DROP TABLE IF EXISTS configuracoes;
 
@@ -21,7 +21,7 @@ INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
 CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
-    tipo varchar(50),
+    tipo varchar(30),
     descricao text,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -29,18 +29,19 @@ CREATE TABLE tarefas (
 -- Adiciona a coluna status (com valores permitidos)
 ALTER TABLE tarefas 
 ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
+
 -- Adiciona a coluna data_para_termino
 ALTER TABLE tarefas 
 ADD COLUMN data_para_termino date;
 
 
 
+
 -- 5. Criação da tabela de Metais
-CREATE TABLE metais (
+CREATE TABLE integradores (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
-    simbolo_quimico varchar(10),
-    descricao text,
+    integrador_cpf varchar(15) NOT NULL,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -54,24 +55,24 @@ INSERT INTO tarefas (nome, tipo, descricao) VALUES
 
 
 -- 7. Inserção dos dados dos Metais
-INSERT INTO metais (nome, simbolo_quimico, descricao) VALUES
-('Ferro', 'Fe', 'Metal magnético e essencial para a produção de aço.'),
-('Zinco', 'Zn', 'Metal usado principalmente para galvanização e prevenção de corrosão.'),
-('Estanho', 'Sn', 'Metal maleável, frequentemente usado em ligas como o bronze.'),
-('Alumínio', 'Al', 'Metal leve, resistente à corrosão e amplamente reciclável.');
+INSERT INTO integradores (nome, integrador_cpf) VALUES
+('Alisson', '21321322'),
+('Amarante', '98798979'),
+('Borges', '6546464465'),
+('Cláudio', '417711771');
 
 -- 8. Configuração de Segurança (RLS)
 ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE metais ENABLE ROW LEVEL SECURITY;
+ALTER TABLE integradores ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de SELECT
 CREATE POLICY "Permitir leitura pública de tarefas" 
 ON tarefas FOR SELECT 
 USING (true);
 
-CREATE POLICY "Permitir leitura pública de metais" 
-ON metais FOR SELECT 
+CREATE POLICY "Permitir leitura pública de integradores" 
+ON integradores FOR SELECT 
 USING (true);
 
 -- Políticas de INSERT (NOVAS)
@@ -79,8 +80,8 @@ CREATE POLICY "Permitir inserção pública de tarefas"
 ON tarefas FOR INSERT 
 WITH CHECK (true);
 
-CREATE POLICY "Permitir inserção pública de metais" 
-ON metais FOR INSERT 
+CREATE POLICY "Permitir inserção pública de integradores" 
+ON integradores FOR INSERT 
 WITH CHECK (true);
 
 -- Política da tabela de configurações
@@ -115,8 +116,8 @@ ON tarefas FOR UPDATE
 USING (true)
 WITH CHECK (true);
 
-CREATE POLICY "Permitir atualização pública de metais" 
-ON metais FOR UPDATE 
+CREATE POLICY "Permitir atualização pública de integradores" 
+ON integradores FOR UPDATE 
 USING (true)
 WITH CHECK (true);
 
@@ -125,6 +126,6 @@ CREATE POLICY "Permitir remoção pública de tarefas"
 ON tarefas FOR DELETE 
 USING (true);
 
-CREATE POLICY "Permitir remoção pública de metais" 
-ON metais FOR DELETE 
+CREATE POLICY "Permitir remoção pública de integradores" 
+ON integradores FOR DELETE 
 USING (true);
