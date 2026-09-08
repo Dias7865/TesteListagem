@@ -3,6 +3,7 @@ DROP FUNCTION IF EXISTS verificar_senha(text);
 DROP TABLE IF EXISTS integradores;
 DROP TABLE IF EXISTS tarefas;
 DROP TABLE IF EXISTS configuracoes;
+DROP TABLE IF EXISTS intensidades;
 
 -- 2. Criação da tabela de configurações
 CREATE TABLE configuracoes (
@@ -129,3 +130,42 @@ USING (true);
 CREATE POLICY "Permitir remoção pública de integradores" 
 ON integradores FOR DELETE 
 USING (true);
+
+
+
+
+
+
+
+CREATE TABLE intensidades (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    ordem char(5),
+    valor_intensidade char(15)
+
+);
+
+INSERT INTO intensidades (ordem, valor_intensidade) VALUES
+('1', 'Baixa'),
+('2', 'Média'),
+('3', 'Alta');
+
+ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Permitir leitura pública de intensidades" 
+ON intensidades FOR SELECT USING (true);
+GRANT SELECT ON intensidades TO anon;
+
+
+-- 3. Adiciona a coluna intensidade_id na tabela tarefas
+ALTER TABLE tarefas 
+ADD COLUMN IF NOT EXISTS intensidade_id uuid REFERENCES intensidades(id);
+
+-- 4. Ativa RLS e cria políticas para a tabela intensidades
+ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Permitir leitura pública de intensidades" ON intensidades;
+CREATE POLICY "Permitir leitura pública de intensidades" 
+ON intensidades FOR SELECT 
+USING (true);
+
+-- 5. Garante permissões
+GRANT SELECT ON intensidades TO anon;
