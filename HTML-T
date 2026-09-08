@@ -574,7 +574,7 @@
                         <option value="">-- Selecione o status --</option>
                         <option value="plantado">🌱 Plantado</option>
                         <option value="aguardando fertilizante">⏳ Aguardando Fertilizante</option>
-                        <option value="não plantado">❌ Não Plantado</option>
+                        <option value="não iniciado">❌ não iniciado</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -901,7 +901,7 @@
                             <option value="">-- Selecione o status --</option>
                             <option value="plantado" ${tarefa.status === 'plantado' ? 'selected' : ''}>🌱 Plantado</option>
                             <option value="aguardando fertilizante" ${tarefa.status === 'aguardando fertilizante' ? 'selected' : ''}>⏳ Aguardando Fertilizante</option>
-                            <option value="não plantado" ${tarefa.status === 'não plantado' ? 'selected' : ''}>❌ Não Plantado</option>
+                            <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ não iniciado</option>
                         </select>
                     </div>
                     <div class="form-group">
