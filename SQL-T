@@ -94,3 +94,23 @@ $$;
 
 -- 10. Permissões
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
+
+-- Políticas de UPDATE
+CREATE POLICY "Permitir atualização pública de arvores" 
+ON arvores FOR UPDATE 
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY "Permitir atualização pública de metais" 
+ON metais FOR UPDATE 
+USING (true)
+WITH CHECK (true);
+
+-- Políticas de DELETE
+CREATE POLICY "Permitir remoção pública de arvores" 
+ON arvores FOR DELETE 
+USING (true);
+
+CREATE POLICY "Permitir remoção pública de metais" 
+ON metais FOR DELETE 
+USING (true);
