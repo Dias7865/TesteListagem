@@ -1,11 +1,18 @@
--- 1. Limpeza
-DROP FUNCTION IF EXISTS verificar_senha(text);
-DROP TABLE IF EXISTS integradores;
-DROP TABLE IF EXISTS tarefas;
-DROP TABLE IF EXISTS configuracoes;
-DROP TABLE IF EXISTS intensidades;
+-- =====================================================
+-- CÓDIGO SQL COMPLETO - SUPABASE
+-- Tarefas, Integradores e Intensidades
+-- =====================================================
 
--- 2. Criação da tabela de configurações
+-- 1. LIMPEZA
+DROP FUNCTION IF EXISTS verificar_senha(text);
+DROP TABLE IF EXISTS tarefas;
+DROP TABLE IF EXISTS integradores;
+DROP TABLE IF EXISTS intensidades;
+DROP TABLE IF EXISTS configuracoes;
+
+-- =====================================================
+-- 2. TABELA DE CONFIGURAÇÕES (senha)
+-- =====================================================
 CREATE TABLE configuracoes (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     chave varchar(50) NOT NULL,
@@ -13,84 +20,95 @@ CREATE TABLE configuracoes (
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
-
-
--- 3. Insere a senha secreta
 INSERT INTO configuracoes (chave, valor) VALUES ('senha_verificacao', 'jkl');
 
--- 4. Criação da tabela dos itens
+-- =====================================================
+-- 3. TABELA DE INTEGRADORES (criada primeiro, pois tarefas referencia)
+-- =====================================================
+CREATE TABLE integradores (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(25) NOT NULL,
+    integrador_cpf varchar(25) NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- =====================================================
+-- 4. TABELA DE INTENSIDADES
+-- =====================================================
+CREATE TABLE intensidades (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    ordem varchar(25),
+    valor_intensidade varchar(25)
+);
+
+INSERT INTO intensidades (ordem, valor_intensidade) VALUES
+('12', 'Baixa'),
+('23', 'Média'),
+('34', 'Alta');
+
+-- =====================================================
+-- 5. TABELA DE TAREFAS (com Intg_id e intensidade_id)
+-- =====================================================
 CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
     tipo varchar(30),
     descricao text,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    intg_id uuid REFERENCES integradores(id),
+    intensidade_id uuid REFERENCES intensidades(id)
 );
 
--- Adiciona a coluna status (com valores permitidos)
+-- Colunas extras
 ALTER TABLE tarefas 
 ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
 
--- Adiciona a coluna data_para_termino
 ALTER TABLE tarefas 
 ADD COLUMN data_para_termino date;
 
-
-
-
--- 5. Criação da tabela de Metais
-CREATE TABLE integradores (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    nome varchar(50) NOT NULL,
-    integrador_cpf varchar(15) NOT NULL,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 6. Inserção dos dados das Árvores
+-- =====================================================
+-- 6. DADOS INICIAIS
+-- =====================================================
 INSERT INTO tarefas (nome, tipo, descricao) VALUES
 ('CASA 1', 'Instalação solar', 'Feito, aguardando vistoria da Equatorial'),
 ('CASA 5', 'Subestação', 'Faltam enviar documentos essenciais'),
-('CASA 9', 'Rateio', 'todos os documentos forma enviados, em progresso');
+('CASA 9', 'Rateio', 'todos os documentos foram enviados, em progresso');
 
-
-
-
--- 7. Inserção dos dados dos Metais
 INSERT INTO integradores (nome, integrador_cpf) VALUES
 ('Alisson', '21321322'),
 ('Amarante', '98798979'),
 ('Borges', '6546464465'),
 ('Cláudio', '417711771');
 
--- 8. Configuração de Segurança (RLS)
+-- =====================================================
+-- 7. RLS E POLÍTICAS
+-- =====================================================
 ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE integradores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
 
--- Políticas de SELECT
-CREATE POLICY "Permitir leitura pública de tarefas" 
-ON tarefas FOR SELECT 
-USING (true);
+-- SELECT
+CREATE POLICY "Permitir leitura pública de tarefas" ON tarefas FOR SELECT USING (true);
+CREATE POLICY "Permitir leitura pública de integradores" ON integradores FOR SELECT USING (true);
+CREATE POLICY "Permitir leitura pública de intensidades" ON intensidades FOR SELECT USING (true);
+CREATE POLICY "Bloquear leitura direta de configuracoes" ON configuracoes FOR SELECT USING (false);
 
-CREATE POLICY "Permitir leitura pública de integradores" 
-ON integradores FOR SELECT 
-USING (true);
+-- INSERT
+CREATE POLICY "Permitir inserção pública de tarefas" ON tarefas FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir inserção pública de integradores" ON integradores FOR INSERT WITH CHECK (true);
 
--- Políticas de INSERT (NOVAS)
-CREATE POLICY "Permitir inserção pública de tarefas" 
-ON tarefas FOR INSERT 
-WITH CHECK (true);
+-- UPDATE
+CREATE POLICY "Permitir atualização pública de tarefas" ON tarefas FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública de integradores" ON integradores FOR UPDATE USING (true) WITH CHECK (true);
 
-CREATE POLICY "Permitir inserção pública de integradores" 
-ON integradores FOR INSERT 
-WITH CHECK (true);
+-- DELETE
+CREATE POLICY "Permitir remoção pública de tarefas" ON tarefas FOR DELETE USING (true);
+CREATE POLICY "Permitir remoção pública de integradores" ON integradores FOR DELETE USING (true);
 
--- Política da tabela de configurações
-CREATE POLICY "Bloquear leitura direta de configuracoes" 
-ON configuracoes FOR SELECT 
-USING (false);
-
--- 9. Função para verificar a senha
+-- =====================================================
+-- 8. FUNÇÃO DE SENHA
+-- =====================================================
 CREATE OR REPLACE FUNCTION verificar_senha(texto_inserido text)
 RETURNS boolean 
 LANGUAGE plpgsql 
@@ -103,69 +121,37 @@ BEGIN
     FROM configuracoes 
     WHERE chave = 'senha_verificacao' 
     LIMIT 1;
-    
     RETURN texto_inserido = senha_correta;
 END;
 $$;
 
--- 10. Permissões
+-- =====================================================
+-- 9. PERMISSÕES
+-- =====================================================
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
-
--- Políticas de UPDATE
-CREATE POLICY "Permitir atualização pública de tarefas" 
-ON tarefas FOR UPDATE 
-USING (true)
-WITH CHECK (true);
-
-CREATE POLICY "Permitir atualização pública de integradores" 
-ON integradores FOR UPDATE 
-USING (true)
-WITH CHECK (true);
-
--- Políticas de DELETE
-CREATE POLICY "Permitir remoção pública de tarefas" 
-ON tarefas FOR DELETE 
-USING (true);
-
-CREATE POLICY "Permitir remoção pública de integradores" 
-ON integradores FOR DELETE 
-USING (true);
-
-
-
-
-
-
-
-CREATE TABLE intensidades (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-    ordem char(5),
-    valor_intensidade char(15)
-
-);
-
-INSERT INTO intensidades (ordem, valor_intensidade) VALUES
-('1', 'Baixa'),
-('2', 'Média'),
-('3', 'Alta');
-
-ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Permitir leitura pública de intensidades" 
-ON intensidades FOR SELECT USING (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON tarefas TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON integradores TO anon;
 GRANT SELECT ON intensidades TO anon;
 
 
--- 3. Adiciona a coluna intensidade_id na tabela tarefas
-ALTER TABLE tarefas 
-ADD COLUMN IF NOT EXISTS intensidade_id uuid REFERENCES intensidades(id);
 
--- 4. Ativa RLS e cria políticas para a tabela intensidades
-ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Permitir leitura pública de intensidades" ON intensidades;
-CREATE POLICY "Permitir leitura pública de intensidades" 
-ON intensidades FOR SELECT 
-USING (true);
+-- 2. Cria a função que copia todos os dados
+CREATE OR REPLACE FUNCTION copiar_integradores_para_intensidades()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    -- Limpa a tabela de intensidades para evitar dados duplicados
+    DELETE FROM intensidades;
+    
+    -- Insere os dados da tabela integradores mapeando CPF -> ordem e Nome -> valor_intensidade
+    INSERT INTO intensidades (ordem, valor_intensidade)
+    SELECT integrador_cpf, nome FROM integradores
+    WHERE integrador_cpf IS NOT NULL AND nome IS NOT NULL;
+END;
+$$;
 
--- 5. Garante permissões
-GRANT SELECT ON intensidades TO anon;
+-- 3. Garante permissão para a sua aplicação executar essa função
+GRANT EXECUTE ON FUNCTION copiar_integradores_para_intensidades() TO anon;
