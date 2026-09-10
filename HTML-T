@@ -81,16 +81,13 @@ h2 { color: #333; font-size: 1.8rem; }
     display: inline-block; background: #667eea; color: white;
     padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px;
 }
-.status-badge, .intensidade-badge {
+.status-badge {
     display: inline-block; padding: 6px 14px; border-radius: 20px;
     font-size: 0.9rem; font-weight: bold; margin-left: 8px;
 }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ff9800; color: white; }
 .status-nao-iniciado { background: #f44336; color: white; }
-.intensidade-alta { background: #d32f2f; color: white; }
-.intensidade-media { background: #f57c00; color: white; }
-.intensidade-baixa { background: #388e3c; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .action-buttons .btn { flex: 1; min-width: 150px; }
 .edit-form {
@@ -204,11 +201,11 @@ h2 { color: #333; font-size: 1.8rem; }
         <div id="formTarefa" class="hidden">
             <div class="form-group">
                 <label for="nomeTarefa">Nome da Tarefa:</label>
-                <input type="text" id="nomeTarefa" placeholder="Ex: Edifício da Matssa">
+                <input type="text" id="nomeTarefa" placeholder="Ex: CASA 10">
             </div>
             <div class="form-group">
                 <label for="tipoTarefa">Tipo:</label>
-                <input type="text" id="tipoTarefa" placeholder="Ex: Nova Instalação Solar">
+                <input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar">
             </div>
             <div class="form-group">
                 <label for="statusTarefa">Status:</label>
@@ -224,11 +221,11 @@ h2 { color: #333; font-size: 1.8rem; }
                 <input type="date" id="dataEsperadaTarefa">
             </div>
             
-            <!-- ✅ Select de Intensidade -->
+            <!-- ✅ Select de Integrador -->
             <div class="form-group">
-                <label for="intensidadeTarefa">Intensidade:</label>
-                <select id="intensidadeTarefa">
-                    <option value="">-- Selecione a intensidade --</option>
+                <label for="integradorTarefa">Integrador Associado:</label>
+                <select id="integradorTarefa">
+                    <option value="">-- Selecione o integrador --</option>
                 </select>
             </div>
             
@@ -247,7 +244,7 @@ h2 { color: #333; font-size: 1.8rem; }
             </div>
             <div class="form-group">
                 <label for="ncpfIntegrador">nº do CPF:</label>
-                <input type="text" id="ncpfIntegrador" placeholder="Ex: 01010101010" maxlength="15">
+                <input type="text" id="ncpfIntegrador" placeholder="Ex: 123456789" maxlength="15">
             </div>
             <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
         </div>
@@ -256,6 +253,7 @@ h2 { color: #333; font-size: 1.8rem; }
     </div>
 </div>
 
+<!-- Dashboard Overlay -->
 <div id="dashboardOverlay" class="dashboard-overlay">
     <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
     <h1 class="dashboard-title">📌 Dashboard de Tarefas</h1>
@@ -270,7 +268,6 @@ const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 
 let dadosTarefas = [];
 let dadosIntegradores = [];
-let dadosIntensidades = []; // ✅ Array para armazenar as intensidades
 
 // --- VERIFICAÇÃO ---
 async function verificarCodigo() {
@@ -340,9 +337,8 @@ function revelarSecoes() {
 }
 
 async function carregarDadosIniciais() {
-    await carregarIntensidades(); // ✅ Carrega primeiro (para popular os selects)
+    await carregarIntegradores(); // Carrega primeiro para popular os selects de integradores
     await carregarTarefas();
-    await carregarIntegradores();
 }
 
 document.getElementById('inputVerificacao').addEventListener('keypress', e => {
@@ -403,6 +399,9 @@ async function carregarIntegradores() {
             opt.textContent = i.nome;
             select.appendChild(opt);
         });
+        
+        // Atualiza a lista do formulário de adição
+        popularSelectIntegrador('integradorTarefa');
     } catch (err) {
         loading.style.display = 'none';
         error.textContent = `❌ Erro: ${err.message}`;
@@ -410,33 +409,19 @@ async function carregarIntegradores() {
     }
 }
 
-// ✅ Carrega as intensidades do Supabase
-async function carregarIntensidades() {
-    try {
-        dadosIntensidades = await buscarDados('intensidades', 'ordem.asc');
-        popularSelectIntensidade('intensidadeTarefa');
-        console.log('✅ Intensidades carregadas:', dadosIntensidades);
-    } catch (err) {
-        console.error('❌ Erro ao carregar intensidades:', err);
-    }
-}
-
-// ✅ Popula um select com as intensidades
-function popularSelectIntensidade(selectId, valorAtual = '') {
+// ✅ Popula um select com os integradores
+function popularSelectIntegrador(selectId, valorAtual = '') {
     const select = document.getElementById(selectId);
-    if (!select) {
-        console.warn(`Elemento '${selectId}' não encontrado!`);
-        return;
-    }
+    if (!select) return;
     
-    select.innerHTML = '<option value="">-- Selecione a intensidade --</option>';
+    select.innerHTML = '<option value="">-- Selecione o integrador --</option>';
     
-    dadosIntensidades.forEach(intensidade => {
+    dadosIntegradores.forEach(integrador => {
         const opt = document.createElement('option');
-        opt.value = intensidade.id;
-        opt.textContent = intensidade.valor_intensidade.trim();
+        opt.value = integrador.id;
+        opt.textContent = integrador.nome;
         
-        if (valorAtual && valorAtual === intensidade.id) {
+        if (valorAtual && valorAtual === integrador.id) {
             opt.selected = true;
         }
         
@@ -444,26 +429,18 @@ function popularSelectIntensidade(selectId, valorAtual = '') {
     });
 }
 
-// ✅ Busca o nome da intensidade pelo ID
-function buscarNomeIntensidade(intensidadeId) {
-    if (!intensidadeId) return null;
-    const intensidade = dadosIntensidades.find(i => i.id === intensidadeId);
-    return intensidade ? intensidade.valor_intensidade.trim() : null;
+// ✅ Busca o nome do integrador pelo ID para exibição
+function buscarNomeIntegrador(integradorId) {
+    if (!integradorId) return null;
+    const integrador = dadosIntegradores.find(i => i.id === integradorId);
+    return integrador ? integrador.nome : null;
 }
 
-// ✅ Retorna o badge colorido para a intensidade
-function getIntensidadeBadge(intensidadeId) {
-    const nome = buscarNomeIntensidade(intensidadeId);
-    if (!nome) return '<span class="intensidade-badge" style="background:#9e9e9e; color:white;">Não definida</span>';
-    
-    const nomeLower = nome.toLowerCase();
-    if (nomeLower === 'alta') {
-        return `<span class="intensidade-badge intensidade-alta">🔥 ${nome}</span>`;
-    } else if (nomeLower === 'média' || nomeLower === 'media') {
-        return `<span class="intensidade-badge intensidade-media">⚡ ${nome}</span>`;
-    } else {
-        return `<span class="intensidade-badge intensidade-baixa">🌱 ${nome}</span>`;
-    }
+// ✅ Retorna o badge estilizado para o Integrador
+function getIntegradorBadge(integradorId) {
+    const nome = buscarNomeIntegrador(integradorId);
+    if (!nome) return '<span class="badge" style="background:#9e9e9e;">Não definido</span>';
+    return `<span class="badge" style="background:#00bcd4;">👤 ${nome}</span>`;
 }
 
 function formatarData(dataISO) {
@@ -488,13 +465,12 @@ function mostrarDetalhesTarefa() {
 
     const t = dadosTarefas[idx];
     
-    // ✅ Agora lê o intensidade_id diretamente do banco
     div.innerHTML = `
         <h3>${t.nome}</h3>
         <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
         <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
         <p><span class="label">Data Esperada:</span> ${formatarData(t.data_para_termino)}</p>
-        <p><span class="label">Intensidade:</span> ${getIntensidadeBadge(t.intensidade_id)}</p>
+        <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
         <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
         <p><span class="label">ID:</span> <code>${t.id}</code></p>
         <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
@@ -559,10 +535,10 @@ function abrirEdicaoTarefa(index) {
                 <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
             </div>
             
-            <!-- ✅ Select de Intensidade no formulário de edição -->
+            <!-- ✅ Select de Integrador no formulário de edição -->
             <div class="form-group">
-                <label for="editIntensidadeTarefa">Intensidade:</label>
-                <select id="editIntensidadeTarefa"></select>
+                <label for="editIntegradorTarefa">Integrador Associado:</label>
+                <select id="editIntegradorTarefa"></select>
             </div>
             
             <div class="form-group">
@@ -577,8 +553,7 @@ function abrirEdicaoTarefa(index) {
         </div>
     `;
     
-    // ✅ Popula o select com a intensidade atual pré-selecionada (vinda do banco)
-    popularSelectIntensidade('editIntensidadeTarefa', tarefa.intensidade_id);
+    popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
 }
 
 function cancelarEdicaoTarefa() {
@@ -592,7 +567,7 @@ async function salvarEdicaoTarefa(index) {
     const status = document.getElementById('editStatusTarefa').value;
     const dataEsperada = document.getElementById('editDataEsperadaTarefa').value;
     const descricao = document.getElementById('editDescricaoTarefa').value.trim();
-    const intensidadeId = document.getElementById('editIntensidadeTarefa').value; // ✅ Captura a intensidade
+    const integradorId = document.getElementById('editIntegradorTarefa').value;
     const msgDiv = document.getElementById('editMsgTarefa');
 
     if (!nome) {
@@ -614,7 +589,7 @@ async function salvarEdicaoTarefa(index) {
                 tipo: tipo || null,
                 status: status || null,
                 data_para_termino: dataEsperada || null,
-                intensidade_id: intensidadeId || null, // ✅ ENVIA AO SUPABASE
+                intg_id: integradorId || null, 
                 descricao: descricao || null
             })
         });
@@ -646,7 +621,7 @@ function abrirEdicaoIntegrador(index) {
             </div>
             <div class="form-group">
                 <label for="editNCPFIntegrador">nº do CPF:</label>
-                <input type="text" id="editNCPFIntegrador" value="${integrador.integrador_cpf || ''}" maxlength="10">
+                <input type="text" id="editNCPFIntegrador" value="${integrador.integrador_cpf || ''}" maxlength="15">
             </div>
             <div class="action-buttons">
                 <button class="btn btn-success" onclick="salvarEdicaoIntegrador(${index})">💾 Salvar</button>
@@ -688,6 +663,10 @@ async function salvarEdicaoIntegrador(index) {
         dadosIntegradores[index] = atualizado[0];
         document.getElementById('selectIntegradores').options[document.getElementById('selectIntegradores').selectedIndex].textContent = nome;
         mostrarDetalhesIntegrador();
+
+        // ✅ SINCRONIZA AS TABELAS NO BANCO
+        await sincronizarIntegradoresComIntensidades();
+
     } catch (err) {
         document.getElementById('editMsgIntegrador').innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
     }
@@ -731,7 +710,12 @@ async function removerIntegrador(index) {
             opt.value = j; opt.textContent = it.nome;
             select.appendChild(opt);
         });
+        popularSelectIntegrador('integradorTarefa'); // Atualiza os selects em outros lugares
         document.getElementById('detalhesIntegrador').style.display = 'none';
+        
+        // ✅ Sincroniza intensidades após remoção
+        await sincronizarIntegradoresComIntensidades();
+        
         alert(`✅ Removido!`);
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
@@ -748,7 +732,7 @@ function atualizarFormulario() {
 
 async function adicionarTarefa() {
     const nome = document.getElementById('nomeTarefa').value.trim();
-    const intensidadeId = document.getElementById('intensidadeTarefa').value; // ✅ Captura a intensidade
+    const integradorId = document.getElementById('integradorTarefa').value;
     const msg = document.getElementById('mensagemAdicionar');
     const btn = document.getElementById('btnAdicionarTarefa');
     if (!nome) { msg.innerHTML = '<div class="error">⚠️ Nome obrigatório!</div>'; return; }
@@ -768,7 +752,7 @@ async function adicionarTarefa() {
                 tipo: document.getElementById('tipoTarefa').value.trim() || null,
                 status: document.getElementById('statusTarefa').value || null,
                 data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
-                intensidade_id: intensidadeId || null, // ✅ ENVIA AO SUPABASE
+                intg_id: integradorId || null, 
                 descricao: document.getElementById('descricaoTarefa').value.trim() || null
             })
         });
@@ -783,7 +767,7 @@ async function adicionarTarefa() {
 
         document.getElementById('tipoElemento').value = '';
         document.getElementById('formTarefa').classList.add('hidden');
-        ['nomeTarefa','tipoTarefa','statusTarefa','dataEsperadaTarefa','intensidadeTarefa','descricaoTarefa'].forEach(id => document.getElementById(id).value = '');
+        ['nomeTarefa','tipoTarefa','statusTarefa','dataEsperadaTarefa','integradorTarefa','descricaoTarefa'].forEach(id => document.getElementById(id).value = '');
         msg.innerHTML = `<div class="success">✅ Tarefa "${nova[0].nome}" adicionada!</div>`;
     } catch (err) {
         msg.innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
@@ -816,20 +800,46 @@ async function adicionarIntegrador() {
         if (!response.ok) throw new Error('Erro ao adicionar');
         const novo = await response.json();
         dadosIntegradores.push(novo[0]);
+        
+        // Atualiza os selects
         const select = document.getElementById('selectIntegradores');
         const opt = document.createElement('option');
         opt.value = dadosIntegradores.length - 1;
         opt.textContent = novo[0].nome;
         select.appendChild(opt);
+        popularSelectIntegrador('integradorTarefa'); 
 
         document.getElementById('tipoElemento').value = '';
         document.getElementById('formIntegrador').classList.add('hidden');
         ['nomeIntegrador','ncpfIntegrador'].forEach(id => document.getElementById(id).value = '');
         msg.innerHTML = `<div class="success">✅ Integrador "${novo[0].nome}" adicionado!</div>`;
+        
+        // ✅ SINCRONIZA AS TABELAS NO BANCO
+        await sincronizarIntegradoresComIntensidades();
+
     } catch (err) {
         msg.innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
     } finally {
         btn.disabled = false; btn.textContent = 'Adicionar Integrador';
+    }
+}
+
+// --- FUNÇÃO PARA COPIAR DADOS ---
+async function sincronizarIntegradoresComIntensidades() {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/copiar_integradores_para_intensidades`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) throw new Error('Erro ao sincronizar tabelas no Supabase');
+        console.log('✅ Dados copiados de integradores para intensidades com sucesso!');
+    } catch (err) {
+        console.error('❌ Erro na sincronização:', err);
     }
 }
 
@@ -841,7 +851,7 @@ function abrirDashboard() {
         <div class="dashboard-card">
             <h3>${t.nome}</h3>
             <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
-            <p><span class="label">Intensidade:</span> ${getIntensidadeBadge(t.intensidade_id)}</p>
+            <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
             <p><span class="label">Data Esperada:</span> ${formatarData(t.data_para_termino)}</p>
             <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
             <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
