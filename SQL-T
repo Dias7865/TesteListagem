@@ -61,7 +61,7 @@ CREATE TABLE tarefas (
 
 -- Colunas extras
 ALTER TABLE tarefas 
-ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado'));
+ADD COLUMN status varchar(30) CHECK (status IN ('em progresso', 'aguardando equatorial', 'não iniciado', 'faltam dados'));
 
 ALTER TABLE tarefas 
 ADD COLUMN data_para_termino date;
