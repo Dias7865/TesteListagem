@@ -88,6 +88,7 @@ h2 { color: #333; font-size: 1.8rem; }
     display: inline-block; padding: 6px 14px; border-radius: 20px;
     font-size: 0.9rem; font-weight: bold; margin-left: 8px;
 }
+.status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ff9800; color: white; }
 .status-nao-iniciado { background: #f44336; color: white; }
@@ -170,6 +171,21 @@ h2 { color: #333; font-size: 1.8rem; }
             "integradores";
     }
 }
+
+/* Badges de Sinalização de Prazo */
+.prazo-no-prazo { background: #4caf50; color: white; }
+.prazo-proximo  { background: #ff9800; color: white; }
+.prazo-limite   { background: #d32f2f; color: white; }
+.prazo-atrasado { background: #8b0000; color: white; }
+
+
+
+
+
+
+
+
+
 </style>
 </head>
 <body>
@@ -236,13 +252,14 @@ h2 { color: #333; font-size: 1.8rem; }
                 </div>
                 <div class="form-group">
                     <label for="statusTarefa">Status:</label>
-                    <select id="statusTarefa">
-                        <option value="">-- Selecione o status --</option>
-                        <option value="em progresso">⏩ Em progresso</option>
-                        <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
-                        <option value="faltam dados">🗂️​ Faltam dados necessários</option>
-                        <option value="não iniciado">❌ Não iniciado</option>
-                    </select>
+				<select id="statusTarefa">
+					<option value="">-- Selecione o status --</option>
+					<option value="concluído">✅ Concluído</option>
+					<option value="em progresso">⏩ Em progresso</option>
+					<option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
+					<option value="faltam dados">🗂️​ Faltam dados necessários</option>
+					<option value="não iniciado">❌ Não iniciado</option>
+				</select>
                 </div>
                 <div class="form-group">
                     <label for="dataEsperadaTarefa">Data Esperada para Entrega:</label>
@@ -490,6 +507,7 @@ function formatarData(dataISO) {
 function getStatusBadge(status) {
     if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
     const s = status.toLowerCase();
+    if (s === 'concluído' || s === 'concluido') return `<span class="status-badge status-concluido">✅ ${status}</span>`;
     if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
     if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
     if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️​ ${status}</span>`;
@@ -510,7 +528,7 @@ function mostrarDetalhesTarefa() {
         <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
         <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
         <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
-        <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)}</p>
+        <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
         <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
@@ -560,13 +578,14 @@ function abrirEdicaoTarefa(index) {
             </div>
             <div class="form-group">
                 <label for="editStatusTarefa">Status:</label>
-                <select id="editStatusTarefa">
-                    <option value="">-- Selecione o status --</option>
-                    <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
-                    <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
-                    <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️​ Faltam dados necessários</option>
-                    <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ não iniciado</option>
-                </select>
+			<select id="editStatusTarefa">
+				<option value="">-- Selecione o status --</option>
+				<option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
+				<option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
+				<option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
+				<option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️​ Faltam dados necessários</option>
+				<option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
+			</select>
             </div>
             <div class="form-group">
                 <label for="editDataEsperadaTarefa">Data Para Esperada:</label>
@@ -884,7 +903,7 @@ function abrirDashboard() {
             <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
             <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
             <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
-            <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)}</p>
+            <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
             <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         </div>
     `).join('');
@@ -896,6 +915,39 @@ function abrirDashboard() {
 function fecharDashboard() {
     document.getElementById('dashboardOverlay').classList.remove('active');
 }
+
+function obterBadgePrazo(dataISO) {
+    if (!dataISO) return '';
+
+    // Extrai ano, mês e dia para evitar problemas com fuso horário (UTC)
+    const [ano, mes, dia] = dataISO.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+
+    // Data atual zerada (00:00:00)
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    // Diferença em dias
+    const diffTempo = dataTermino.getTime() - hoje.getTime();
+    const diffDias = Math.round(diffTempo / (1000 * 60 * 60 * 24));
+
+    if (diffDias > 8) {
+        return '<span class="status-badge prazo-no-prazo">🟢 No prazo</span>';
+    } else if (diffDias > 1 && diffDias <= 8) {
+        return '<span class="status-badge prazo-proximo">⚠️ PRAZO PRÓXIMO</span>';
+    } else if (diffDias <= 1 && diffDias >=0) {
+        return '<span class="status-badge prazo-limite">🚨 DIA LIMITE</span>';
+    } else {
+        return '<span class="status-badge prazo-atrasado">❌ ATRASADO</span>';
+    }
+}
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
