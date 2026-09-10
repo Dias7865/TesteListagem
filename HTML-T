@@ -3,23 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leitor de Dados - Matssa</title>
+<title>Leitor de Dados - Matssa </title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
 }
-.container { max-width: 800px; margin: 0 auto; }
+
+/* Largura expandida para 1200px para caber as 2 colunas confortavelmente */
+.container { max-width: 1200px; margin: 0 auto; }
+
 h1 {
     text-align: center; color: white; margin-bottom: 30px;
     font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 .section {
     background: white; border-radius: 12px; padding: 30px;
-    margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-bottom: 0px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .section-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -28,7 +31,7 @@ h1 {
 h2 { color: #333; font-size: 1.8rem; }
 .btn {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
     color: white; border: none; border-radius: 8px; cursor: pointer;
     font-size: 16px; font-weight: bold;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -43,7 +46,7 @@ h2 { color: #333; font-size: 1.8rem; }
     background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
     width: 100%; padding: 15px; font-size: 18px;
 }
-.loading { text-align: center; padding: 20px; color: #667eea; font-size: 1.1rem; }
+.loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .success { background: #e8f5e9; border: 1px solid #4caf50; color: #2e7d32; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .verificacao-container { display: flex; gap: 10px; align-items: center; margin-top: 15px; }
@@ -72,13 +75,13 @@ h2 { color: #333; font-size: 1.8rem; }
 .form-group textarea { resize: vertical; min-height: 80px; }
 .detalhes-card {
     background: #f9f9f9; border-radius: 10px; padding: 25px;
-    border-left: 4px solid #667eea; margin-top: 20px;
+    border-left: 4px solid #00730d; margin-top: 20px;
 }
 .detalhes-card h3 { color: #333; margin-bottom: 15px; font-size: 1.6rem; }
 .detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
 .detalhes-card .label { font-weight: bold; color: #764ba2; }
 .detalhes-card .badge {
-    display: inline-block; background: #667eea; color: white;
+    display: inline-block; background: #00730d; color: white;    //---- Cor de fundo
     padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px;
 }
 .status-badge {
@@ -138,12 +141,42 @@ h2 { color: #333; font-size: 1.8rem; }
     to { opacity: 1; transform: translateY(0); }
 }
 .section-revealed { animation: slideIn 0.5s ease-out; }
+
+/* --- ESTRUTURA DE LAYOUT EM GRID --- */
+.app-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr; /* Coluna esquerda maior que a direita */
+    grid-template-areas:
+        "tarefas dashboard"
+        "tarefas adicionar"
+        "tarefas integradores";
+    gap: 20px;
+    align-items: start;
+}
+
+.area-tarefas { grid-area: tarefas; }
+.area-dashboard { grid-area: dashboard; }
+.area-adicionar { grid-area: adicionar; }
+.area-integradores { grid-area: integradores; }
+
+/* Responsividade para telas menores */
+@media (max-width: 850px) {
+    .app-layout {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "tarefas"
+            "dashboard"
+            "adicionar"
+            "integradores";
+    }
+}
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>📌 Leitor de Dados Supabase 🪨</h1>
+    <h1>📌 Visualização de Projetos Atuais 🪨</h1>
 
+    <!-- Seção de Verificação -->
     <div id="secaoVerificacao" class="section">
         <div class="section-header"><h2>🔍 Verificação</h2></div>
         <p style="color:#666; margin-bottom:10px;">Digite o código e clique em Verificar para liberar o acesso:</p>
@@ -154,109 +187,112 @@ h2 { color: #333; font-size: 1.8rem; }
         <div id="mensagemResultado" class="mensagem-resultado"></div>
     </div>
 
-    <div id="secaoTarefas" class="section hidden">
-        <div class="section-header"><h2>📌 Tarefas</h2></div>
-        <div class="seletor-container">
-            <label for="selectTarefas">Selecione uma tarefa:</label>
-            <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
-                <option value="">-- Escolha uma tarefa --</option>
-            </select>
-        </div>
-        <div id="tarefasLoading" class="loading" style="display:none;">Carregando tarefas...</div>
-        <div id="tarefasError" class="error" style="display:none;"></div>
-        <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
-    </div>
-
-    <div id="secaoIntegradores" class="section hidden">
-        <div class="section-header"><h2>🪨 Integradores</h2></div>
-        <div class="seletor-container">
-            <label for="selectIntegradores">Selecione um integrador:</label>
-            <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
-                <option value="">-- Escolha um integrador --</option>
-            </select>
-        </div>
-        <div id="integradoresLoading" class="loading" style="display:none;">Carregando integradores...</div>
-        <div id="integradoresError" class="error" style="display:none;"></div>
-        <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
-    </div>
-
-    <div id="secaoDashboard" class="section hidden">
-        <div class="section-header"><h2>📊 Dashboard</h2></div>
-        <p style="color:#666; margin-bottom:20px;">Visualize todas as tarefas cadastradas em tela cheia:</p>
-        <button class="btn btn-dashboard" onclick="abrirDashboard()">🎬 Abrir Dashboard de Tarefas</button>
-    </div>
-
-    <div id="secaoAdicionar" class="section hidden">
-        <div class="section-header"><h2>➕ Adicionar Elemento</h2></div>
-        <p style="color:#666; margin-bottom:20px;">Crie um novo elemento para uma das listas existentes:</p>
-        <div class="form-group">
-            <label for="tipoElemento">Tipo de Elemento:</label>
-            <select id="tipoElemento" onchange="atualizarFormulario()">
-                <option value="">-- Selecione o tipo --</option>
-                <option value="tarefa">📌 Tarefa</option>
-                <option value="integrador">🪨 Integrador</option>
-            </select>
-        </div>
-
-        <!-- Formulário Tarefa -->
-        <div id="formTarefa" class="hidden">
-            <div class="form-group">
-                <label for="nomeTarefa">Nome da Tarefa:</label>
-                <input type="text" id="nomeTarefa" placeholder="Ex: CASA 10">
+    <!-- Container do Grid com as duas colunas -->
+    <div id="conteudoProtegido" class="app-layout hidden">
+        
+        <!-- Esquerda: Tarefas -->
+        <div id="secaoTarefas" class="section area-tarefas hidden">
+            <div class="section-header"><h2>📌 Tarefas</h2></div>
+            <div class="seletor-container">
+                <label for="selectTarefas">Selecione uma tarefa:</label>
+                <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
+                    <option value="">-- Escolha uma tarefa --</option>
+                </select>
             </div>
+            <div id="tarefasLoading" class="loading" style="display:none;">Carregando tarefas...</div>
+            <div id="tarefasError" class="error" style="display:none;"></div>
+            <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
+        </div>
+
+        <!-- Direita 1: Dashboard -->
+        <div id="secaoDashboard" class="section area-dashboard hidden">
+            <div class="section-header"><h2>📊 Dashboard</h2></div>
+            <p style="color:#666; margin-bottom:20px;">Visualize todas as tarefas cadastradas em tela cheia:</p>
+            <button class="btn btn-dashboard" onclick="abrirDashboard()">🎬 Abrir Dashboard de Tarefas</button>
+        </div>
+
+        <!-- Direita 2: Adicionar Elemento -->
+        <div id="secaoAdicionar" class="section area-adicionar hidden">
+            <div class="section-header"><h2>➕ Adicionar Elemento</h2></div>
+            <p style="color:#666; margin-bottom:20px;">Crie um novo elemento para uma das listas existentes:</p>
             <div class="form-group">
-                <label for="tipoTarefa">Tipo:</label>
-                <input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar">
-            </div>
-            <div class="form-group">
-                <label for="statusTarefa">Status:</label>
-                <select id="statusTarefa">
-                    <option value="">-- Selecione o status --</option>
-                    <option value="em progresso">⏩ Em progresso</option>
-                    <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
-					<option value="faltam dados">🗂️​ Faltam dados necessários</option>
-                    <option value="não iniciado">❌ Não iniciado</option>
+                <label for="tipoElemento">Tipo de Elemento:</label>
+                <select id="tipoElemento" onchange="atualizarFormulario()">
+                    <option value="">-- Selecione o tipo --</option>
+                    <option value="tarefa">📌 Tarefa</option>
+                    <option value="integrador">🪨 Integrador</option>
                 </select>
             </div>
 
-            
-            <!-- ✅ Select de Integrador -->
-            <div class="form-group">
-                <label for="integradorTarefa">Integrador Associado:</label>
-                <select id="integradorTarefa">
-                    <option value="">-- Selecione o integrador --</option>
+            <!-- Formulário Tarefa -->
+            <div id="formTarefa" class="hidden">
+                <div class="form-group">
+                    <label for="nomeTarefa">Nome da Tarefa:</label>
+                    <input type="text" id="nomeTarefa" placeholder="Ex: CASA 10">
+                </div>
+                <div class="form-group">
+                    <label for="tipoTarefa">Tipo:</label>
+                    <input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar">
+                </div>
+                <div class="form-group">
+                    <label for="statusTarefa">Status:</label>
+                    <select id="statusTarefa">
+                        <option value="">-- Selecione o status --</option>
+                        <option value="em progresso">⏩ Em progresso</option>
+                        <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
+                        <option value="faltam dados">🗂️​ Faltam dados necessários</option>
+                        <option value="não iniciado">❌ Não iniciado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dataEsperadaTarefa">Data Esperada para Entrega:</label>
+                    <input type="date" id="dataEsperadaTarefa">
+                </div>
+                <div class="form-group">
+                    <label for="integradorTarefa">Integrador Associado:</label>
+                    <select id="integradorTarefa">
+                        <option value="">-- Selecione o integrador --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="descricaoTarefa">Descrição:</label>
+                    <textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea>
+                </div>
+                <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
+            </div>
+
+            <!-- Formulário Integrador -->
+            <div id="formIntegrador" class="hidden">
+                <div class="form-group">
+                    <label for="nomeIntegrador">Nome do Integrador:</label>
+                    <input type="text" id="nomeIntegrador" placeholder="Ex: João">
+                </div>
+                <div class="form-group">
+                    <label for="ncpfIntegrador">nº do CPF:</label>
+                    <input type="text" id="ncpfIntegrador" placeholder="Ex: 123456789" maxlength="15">
+                </div>
+                <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
+            </div>
+
+            <div id="mensagemAdicionar" style="margin-top:15px;"></div>
+        </div>
+
+        <!-- Direita 3: Integradores -->
+        <div id="secaoIntegradores" class="section area-integradores hidden">
+            <div class="section-header"><h2>🪨 Integradores</h2></div>
+            <div class="seletor-container">
+                <label for="selectIntegradores">Selecione um integrador:</label>
+                <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
+                    <option value="">-- Escolha um integrador --</option>
                 </select>
             </div>
-            
-            <div class="form-group">
-                <label for="descricaoTarefa">Descrição:</label>
-                <textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea>
-            </div>
-            <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
+            <div id="integradoresLoading" class="loading" style="display:none;">Carregando integradores...</div>
+            <div id="integradoresError" class="error" style="display:none;"></div>
+            <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
         </div>
 
-        <!-- Formulário Integrador -->
-        <div id="formIntegrador" class="hidden">
-            <div class="form-group">
-                <label for="nomeIntegrador">Nome do Integrador:</label>
-                <input type="text" id="nomeIntegrador" placeholder="Ex: João">
-            </div>
-            <div class="form-group">
-                <label for="ncpfIntegrador">nº do CPF:</label>
-                <input type="text" id="ncpfIntegrador" placeholder="Ex: 123456789" maxlength="15">
-            </div>
-            <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
-        </div>
-
-            <div class="form-group">
-                <label for="dataEsperadaTarefa">Data Esperada para Entrega:</label>
-                <input type="date" id="dataEsperadaTarefa">
-            </div>
-
-
-        <div id="mensagemAdicionar" style="margin-top:15px;"></div>
-    </div>
-</div>
+    </div> <!-- /conteudoProtegido -->
+</div> <!-- /container -->
 
 <!-- Dashboard Overlay -->
 <div id="dashboardOverlay" class="dashboard-overlay">
@@ -334,6 +370,7 @@ async function verificarCodigo() {
 }
 
 function revelarSecoes() {
+    document.getElementById('conteudoProtegido').classList.remove('hidden');
     ['secaoTarefas', 'secaoIntegradores', 'secaoDashboard', 'secaoAdicionar'].forEach(id => {
         const el = document.getElementById(id);
         el.classList.remove('hidden');
@@ -342,7 +379,7 @@ function revelarSecoes() {
 }
 
 async function carregarDadosIniciais() {
-    await carregarIntegradores(); // Carrega primeiro para popular os selects de integradores
+    await carregarIntegradores();
     await carregarTarefas();
 }
 
@@ -405,7 +442,6 @@ async function carregarIntegradores() {
             select.appendChild(opt);
         });
         
-        // Atualiza a lista do formulário de adição
         popularSelectIntegrador('integradorTarefa');
     } catch (err) {
         loading.style.display = 'none';
@@ -414,7 +450,6 @@ async function carregarIntegradores() {
     }
 }
 
-// ✅ Popula um select com os integradores
 function popularSelectIntegrador(selectId, valorAtual = '') {
     const select = document.getElementById(selectId);
     if (!select) return;
@@ -434,14 +469,12 @@ function popularSelectIntegrador(selectId, valorAtual = '') {
     });
 }
 
-// ✅ Busca o nome do integrador pelo ID para exibição
 function buscarNomeIntegrador(integradorId) {
     if (!integradorId) return null;
     const integrador = dadosIntegradores.find(i => i.id === integradorId);
     return integrador ? integrador.nome : null;
 }
 
-// ✅ Retorna o badge estilizado para o Integrador
 function getIntegradorBadge(integradorId) {
     const nome = buscarNomeIntegrador(integradorId);
     if (!nome) return '<span class="badge" style="background:#9e9e9e;">Não definido</span>';
@@ -459,7 +492,7 @@ function getStatusBadge(status) {
     const s = status.toLowerCase();
     if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
     if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
-	if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️​ ${status}</span>`;
+    if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️​ ${status}</span>`;
     return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
 }
 
@@ -475,9 +508,9 @@ function mostrarDetalhesTarefa() {
         <h3>${t.nome}</h3>
         <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
         <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
-		<p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
+        <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
         <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
-		<p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)}</p>
+        <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)}</p>
         <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
@@ -531,7 +564,7 @@ function abrirEdicaoTarefa(index) {
                     <option value="">-- Selecione o status --</option>
                     <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
                     <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
-					<option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️​ Faltam dados necessários</option>
+                    <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️​ Faltam dados necessários</option>
                     <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ não iniciado</option>
                 </select>
             </div>
@@ -539,13 +572,10 @@ function abrirEdicaoTarefa(index) {
                 <label for="editDataEsperadaTarefa">Data Para Esperada:</label>
                 <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
             </div>
-            
-            <!-- ✅ Select de Integrador no formulário de edição -->
             <div class="form-group">
                 <label for="editIntegradorTarefa">Integrador Associado:</label>
                 <select id="editIntegradorTarefa"></select>
             </div>
-            
             <div class="form-group">
                 <label for="editDescricaoTarefa">Descrição:</label>
                 <textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea>
@@ -669,7 +699,6 @@ async function salvarEdicaoIntegrador(index) {
         document.getElementById('selectIntegradores').options[document.getElementById('selectIntegradores').selectedIndex].textContent = nome;
         mostrarDetalhesIntegrador();
 
-        // ✅ SINCRONIZA AS TABELAS NO BANCO
         await sincronizarIntegradoresComIntensidades();
 
     } catch (err) {
@@ -715,10 +744,9 @@ async function removerIntegrador(index) {
             opt.value = j; opt.textContent = it.nome;
             select.appendChild(opt);
         });
-        popularSelectIntegrador('integradorTarefa'); // Atualiza os selects em outros lugares
+        popularSelectIntegrador('integradorTarefa');
         document.getElementById('detalhesIntegrador').style.display = 'none';
         
-        // ✅ Sincroniza intensidades após remoção
         await sincronizarIntegradoresComIntensidades();
         
         alert(`✅ Removido!`);
@@ -806,7 +834,6 @@ async function adicionarIntegrador() {
         const novo = await response.json();
         dadosIntegradores.push(novo[0]);
         
-        // Atualiza os selects
         const select = document.getElementById('selectIntegradores');
         const opt = document.createElement('option');
         opt.value = dadosIntegradores.length - 1;
@@ -819,7 +846,6 @@ async function adicionarIntegrador() {
         ['nomeIntegrador','ncpfIntegrador'].forEach(id => document.getElementById(id).value = '');
         msg.innerHTML = `<div class="success">✅ Integrador "${novo[0].nome}" adicionado!</div>`;
         
-        // ✅ SINCRONIZA AS TABELAS NO BANCO
         await sincronizarIntegradoresComIntensidades();
 
     } catch (err) {
@@ -857,8 +883,8 @@ function abrirDashboard() {
             <h3>${t.nome}</h3>
             <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
             <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
-			<p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
-			<p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)}</p>
+            <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
+            <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)}</p>
             <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         </div>
     `).join('');
