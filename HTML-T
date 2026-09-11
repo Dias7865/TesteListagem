@@ -74,7 +74,6 @@ h2 { color: #333; font-size: 1.8rem; }
     text-transform: uppercase; letter-spacing: 1px;
 }
 
-/* Alinhamento superior alinhando caixas topo a topo */
 .grid-caixas-status, .grid-caixas-prazos {
     display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start; flex: 1;
 }
@@ -83,7 +82,6 @@ h2 { color: #333; font-size: 1.8rem; }
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 110px;
 }
 
-/* Quadrado para os status */
 .item-caixa-status .caixa-quantidade {
     width: 100%; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
@@ -91,7 +89,6 @@ h2 { color: #333; font-size: 1.8rem; }
     box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
 }
 
-/* Círculo para os prazos */
 .item-caixa-prazo .caixa-quantidade {
     width: 75px; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
@@ -104,15 +101,20 @@ h2 { color: #333; font-size: 1.8rem; }
     font-size: 0.9rem; text-transform: capitalize; line-height: 1.2;
 }
 
-/* Botão da 2ª Página topo */
+/* Divisão dos Botões Laterais na 1ª Página */
+.p1-botoes-laterais {
+    display: flex; flex-direction: column; gap: 10px; height: 100%;
+}
 .btn-p1-lateral {
     border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
-    font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 12px;
+    font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 12px;
     display: flex; align-items: center; justify-content: center; text-align: center;
-    padding: 15px; transition: transform 0.2s, background 0.2s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; height: 100%;
+    padding: 10px; transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; flex: 1;
 }
-.btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
+.btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-2px); }
+.btn-p1-relatorios { background: #764ba2; color: #fff; }
+.btn-p1-relatorios:hover { background: #5a3780; color: #fff; }
 
 .p1-corpo {
     display: grid; grid-template-columns: 1fr 320px; gap: 15px; align-items: stretch;
@@ -134,7 +136,6 @@ h2 { color: #333; font-size: 1.8rem; }
 }
 .item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
 
-/* Visualização Dinâmica Vertical Integrada (Sem fundo colorido nos textos) */
 .container-vis-dinamica {
     background: white; border: 4px solid #1a1a1a; border-radius: 12px;
     padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -161,7 +162,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .vis-card h4 { font-size: 1.15rem; margin-bottom: 8px; }
 .vis-card p { margin: 6px 0; }
 
-/* --- ESTRUTURA DE LAYOUT DA 2ª PÁGINA --- */
+/* --- ESTRUTURA LAYOUT PÁGINA 2 --- */
 .app-layout {
     display: grid; grid-template-columns: 1.4fr 1fr;
     grid-template-areas:
@@ -172,6 +173,23 @@ h2 { color: #333; font-size: 1.8rem; }
 .area-tarefas { grid-area: tarefas; }
 .area-adicionar { grid-area: adicionar; }
 .area-integradores { grid-area: integradores; }
+
+/* --- ESTRUTURA LAYOUT PÁGINA 3 (RELATÓRIOS) --- */
+.grid-relatorios {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 15px;
+}
+.card-relatorio {
+    background: #fdfdfd; border: 3px solid #1a1a1a; border-radius: 12px;
+    padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex; flex-direction: column; gap: 8px;
+}
+.btn-deletar-relatorio {
+    position: absolute; top: 10px; right: 10px; background: #f44336; color: white;
+    border: 2px solid #1a1a1a; border-radius: 50%; width: 30px; height: 30px;
+    font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+}
+.btn-deletar-relatorio:hover { background: #d32f2f; transform: scale(1.1); }
 
 @media (max-width: 900px) {
     .p1-topo { grid-template-columns: 1fr; }
@@ -198,7 +216,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
-.status-aguardando { background: #ffc229; color: white; }
+.status-aguardando { background: #ff9800; color: white; }
 .status-nao-iniciado { background: #f44336; color: white; }
 .status-faltam-dados { background: #00802D; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
@@ -208,8 +226,8 @@ h2 { color: #333; font-size: 1.8rem; }
 
 .prazo-no-prazo { background: #4caf50; color: white; }
 .prazo-proximo  { background: #ff9800; color: white; }
-.prazo-limite   { background: #80004c; color: white; }
-.prazo-atrasado { background: #d32f2f; color: white; }
+.prazo-limite   { background: #d32f2f; color: white; }
+.prazo-atrasado { background: #8b0000; color: white; }
 
 /* Modal */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -236,7 +254,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
     <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
-        <!-- TOPO: Status + Botão Ir à 2ª Página -->
+        <!-- TOPO: Status + Botões da 2ª Página e Relatórios -->
         <div class="p1-topo">
             <div class="painel-com-rotulo">
                 <div class="rotulo-vertical">ESTADO DE CADA SERVIÇO</div>
@@ -244,9 +262,16 @@ h2 { color: #333; font-size: 1.8rem; }
                     <div class="loading">Carregando contadores...</div>
                 </div>
             </div>
-            <button class="btn-p1-lateral" onclick="irParaPagina2()">
-                vai à 2ªpag ➔
-            </button>
+            
+            <!-- Botões divididos ao meio na direita -->
+            <div class="p1-botoes-laterais">
+                <button class="btn-p1-lateral" onclick="irParaPagina2()">
+                    vai à 2ªpag ➔
+                </button>
+                <button class="btn-p1-lateral btn-p1-relatorios" onclick="irParaPagina3()">
+                    📊 Relatórios ➔
+                </button>
+            </div>
         </div>
 
         <!-- CORPO: Esquerda (Prazos + Lista) / Direita (Visualização Dinâmica Vertical) -->
@@ -309,6 +334,7 @@ h2 { color: #333; font-size: 1.8rem; }
                         <option value="">-- Selecione o tipo --</option>
                         <option value="tarefa">📌 Tarefa</option>
                         <option value="integrador">🪨 Integrador</option>
+                        <option value="trfconcluida">📊 Tarefa Concluída</option>
                     </select>
                 </div>
 
@@ -340,6 +366,22 @@ h2 { color: #333; font-size: 1.8rem; }
                     <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
                 </div>
 
+                <!-- Form Tarefa Concluída (Database: trfsconcluidas) -->
+                <div id="formTrfConcluida" class="hidden">
+                    <div class="form-group"><label for="nomeTrfConcluida">Nome da Tarefa:</label><input type="text" id="nomeTrfConcluida" placeholder="Ex: CASA 12"></div>
+                    <div class="form-group"><label for="tipoTrfConcluida">Tipo:</label><input type="text" id="tipoTrfConcluida" placeholder="Ex: Manutenção"></div>
+                    <div class="form-group">
+                        <label for="statusTrfConcluida">Status:</label>
+                        <select id="statusTrfConcluida">
+                            <option value="concluído" selected>✅ Concluído</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="dataFinalizadoTrfConcluida">Data de Finalização:</label><input type="date" id="dataFinalizadoTrfConcluida"></div>
+                    <div class="form-group"><label for="intgFzTrfConcluida">Integrador Responsável (intg_fz):</label><input type="text" id="intgFzTrfConcluida" placeholder="Nome do integrador"></div>
+                    <div class="form-group"><label for="descricaoTrfConcluida">Descrição:</label><textarea id="descricaoTrfConcluida" placeholder="Detalhes da conclusão..."></textarea></div>
+                    <button class="btn btn-success" onclick="adicionarTrfConcluida()" id="btnAdicionarTrfConcluida">Adicionar Tarefa Concluída</button>
+                </div>
+
                 <div id="mensagemAdicionar" style="margin-top:15px;"></div>
             </div>
 
@@ -355,6 +397,23 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="integradoresLoading" class="loading" style="display:none;">Carregando integradores...</div>
                 <div id="integradoresError" class="error" style="display:none;"></div>
                 <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PÁGINA 3 (RELATÓRIOS) ==================== -->
+    <div id="pagina3" class="hidden">
+        <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="irParaPagina1()">⬅️ Voltar à 1ª Página</button>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>📊 Relatórios de Tarefas Concluídas</h2>
+            </div>
+            <div id="loadingTrfsConcluidas" class="loading" style="display:none;">Carregando relatórios...</div>
+            <div id="gridTrfsConcluidas" class="grid-relatorios">
+                <!-- Itens da tabela trfsconcluidas renderizados aqui -->
             </div>
         </div>
     </div>
@@ -375,16 +434,29 @@ const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 let dadosTarefas = [];
 let dadosIntegradores = [];
 let dadosIntensidades = [];
+let dadosTrfsConcluidas = [];
 
-function irParaPagina2() {
+function esconderTodasPaginas() {
     document.getElementById('pagina1').classList.add('hidden');
-    document.getElementById('pagina2').classList.remove('hidden');
+    document.getElementById('pagina2').classList.add('hidden');
+    document.getElementById('pagina3').classList.add('hidden');
 }
 
 function irParaPagina1() {
-    document.getElementById('pagina2').classList.add('hidden');
+    esconderTodasPaginas();
     document.getElementById('pagina1').classList.remove('hidden');
     carregarPagina1();
+}
+
+function irParaPagina2() {
+    esconderTodasPaginas();
+    document.getElementById('pagina2').classList.remove('hidden');
+}
+
+function irParaPagina3() {
+    esconderTodasPaginas();
+    document.getElementById('pagina3').classList.remove('hidden');
+    carregarTrfsConcluidas();
 }
 
 // --- VERIFICAÇÃO DE CÓDIGO ---
@@ -478,9 +550,9 @@ function getCorPorStatus(status) {
     if (!status) return { bg: '#f9f9f9', text: '#1a1a1a' };
     const s = status.toLowerCase();
     if (s.includes('conclu')) return { bg: '#2196f3', text: '#ffffff' };
-    if (s.includes('progresso')) return { bg: '#ff9800', text: '#ffffff' };
-    if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
-    if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
+    if (s.includes('progresso')) return { bg: '#4caf50', text: '#ffffff' };
+    if (s.includes('aguardando')) return { bg: '#ff9800', text: '#ffffff' };
+    if (s.includes('faltam')) return { bg: '#00802D', text: '#ffffff' };
     if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
@@ -503,13 +575,12 @@ function getCorPrazo(dataISO) {
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
     const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDias > 8) return '#4caf50'; // Dentro do prazo
-    if (diffDias >= 2) return '#ffc229'; // Prazo próximo
-    if (diffDias >= 0) return '#80004c'; // No limite
-    return '#d32f2f'; // Atrasado
+    if (diffDias > 8) return '#4caf50';
+    if (diffDias >= 2) return '#ff9800';
+    if (diffDias >= 0) return '#d32f2f';
+    return '#8b0000';
 }
 
-// Renderiza Caixas de Status com Emoji apenas nas categorias de Status
 function renderizarCaixasStatus() {
     const container = document.getElementById('gridStatusCaixas');
     if (!dadosIntensidades || dadosIntensidades.length === 0) {
@@ -535,19 +606,10 @@ function renderizarCaixasStatus() {
     }).join('');
 }
 
-// Renderiza Círculos de Prazos (sem emoji na categoria)
 function renderizarCaixasPrazos() {
     const container = document.getElementById('gridPrazosCaixas');
-    
-    const contadoresPrazos = {
-        'dentro do prazo': 0,
-        'prazo próximo': 0,
-        'no limite': 0,
-        'atrasado': 0
-    };
-
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const contadoresPrazos = { 'dentro do prazo': 0, 'prazo próximo': 0, 'no limite': 0, 'atrasado': 0 };
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
 
     dadosTarefas.forEach(t => {
         const s = (t.status || '').toLowerCase();
@@ -565,9 +627,9 @@ function renderizarCaixasPrazos() {
 
     const listaPrazos = [
         { label: 'Dentro Do Prazo', qtd: contadoresPrazos['dentro do prazo'], bg: '#4caf50' },
-        { label: 'Prazo Próximo', qtd: contadoresPrazos['prazo próximo'], bg: '#ffc229' },
-        { label: 'No Limite', qtd: contadoresPrazos['no limite'], bg: '#80004c' },
-        { label: 'Atrasado', qtd: contadoresPrazos['atrasado'], bg: '#d32f2f' }
+        { label: 'Prazo Próximo', qtd: contadoresPrazos['prazo próximo'], bg: '#ff9800' },
+        { label: 'No Limite', qtd: contadoresPrazos['no limite'], bg: '#d32f2f' },
+        { label: 'Atrasado', qtd: contadoresPrazos['atrasado'], bg: '#8b0000' }
     ];
 
     container.innerHTML = listaPrazos.map(item => `
@@ -580,7 +642,6 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
-// Renderiza Lista Pendentes
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
     const pendentes = dadosTarefas.filter(t => {
@@ -610,7 +671,6 @@ function renderizarListaPendentes() {
     }).join('');
 }
 
-// Formatadores de texto simples (sem fundo colorido) para a Visualização Dinâmica
 function getTextoStatusSemFundo(status) {
     if (!status) return 'Não definido';
     const s = status.toLowerCase();
@@ -635,7 +695,6 @@ function getTextoPrazoSemFundo(dataISO) {
     return '❌ ATRASADO';
 }
 
-// Renderiza Visualização Dinâmica (sem coloração de fundo nos textos)
 function renderizarVisualizacaoDinamicaVertical() {
     const track = document.getElementById('visDinamicaTrack');
     if (!dadosTarefas || dadosTarefas.length === 0) {
@@ -833,13 +892,16 @@ async function salvarEdicaoTarefa(index) {
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
-// --- ADICIONAR TAREFAS / INTEGRADORES ---
+// --- ADICIONAR ELEMENTOS ---
 function atualizarFormulario() {
     const tipo = document.getElementById('tipoElemento').value;
     document.getElementById('formTarefa').classList.add('hidden');
     document.getElementById('formIntegrador').classList.add('hidden');
+    document.getElementById('formTrfConcluida').classList.add('hidden');
+
     if (tipo === 'tarefa') document.getElementById('formTarefa').classList.remove('hidden');
     else if (tipo === 'integrador') document.getElementById('formIntegrador').classList.remove('hidden');
+    else if (tipo === 'trfconcluida') document.getElementById('formTrfConcluida').classList.remove('hidden');
 }
 
 async function adicionarTarefa() {
@@ -882,6 +944,80 @@ async function adicionarIntegrador() {
         await carregarIntegradores();
         alert('✅ Integrador adicionado!');
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+// Adicionar Tarefa Concluída (Database: trfsconcluidas)
+async function adicionarTrfConcluida() {
+    const nome = document.getElementById('nomeTrfConcluida').value.trim();
+    if (!nome) return alert('⚠️ Digite o nome da tarefa concluída');
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            body: JSON.stringify({
+                nome: nome,
+                tipo: document.getElementById('tipoTrfConcluida').value.trim() || null,
+                status: document.getElementById('statusTrfConcluida').value || 'concluído',
+                data_finalizado: document.getElementById('dataFinalizadoTrfConcluida').value || null,
+                intg_fz: document.getElementById('intgFzTrfConcluida').value.trim() || null,
+                descricao: document.getElementById('descricaoTrfConcluida').value.trim() || null
+            })
+        });
+        if (!response.ok) throw new Error('Erro ao adicionar tarefa concluída');
+        alert('✅ Tarefa Concluída registrada com sucesso!');
+        document.getElementById('nomeTrfConcluida').value = '';
+        document.getElementById('tipoTrfConcluida').value = '';
+        document.getElementById('dataFinalizadoTrfConcluida').value = '';
+        document.getElementById('intgFzTrfConcluida').value = '';
+        document.getElementById('descricaoTrfConcluida').value = '';
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+// --- RELATÓRIOS (PÁGINA 3) ---
+async function carregarTrfsConcluidas() {
+    const loading = document.getElementById('loadingTrfsConcluidas');
+    const container = document.getElementById('gridTrfsConcluidas');
+    loading.style.display = 'block';
+    container.innerHTML = '';
+
+    try {
+        dadosTrfsConcluidas = await buscarDados('trfsconcluidas');
+        loading.style.display = 'none';
+
+        if (!dadosTrfsConcluidas || dadosTrfsConcluidas.length === 0) {
+            container.innerHTML = '<p style="color:#666; text-align:center; grid-column: 1/-1;">Nenhuma tarefa concluída encontrada no relatório.</p>';
+            return;
+        }
+
+        container.innerHTML = dadosTrfsConcluidas.map(item => `
+            <div class="card-relatorio">
+                <button class="btn-deletar-relatorio" title="Excluir da database" onclick="removerTrfConcluida(${item.id})">✕</button>
+                <h3 style="color:#333; margin-right: 35px;">${item.nome}</h3>
+                <p><b>Tipo:</b> ${item.tipo || 'N/A'}</p>
+                <p><b>Status:</b> <span class="status-badge status-concluido">✅ ${item.status || 'Concluído'}</span></p>
+                <p><b>Integrador (intg_fz):</b> ${item.intg_fz || 'Não informado'}</p>
+                <p><b>Data Finalizado:</b> ${formatarData(item.data_finalizado)}</p>
+                <p><b>Descrição:</b> ${item.descricao || 'Sem descrição'}</p>
+            </div>
+        `).join('');
+    } catch (err) {
+        loading.style.display = 'none';
+        container.innerHTML = `<p class="error" style="grid-column: 1/-1;">Erro ao carregar relatórios: ${err.message}</p>`;
+    }
+}
+
+async function removerTrfConcluida(id) {
+    if (!confirm('Tem certeza que deseja excluir esta tarefa concluída do relatório?')) return;
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!response.ok) throw new Error('Erro ao deletar');
+        await carregarTrfsConcluidas();
+    } catch (err) { alert(`❌ Erro ao remover: ${err.message}`); }
 }
 
 async function removerTarefa(index) {
