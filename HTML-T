@@ -41,10 +41,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .btn-warning { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
 .btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
 .btn-secondary { background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%); }
-.btn-dashboard {
-    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
-    width: 100%; padding: 15px; font-size: 18px;
-}
+
 .loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
 .verificacao-container { display: flex; gap: 10px; align-items: center; margin-top: 15px; }
@@ -59,74 +56,77 @@ h2 { color: #333; font-size: 1.8rem; }
 .mensagem-sucesso { background: #e8f5e9; border: 2px solid #4caf50; color: #2e7d32; }
 .mensagem-erro { background: #fce4ec; border: 2px solid #f44336; color: #c62828; }
 
-/* --- ESTILOS DA 1ª PÁGINA (PAINEL DE STATUS & PENDÊNCIAS) --- */
-.painel-status-container {
+/* --- ESTRUTURA LAYOUT DA 1ª PÁGINA --- */
+.painel-status-container, .painel-prazos-container {
     background: white; border: 4px solid #1a1a1a; border-radius: 12px;
-    padding: 25px; margin-bottom: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
-.grid-caixas-status {
-    display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start;
+.grid-caixas-status, .grid-caixas-prazos {
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start;
 }
-.item-caixa-status {
-    display: flex; flex-direction: column; align-items: center; width: 130px;
+.item-caixa-status, .item-caixa-prazo {
+    display: flex; flex-direction: column; align-items: center; width: 120px;
 }
 .caixa-quantidade {
-    width: 100%; height: 90px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    width: 100%; height: 80px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2.2rem; font-weight: bold; color: #1a1a1a; border-radius: 8px;
+    font-size: 2.2rem; font-weight: bold; color: #ffffff; border-radius: 8px;
     box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
 }
-.nome-status-caixa {
+.nome-status-caixa, .nome-prazo-caixa {
     margin-top: 8px; font-weight: bold; color: #333; text-align: center;
     font-size: 0.95rem; text-transform: capitalize; line-height: 1.2;
 }
 
 .area-inferior-p1 {
-    display: flex; gap: 20px; align-items: stretch; min-height: 250px;
+    display: grid; grid-template-columns: 1fr 160px; gap: 20px; align-items: stretch;
 }
+.p1-coluna-esquerda { display: flex; flex-direction: column; }
 .container-lista-pendentes {
     flex: 1; background: white; border: 4px solid #1a1a1a; border-radius: 12px;
-    padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); min-height: 250px;
 }
 .container-lista-pendentes h3 {
-    margin-bottom: 15px; color: #333; font-size: 1.3rem; border-bottom: 2px solid #eee; padding-bottom: 8px;
+    margin-bottom: 15px; color: #333; font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 8px;
 }
 .lista-vertical-pendentes {
-    display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto;
 }
 .item-pendente {
-    display: flex; align-items: center; gap: 15px; padding: 12px 16px;
-    background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 1.05rem;
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 1rem;
 }
 .item-pendente-nome { font-weight: bold; color: #222; }
 
-.btn-navegacao-p2 {
-    width: 140px; border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
-    font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 12px;
+/* Botões da coluna lateral direita da Página 1 */
+.p1-coluna-direita {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 15px;
+}
+.btn-p1-lateral {
+    border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
+    font-weight: bold; font-size: 1.05rem; cursor: pointer; border-radius: 12px;
     display: flex; align-items: center; justify-content: center; text-align: center;
     padding: 15px; transition: transform 0.2s, background 0.2s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; min-height: 90px;
 }
-.btn-navegacao-p2:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
+.btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
 
 /* --- ESTRUTURA DE LAYOUT DA 2ª PÁGINA --- */
 .app-layout {
-    display: grid; grid-template-columns: 1.6fr 1fr;
+    display: grid; grid-template-columns: 1.4fr 1fr;
     grid-template-areas:
-        "tarefas dashboard"
         "tarefas adicionar"
         "tarefas integradores";
     gap: 20px; align-items: start;
 }
 .area-tarefas { grid-area: tarefas; }
-.area-dashboard { grid-area: dashboard; }
 .area-adicionar { grid-area: adicionar; }
 .area-integradores { grid-area: integradores; }
 
 @media (max-width: 850px) {
-    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "dashboard" "adicionar" "integradores"; }
-    .area-inferior-p1 { flex-direction: column; }
-    .btn-navegacao-p2 { width: 100%; height: 60px; }
+    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores"; }
+    .area-inferior-p1 { grid-template-columns: 1fr; }
+    .p1-coluna-direita { flex-direction: row; }
 }
 
 .seletor-container { margin-bottom: 20px; }
@@ -145,7 +145,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
 .detalhes-card .label { font-weight: bold; color: #764ba2; }
 .detalhes-card .badge { display: inline-block; background: #00730d; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px; }
-.status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-left: 8px; }
+.status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ff9800; color: white; }
@@ -159,13 +159,11 @@ h2 { color: #333; font-size: 1.8rem; }
 .dashboard-close { position: absolute; top: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; color: white; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000; }
 .dashboard-title { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); color: white; font-size: 2.5rem; z-index: 10; }
 .dashboard-container { position: absolute; top: 50%; left: 0; width: 100%; height: 450px; transform: translateY(-50%); overflow: hidden; }
-.dashboard-track { display: flex; gap: 40px; animation: scrollLeft 30s linear infinite; height: 100%; }
+.dashboard-track { display: flex; gap: 40px; animation: scrollLeft var(--animation-duration, 30s) linear infinite; height: 100%; }
 .dashboard-card { flex-shrink: 0; width: 400px; height: 100%; background: linear-gradient(135deg, rgba(102,126,234,0.9), rgba(118,75,162,0.9)); border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; color: white; overflow-y: auto; }
 @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-440px * var(--card-count))); } }
 
 .hidden { display: none !important; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.section-revealed { animation: slideIn 0.5s ease-out; }
 
 .prazo-no-prazo { background: #4caf50; color: white; }
 .prazo-proximo  { background: #ff9800; color: white; }
@@ -175,7 +173,7 @@ h2 { color: #333; font-size: 1.8rem; }
 /* Modal */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
 .modal-overlay.active { display: flex; }
-.modal-card { background: white; border-radius: 12px; padding: 30px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #ffbd17; animation: slideIn 0.3s ease-out; }
+.modal-card { background: white; border-radius: 12px; padding: 30px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #ffbd17; }
 .modal-close { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: #f0f0f0; border: none; border-radius: 50%; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .modal-close:hover { background: #f44336; color: white; }
 </style>
@@ -195,27 +193,41 @@ h2 { color: #333; font-size: 1.8rem; }
         <div id="mensagemResultado" class="mensagem-resultado"></div>
     </div>
 
-    <!-- ==================== PÁGINA 1: STATUS & PENDÊNCIAS ==================== -->
+    <!-- ==================== PÁGINA 1: STATUS, PRAZOS & PENDÊNCIAS ==================== -->
     <div id="pagina1" class="hidden">
-        <!-- Parte Superior: Caixas de Status -->
+        <!-- Parte 1: Caixas de Status (Sem atrasados) -->
         <div class="painel-status-container">
             <div id="gridStatusCaixas" class="grid-caixas-status">
                 <div class="loading">Carregando contadores de status...</div>
             </div>
         </div>
 
-        <!-- Parte Inferior: Lista de Não Concluídos e Botão para Página 2 -->
+        <!-- Parte 2: Área dos Prazos -->
+        <div class="painel-prazos-container">
+            <div id="gridPrazosCaixas" class="grid-caixas-prazos">
+                <div class="loading">Carregando contadores de prazos...</div>
+            </div>
+        </div>
+
+        <!-- Parte 3: Inferior (Lista + Coluna Lateral de Botões) -->
         <div class="area-inferior-p1">
-            <div class="container-lista-pendentes">
-                <h3>📋 Tarefas Pendentes (Não Concluídas)</h3>
-                <div id="listaPendentesVertical" class="lista-vertical-pendentes">
-                    <div class="loading">Carregando lista de tarefas...</div>
+            <div class="p1-coluna-esquerda">
+                <div class="container-lista-pendentes">
+                    <h3>📋 Tarefas Pendentes (Não Concluídas)</h3>
+                    <div id="listaPendentesVertical" class="lista-vertical-pendentes">
+                        <div class="loading">Carregando lista de tarefas...</div>
+                    </div>
                 </div>
             </div>
 
-            <button class="btn-navegacao-p2" onclick="irParaPagina2()">
-                vai à 2ªpag ➔
-            </button>
+            <div class="p1-coluna-direita">
+                <button class="btn-p1-lateral" onclick="abrirDashboard()">
+                    Visualização Dinâmica
+                </button>
+                <button class="btn-p1-lateral" onclick="irParaPagina2()">
+                    vai à 2ªpag ➔
+                </button>
+            </div>
         </div>
     </div>
 
@@ -240,14 +252,7 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
             </div>
 
-            <!-- Coluna Direita 1: Dashboard -->
-            <div id="secaoDashboard" class="section area-dashboard">
-                <div class="section-header"><h2>📊 Dashboard</h2></div>
-                <p style="color:#666; margin-bottom:20px;">Visualize todas as tarefas cadastradas em tela cheia:</p>
-                <button class="btn btn-dashboard" onclick="abrirDashboard()">🎬 Abrir Dashboard de Tarefas</button>
-            </div>
-
-            <!-- Coluna Direita 2: Adicionar Elemento -->
+            <!-- Coluna Direita 1: Adicionar Elemento -->
             <div id="secaoAdicionar" class="section area-adicionar">
                 <div class="section-header"><h2>➕ Adicionar Elemento</h2></div>
                 <p style="color:#666; margin-bottom:20px;">Crie um novo elemento para uma das listas existentes:</p>
@@ -291,7 +296,7 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="mensagemAdicionar" style="margin-top:15px;"></div>
             </div>
 
-            <!-- Coluna Direita 3: Integradores -->
+            <!-- Coluna Direita 2: Integradores -->
             <div id="secaoIntegradores" class="section area-integradores">
                 <div class="section-header"><h2>🪨 Integradores</h2></div>
                 <div class="seletor-container">
@@ -413,7 +418,6 @@ async function carregarDadosIniciais() {
 }
 
 async function carregarPagina1() {
-    // 1. Recalcula e busca intensidades para as caixas
     try {
         await fetch(`${SUPABASE_URL}/rest/v1/rpc/calcular_intensidades`, {
             method: 'POST',
@@ -424,34 +428,28 @@ async function carregarPagina1() {
             headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
         dadosIntensidades = await resInt.json();
+        
         renderizarCaixasStatus();
+        renderizarCaixasPrazos();
+        renderizarListaPendentes();
     } catch (e) {
-        console.error('Erro ao atualizar intensidades:', e);
+        console.error('Erro ao atualizar página 1:', e);
     }
-
-    // 2. Renderiza lista vertical de não concluídos
-    renderizarListaPendentes();
 }
 
-// Função auxiliar para mapear cada status à sua respectiva cor
+// Cores dos status
 function getCorPorStatus(status) {
     if (!status) return { bg: '#f9f9f9', text: '#1a1a1a' };
-    
     const s = status.toLowerCase();
-    
-    if (s.includes('conclu')) return { bg: '#2196f3', text: '#ffffff' };          // Azul
-    if (s.includes('progresso')) return { bg: '#4caf50', text: '#ffffff' };       // Verde
-    if (s.includes('aguardando')) return { bg: '#ff9800', text: '#ffffff' };      // Laranja
-    if (s.includes('faltam')) return { bg: '#00802D', text: '#ffffff' };          // Verde Escuro
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) {
-        return { bg: '#f44336', text: '#ffffff' };                                // Vermelho
-    }
-    
-    // Cor padrão caso haja algum outro status diferente
+    if (s.includes('conclu')) return { bg: '#2196f3', text: '#ffffff' };
+    if (s.includes('progresso')) return { bg: '#4caf50', text: '#ffffff' };
+    if (s.includes('aguardando')) return { bg: '#ff9800', text: '#ffffff' };
+    if (s.includes('faltam')) return { bg: '#00802D', text: '#ffffff' };
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
-// Renderização das caixas com as cores aplicadas
+// Renderiza o Topo (Status sem a caixa 'atrasados')
 function renderizarCaixasStatus() {
     const container = document.getElementById('gridStatusCaixas');
     if (!dadosIntensidades || dadosIntensidades.length === 0) {
@@ -459,7 +457,12 @@ function renderizarCaixasStatus() {
         return;
     }
 
-    container.innerHTML = dadosIntensidades.map(item => {
+    // Filtra para excluir a aba 'atrasado' ou 'atrasados' da caixa superior
+    const intensidadesFiltradas = dadosIntensidades.filter(item => 
+        !item.status_nome.toLowerCase().includes('atrasad')
+    );
+
+    container.innerHTML = intensidadesFiltradas.map(item => {
         const cores = getCorPorStatus(item.status_nome);
         return `
             <div class="item-caixa-status">
@@ -472,6 +475,54 @@ function renderizarCaixasStatus() {
     }).join('');
 }
 
+// Renderiza o Meio (Contadores de Prazos)
+function renderizarCaixasPrazos() {
+    const container = document.getElementById('gridPrazosCaixas');
+    
+    // Inicializa contadores
+    const contadoresPrazos = {
+        'dentro do prazo': 0,
+        'prazo próximo': 0,
+        'no limite': 0,
+        'atrasado': 0
+    };
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    // Contabiliza apenas tarefas ativas (não concluídas) e com data definida
+    dadosTarefas.forEach(t => {
+        const s = (t.status || '').toLowerCase();
+        if (s !== 'concluído' && s !== 'concluido' && t.data_para_termino) {
+            const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+            const dataTermino = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias > 8) contadoresPrazos['dentro do prazo']++;
+            else if (diffDias >= 2) contadoresPrazos['prazo próximo']++;
+            else if (diffDias >= 0) contadoresPrazos['no limite']++;
+            else contadoresPrazos['atrasado']++;
+        }
+    });
+
+    const listaPrazos = [
+        { label: 'dentro do prazo', qtd: contadoresPrazos['dentro do prazo'], bg: '#4caf50' },
+        { label: 'prazo próximo', qtd: contadoresPrazos['prazo próximo'], bg: '#ff9800' },
+        { label: 'no limite', qtd: contadoresPrazos['no limite'], bg: '#d32f2f' },
+        { label: 'atrasado', qtd: contadoresPrazos['atrasado'], bg: '#8b0000' }
+    ];
+
+    container.innerHTML = listaPrazos.map(item => `
+        <div class="item-caixa-prazo">
+            <div class="caixa-quantidade" style="background-color: ${item.bg}; color: #ffffff;">
+                ${item.qtd}
+            </div>
+            <div class="nome-prazo-caixa">${item.label}</div>
+        </div>
+    `).join('');
+}
+
+// Renderiza a Lista de Não Concluídos (Status primeiro, depois o Nome na mesma linha)
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
     const pendentes = dadosTarefas.filter(t => {
@@ -745,7 +796,7 @@ async function removerIntegrador(index) {
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
-// --- DASHBOARD ---
+// --- DASHBOARD (VISUALIZAÇÃO DINÂMICA) ---
 function abrirDashboard() {
     if (dadosTarefas.length === 0) return alert('⚠️ Sem tarefas!');
     const track = document.getElementById('dashboardTrack');
@@ -759,7 +810,14 @@ function abrirDashboard() {
         </div>
     `).join('');
     track.innerHTML = cardsHTML + cardsHTML;
+
+    // Define o tempo fixo que cada card leva para atravessar a tela
+    const tempoPorCard = 6; // Tempo em segundos para cada card. Aumente para deixar mais lento ou diminua para acelerar.
+    const tempoTotal = dadosTarefas.length * tempoPorCard;
+
     track.style.setProperty('--card-count', dadosTarefas.length);
+    track.style.setProperty('--animation-duration', `${tempoTotal}s`);
+    
     document.getElementById('dashboardOverlay').classList.add('active');
 }
 
