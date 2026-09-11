@@ -13,10 +13,10 @@ body {
     padding: 20px;
 }
 
-.container { max-width: 1200px; margin: 0 auto; }
+.container { max-width: 1250px; margin: 0 auto; }
 
 h1 {
-    text-align: center; color: white; margin-bottom: 30px;
+    text-align: center; color: white; margin-bottom: 25px;
     font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 .section {
@@ -57,59 +57,108 @@ h2 { color: #333; font-size: 1.8rem; }
 .mensagem-erro { background: #fce4ec; border: 2px solid #f44336; color: #c62828; }
 
 /* --- ESTRUTURA LAYOUT DA 1ª PÁGINA --- */
-.painel-status-container, .painel-prazos-container {
-    background: white; border: 4px solid #1a1a1a; border-radius: 12px;
-    padding: 20px; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-.grid-caixas-status, .grid-caixas-prazos {
-    display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start;
-}
-.item-caixa-status, .item-caixa-prazo {
-    display: flex; flex-direction: column; align-items: center; width: 120px;
-}
-.caixa-quantidade {
-    width: 100%; height: 80px; border: 4px solid #1a1a1a; background: #f9f9f9;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.2rem; font-weight: bold; color: #ffffff; border-radius: 8px;
-    box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
-}
-.nome-status-caixa, .nome-prazo-caixa {
-    margin-top: 8px; font-weight: bold; color: #333; text-align: center;
-    font-size: 0.95rem; text-transform: capitalize; line-height: 1.2;
+.p1-topo {
+    display: grid; grid-template-columns: 1fr 180px; gap: 15px; margin-bottom: 15px; align-items: stretch;
 }
 
-.area-inferior-p1 {
-    display: grid; grid-template-columns: 1fr 160px; gap: 20px; align-items: stretch;
+.painel-com-rotulo {
+    background: white; border: 4px solid #1a1a1a; border-radius: 12px;
+    padding: 15px; display: flex; align-items: center; gap: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
-.p1-coluna-esquerda { display: flex; flex-direction: column; }
+
+.rotulo-vertical {
+    writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
+    font-weight: bold; font-size: 1.1rem; color: #1a1a1a;
+    border-left: 3px solid #1a1a1a; padding-left: 8px; white-space: nowrap;
+    text-transform: uppercase; letter-spacing: 1px;
+}
+
+.grid-caixas-status, .grid-caixas-prazos {
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: center; flex: 1;
+}
+
+.item-caixa-status, .item-caixa-prazo {
+    display: flex; flex-direction: column; align-items: center; width: 110px;
+}
+
+/* Quadrado para os status */
+.item-caixa-status .caixa-quantidade {
+    width: 100%; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: bold; color: #ffffff; border-radius: 8px;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Círculo para os prazos */
+.item-caixa-prazo .caixa-quantidade {
+    width: 75px; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: bold; color: #ffffff; border-radius: 50%;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+}
+
+.nome-status-caixa, .nome-prazo-caixa {
+    margin-top: 8px; font-weight: bold; color: #333; text-align: center;
+    font-size: 0.9rem; text-transform: capitalize; line-height: 1.2;
+}
+
+/* Botão da 2ª Página topo */
+.btn-p1-lateral {
+    border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
+    font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 15px; transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; height: 100%;
+}
+.btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
+
+.p1-corpo {
+    display: grid; grid-template-columns: 1fr 300px; gap: 15px; align-items: stretch;
+}
+.p1-corpo-esquerda { display: flex; flex-direction: column; gap: 15px; }
+
 .container-lista-pendentes {
     flex: 1; background: white; border: 4px solid #1a1a1a; border-radius: 12px;
     padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); min-height: 250px;
 }
-.container-lista-pendentes h3 {
-    margin-bottom: 15px; color: #333; font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 8px;
-}
 .lista-vertical-pendentes {
-    display: flex; flex-direction: column; gap: 10px; max-height: 260px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;
 }
 .item-pendente {
-    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
-    background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 8px; font-size: 1rem; font-weight: bold;
+    color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
-.item-pendente-nome { font-weight: bold; color: #222; }
+.item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
 
-/* Botões da coluna lateral direita da Página 1 */
-.p1-coluna-direita {
-    display: flex; flex-direction: column; justify-content: space-between; gap: 15px;
+/* Visualização Dinâmica Vertical Integrada */
+.container-vis-dinamica {
+    background: white; border: 4px solid #1a1a1a; border-radius: 12px;
+    padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    overflow: hidden; display: flex; flex-direction: column; height: 100%; min-height: 400px; max-height: 480px;
 }
-.btn-p1-lateral {
-    border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
-    font-weight: bold; font-size: 1.05rem; cursor: pointer; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    padding: 15px; transition: transform 0.2s, background 0.2s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; min-height: 90px;
+.vis-dinamica-titulo {
+    font-size: 1.1rem; font-weight: bold; text-align: center; margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 2px solid #eee; color: #1a1a1a;
 }
-.btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
+.vis-dinamica-viewport { overflow: hidden; flex: 1; position: relative; }
+.vis-dinamica-track {
+    display: flex; flex-direction: column; gap: 15px;
+    animation: scrollUp var(--animation-duration-v, 20s) linear infinite;
+}
+@keyframes scrollUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+.vis-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; border-radius: 10px; padding: 15px; border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
+}
+.vis-card h4 { font-size: 1.1rem; margin-bottom: 6px; }
+.vis-card p { margin: 4px 0; }
 
 /* --- ESTRUTURA DE LAYOUT DA 2ª PÁGINA --- */
 .app-layout {
@@ -123,10 +172,10 @@ h2 { color: #333; font-size: 1.8rem; }
 .area-adicionar { grid-area: adicionar; }
 .area-integradores { grid-area: integradores; }
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
+    .p1-topo { grid-template-columns: 1fr; }
+    .p1-corpo { grid-template-columns: 1fr; }
     .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores"; }
-    .area-inferior-p1 { grid-template-columns: 1fr; }
-    .p1-coluna-direita { flex-direction: row; }
 }
 
 .seletor-container { margin-bottom: 20px; }
@@ -145,7 +194,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
 .detalhes-card .label { font-weight: bold; color: #764ba2; }
 .detalhes-card .badge { display: inline-block; background: #00730d; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px; }
-.status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
+.status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ff9800; color: white; }
@@ -153,15 +202,6 @@ h2 { color: #333; font-size: 1.8rem; }
 .status-faltam-dados { background: #00802D; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .action-buttons .btn { flex: 1; min-width: 150px; }
-
-.dashboard-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); z-index: 9999; display: none; overflow: hidden; }
-.dashboard-overlay.active { display: block; }
-.dashboard-close { position: absolute; top: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; color: white; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-.dashboard-title { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); color: white; font-size: 2.5rem; z-index: 10; }
-.dashboard-container { position: absolute; top: 50%; left: 0; width: 100%; height: 450px; transform: translateY(-50%); overflow: hidden; }
-.dashboard-track { display: flex; gap: 40px; animation: scrollLeft var(--animation-duration, 30s) linear infinite; height: 100%; }
-.dashboard-card { flex-shrink: 0; width: 400px; height: 100%; background: linear-gradient(135deg, rgba(102,126,234,0.9), rgba(118,75,162,0.9)); border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; justify-content: center; color: white; overflow-y: auto; }
-@keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-440px * var(--card-count))); } }
 
 .hidden { display: none !important; }
 
@@ -193,52 +233,58 @@ h2 { color: #333; font-size: 1.8rem; }
         <div id="mensagemResultado" class="mensagem-resultado"></div>
     </div>
 
-    <!-- ==================== PÁGINA 1: STATUS, PRAZOS & PENDÊNCIAS ==================== -->
+    <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
-        <!-- Parte 1: Caixas de Status (Sem atrasados) -->
-        <div class="painel-status-container">
-            <div id="gridStatusCaixas" class="grid-caixas-status">
-                <div class="loading">Carregando contadores de status...</div>
+        <!-- TOPO: Status + Botão Ir à 2ª Página -->
+        <div class="p1-topo">
+            <div class="painel-com-rotulo">
+                <div class="rotulo-vertical">Estado de Cada Serviço</div>
+                <div id="gridStatusCaixas" class="grid-caixas-status">
+                    <div class="loading">Carregando contadores...</div>
+                </div>
             </div>
+            <button class="btn-p1-lateral" onclick="irParaPagina2()">
+                vai à 2ªpag ➔
+            </button>
         </div>
 
-        <!-- Parte 2: Área dos Prazos -->
-        <div class="painel-prazos-container">
-            <div id="gridPrazosCaixas" class="grid-caixas-prazos">
-                <div class="loading">Carregando contadores de prazos...</div>
-            </div>
-        </div>
+        <!-- CORPO: Esquerda (Prazos + Lista) / Direita (Visualização Dinâmica Vertical) -->
+        <div class="p1-corpo">
+            <div class="p1-corpo-esquerda">
+                <!-- Prazos -->
+                <div class="painel-com-rotulo">
+                    <div class="rotulo-vertical">Estado de Cada Prazo</div>
+                    <div id="gridPrazosCaixas" class="grid-caixas-prazos">
+                        <div class="loading">Carregando prazos...</div>
+                    </div>
+                </div>
 
-        <!-- Parte 3: Inferior (Lista + Coluna Lateral de Botões) -->
-        <div class="area-inferior-p1">
-            <div class="p1-coluna-esquerda">
+                <!-- Lista de Tarefas Pendentes -->
                 <div class="container-lista-pendentes">
-                    <h3>📋 Tarefas Pendentes (Não Concluídas)</h3>
                     <div id="listaPendentesVertical" class="lista-vertical-pendentes">
-                        <div class="loading">Carregando lista de tarefas...</div>
+                        <div class="loading">Carregando tarefas...</div>
                     </div>
                 </div>
             </div>
 
-            <div class="p1-coluna-direita">
-                <button class="btn-p1-lateral" onclick="abrirDashboard()">
-                    Visualização Dinâmica
-                </button>
-                <button class="btn-p1-lateral" onclick="irParaPagina2()">
-                    vai à 2ªpag ➔
-                </button>
+            <!-- Área de Visualização Dinâmica Vertical Integrada -->
+            <div class="container-vis-dinamica">
+                <div class="vis-dinamica-titulo">⚡ Visualização Dinâmica</div>
+                <div class="vis-dinamica-viewport">
+                    <div id="visDinamicaTrack" class="vis-dinamica-track"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ==================== PÁGINA 2: GERENCIAMENTO COMPLETO ==================== -->
+    <!-- ==================== PÁGINA 2 ==================== -->
     <div id="pagina2" class="hidden">
         <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
             <button class="btn btn-secondary" onclick="irParaPagina1()">⬅️ Voltar à 1ª Página</button>
         </div>
 
         <div id="conteudoProtegido" class="app-layout">
-            <!-- Coluna Esquerda: Tarefas -->
+            <!-- Tarefas -->
             <div id="secaoTarefas" class="section area-tarefas">
                 <div class="section-header"><h2>📌 Tarefas</h2></div>
                 <div class="seletor-container">
@@ -252,7 +298,7 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
             </div>
 
-            <!-- Coluna Direita 1: Adicionar Elemento -->
+            <!-- Adicionar Elemento -->
             <div id="secaoAdicionar" class="section area-adicionar">
                 <div class="section-header"><h2>➕ Adicionar Elemento</h2></div>
                 <p style="color:#666; margin-bottom:20px;">Crie um novo elemento para uma das listas existentes:</p>
@@ -296,7 +342,7 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="mensagemAdicionar" style="margin-top:15px;"></div>
             </div>
 
-            <!-- Coluna Direita 2: Integradores -->
+            <!-- Integradores -->
             <div id="secaoIntegradores" class="section area-integradores">
                 <div class="section-header"><h2>🪨 Integradores</h2></div>
                 <div class="seletor-container">
@@ -321,15 +367,6 @@ h2 { color: #333; font-size: 1.8rem; }
     </div>
 </div>
 
-<!-- Dashboard Overlay -->
-<div id="dashboardOverlay" class="dashboard-overlay">
-    <button class="dashboard-close" onclick="fecharDashboard()">✕</button>
-    <h1 class="dashboard-title">📌 Dashboard de Tarefas</h1>
-    <div class="dashboard-container">
-        <div id="dashboardTrack" class="dashboard-track"></div>
-    </div>
-</div>
-
 <script>
 const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
@@ -338,7 +375,6 @@ let dadosTarefas = [];
 let dadosIntegradores = [];
 let dadosIntensidades = [];
 
-// --- NAVEGAÇÃO ENTRE PÁGINAS ---
 function irParaPagina2() {
     document.getElementById('pagina1').classList.add('hidden');
     document.getElementById('pagina2').classList.remove('hidden');
@@ -379,7 +415,6 @@ async function verificarCodigo() {
         });
 
         if (!response.ok) throw new Error(`Erro ${response.status}`);
-
         const resultado = await response.json();
 
         if (resultado === true) {
@@ -432,12 +467,12 @@ async function carregarPagina1() {
         renderizarCaixasStatus();
         renderizarCaixasPrazos();
         renderizarListaPendentes();
+        renderizarVisualizacaoDinamicaVertical();
     } catch (e) {
         console.error('Erro ao atualizar página 1:', e);
     }
 }
 
-// Cores dos status
 function getCorPorStatus(status) {
     if (!status) return { bg: '#f9f9f9', text: '#1a1a1a' };
     const s = status.toLowerCase();
@@ -449,7 +484,30 @@ function getCorPorStatus(status) {
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
-// Renderiza o Topo (Status sem a caixa 'atrasados')
+function getEmojiStatus(status) {
+    if (!status) return '❌';
+    const s = status.toLowerCase();
+    if (s.includes('progresso')) return '⏩';
+    if (s.includes('aguardando')) return '⏳';
+    if (s.includes('faltam')) return '🗂️';
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return '❌';
+    return '📌';
+}
+
+function getCorPrazo(dataISO) {
+    if (!dataISO) return '#757575';
+    const [ano, mes, dia] = dataISO.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDias > 8) return '#4caf50'; // Dentro do prazo
+    if (diffDias >= 2) return '#ff9800'; // Prazo próximo
+    if (diffDias >= 0) return '#d32f2f'; // No limite
+    return '#8b0000'; // Atrasado
+}
+
+// Renderiza Caixas de Status (Sem 'atrasados')
 function renderizarCaixasStatus() {
     const container = document.getElementById('gridStatusCaixas');
     if (!dadosIntensidades || dadosIntensidades.length === 0) {
@@ -457,7 +515,6 @@ function renderizarCaixasStatus() {
         return;
     }
 
-    // Filtra para excluir a aba 'atrasado' ou 'atrasados' da caixa superior
     const intensidadesFiltradas = dadosIntensidades.filter(item => 
         !item.status_nome.toLowerCase().includes('atrasad')
     );
@@ -475,11 +532,10 @@ function renderizarCaixasStatus() {
     }).join('');
 }
 
-// Renderiza o Meio (Contadores de Prazos)
+// Renderiza Círculos de Prazos
 function renderizarCaixasPrazos() {
     const container = document.getElementById('gridPrazosCaixas');
     
-    // Inicializa contadores
     const contadoresPrazos = {
         'dentro do prazo': 0,
         'prazo próximo': 0,
@@ -490,7 +546,6 @@ function renderizarCaixasPrazos() {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    // Contabiliza apenas tarefas ativas (não concluídas) e com data definida
     dadosTarefas.forEach(t => {
         const s = (t.status || '').toLowerCase();
         if (s !== 'concluído' && s !== 'concluido' && t.data_para_termino) {
@@ -522,7 +577,7 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
-// Renderiza a Lista de Não Concluídos (Status primeiro, depois o Nome na mesma linha)
+// Renderiza Lista Pendentes (Emoji + Nome + Data dd/mm/yyyy na mesma linha com a cor do prazo no fundo)
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
     const pendentes = dadosTarefas.filter(t => {
@@ -531,16 +586,46 @@ function renderizarListaPendentes() {
     });
 
     if (pendentes.length === 0) {
-        container.innerHTML = '<p style="color:#666;">🎉 Nenhuma tarefa pendente no momento!</p>';
+        container.innerHTML = '<p style="color:#666; text-align:center;">🎉 Nenhuma tarefa pendente no momento!</p>';
         return;
     }
 
-    container.innerHTML = pendentes.map(t => `
-        <div class="item-pendente">
-            ${getStatusBadge(t.status)}
-            <span class="item-pendente-nome">${t.nome}</span>
+    container.innerHTML = pendentes.map(t => {
+        const emoji = getEmojiStatus(t.status);
+        const bgCor = getCorPrazo(t.data_para_termino);
+        const dataFormatada = formatarData(t.data_para_termino);
+
+        return `
+            <div class="item-pendente" style="background-color: ${bgCor};">
+                <div class="item-pendente-esquerda">
+                    <span>${emoji}</span>
+                    <span>${t.nome}</span>
+                </div>
+                <span>${dataFormatada}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Renderiza Visualização Dinâmica Vertical Integrada na Página 1
+function renderizarVisualizacaoDinamicaVertical() {
+    const track = document.getElementById('visDinamicaTrack');
+    if (!dadosTarefas || dadosTarefas.length === 0) {
+        track.innerHTML = '<p style="text-align:center; color:#666;">Sem dados para exibir.</p>';
+        return;
+    }
+
+    const cardsHTML = dadosTarefas.map(t => `
+        <div class="vis-card">
+            <h4>${t.nome}</h4>
+            <p><b>Status:</b> ${getStatusBadge(t.status)}</p>
+            <p><b>Data:</b> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
         </div>
     `).join('');
+
+    track.innerHTML = cardsHTML + cardsHTML;
+    const tempoTotal = Math.max(12, dadosTarefas.length * 5);
+    track.style.setProperty('--animation-duration-v', `${tempoTotal}s`);
 }
 
 // --- BUSCAR DADOS GENÉRICOS ---
@@ -716,6 +801,7 @@ async function salvarEdicaoTarefa(index) {
         mostrarDetalhesTarefa();
         fecharModalEditTarefa();
         await carregarTarefas();
+        await carregarPagina1();
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
@@ -794,35 +880,6 @@ async function removerIntegrador(index) {
         await carregarIntegradores();
         document.getElementById('detalhesIntegrador').style.display = 'none';
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
-}
-
-// --- DASHBOARD (VISUALIZAÇÃO DINÂMICA) ---
-function abrirDashboard() {
-    if (dadosTarefas.length === 0) return alert('⚠️ Sem tarefas!');
-    const track = document.getElementById('dashboardTrack');
-    const cardsHTML = dadosTarefas.map(t => `
-        <div class="dashboard-card">
-            <h3>${t.nome}</h3>
-            <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
-            <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
-            <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
-            <p><span class="label">Data Esperada:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
-        </div>
-    `).join('');
-    track.innerHTML = cardsHTML + cardsHTML;
-
-    // Define o tempo fixo que cada card leva para atravessar a tela
-    const tempoPorCard = 6; // Tempo em segundos para cada card. Aumente para deixar mais lento ou diminua para acelerar.
-    const tempoTotal = dadosTarefas.length * tempoPorCard;
-
-    track.style.setProperty('--card-count', dadosTarefas.length);
-    track.style.setProperty('--animation-duration', `${tempoTotal}s`);
-    
-    document.getElementById('dashboardOverlay').classList.add('active');
-}
-
-function fecharDashboard() {
-    document.getElementById('dashboardOverlay').classList.remove('active');
 }
 
 function obterBadgePrazo(dataISO) {
