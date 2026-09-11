@@ -21,7 +21,7 @@ h1 {
 }
 .section {
     background: white; border-radius: 12px; padding: 30px;
-    margin-bottom: 0px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .section-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -44,7 +44,32 @@ h2 { color: #333; font-size: 1.8rem; }
 
 .loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
-.verificacao-container { display: flex; gap: 10px; align-items: center; margin-top: 15px; }
+
+.imagem-login {
+    width: 100%;
+    max-width: 400px; /* Mesma largura máxima definida na caixa de senha */
+    height: 180px; /* Define uma altura proporcional para não cobrir a tela */
+    object-fit: cover; /* Corta os excessos mantendo a proporção da imagem sem distorcer */
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 15px auto; /* Centraliza horizontalmente e dá espaçamento abaixo */
+}
+
+
+
+#secaoVerificacao {
+    max-width: 800px;
+    margin: 18vh auto 20px auto; /* O '18vh' empurra a caixa para baixo proporcionalmente à tela */
+    text-align: center;
+}
+
+.verificacao-container {
+	display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    max-width: 400px;
+    margin: 15px auto 0 auto; }
 .verificacao-container input {
     flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0;
     border-radius: 8px; font-size: 16px;
@@ -74,28 +99,26 @@ h2 { color: #333; font-size: 1.8rem; }
     text-transform: uppercase; letter-spacing: 1px;
 }
 
-/* Alinhamento superior alinhando caixas topo a topo */
 .grid-caixas-status, .grid-caixas-prazos {
     display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start; flex: 1;
 }
 
 .item-caixa-status, .item-caixa-prazo {
-    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 110px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 140px;
+	
 }
 
-/* Quadrado para os status */
 .item-caixa-status .caixa-quantidade {
-    width: 100%; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    width: 100%; height: 105px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; font-weight: bold; color: #ffffff; border-radius: 8px;
+    font-size: 2.8rem; font-weight: bold; color: #ffffff; border-radius: 8px;
     box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
 }
 
-/* Círculo para os prazos */
 .item-caixa-prazo .caixa-quantidade {
-    width: 75px; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    width: 120px; height: 120px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; font-weight: bold; color: #ffffff; border-radius: 50%;
+    font-size: 2.8rem; font-weight: bold; color: #ffffff; border-radius: 50%;
     box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
 }
 
@@ -104,7 +127,6 @@ h2 { color: #333; font-size: 1.8rem; }
     font-size: 0.9rem; text-transform: capitalize; line-height: 1.2;
 }
 
-/* Botão da 2ª Página topo */
 .btn-p1-lateral {
     border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
     font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 12px;
@@ -134,7 +156,6 @@ h2 { color: #333; font-size: 1.8rem; }
 }
 .item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
 
-/* Visualização Dinâmica Vertical Integrada (Sem fundo colorido nos textos) */
 .container-vis-dinamica {
     background: white; border: 4px solid #1a1a1a; border-radius: 12px;
     padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -149,6 +170,17 @@ h2 { color: #333; font-size: 1.8rem; }
     display: flex; flex-direction: column; gap: 15px;
     animation: scrollUp var(--animation-duration-v, 20s) linear infinite;
 }
+
+.p1-titulo-periodo {
+    text-align: center;
+    color: white;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+
 @keyframes scrollUp {
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
@@ -166,17 +198,19 @@ h2 { color: #333; font-size: 1.8rem; }
     display: grid; grid-template-columns: 1.4fr 1fr;
     grid-template-areas:
         "tarefas adicionar"
-        "tarefas integradores";
+        "tarefas integradores"
+        "concluidas concluidas";
     gap: 20px; align-items: start;
 }
 .area-tarefas { grid-area: tarefas; }
 .area-adicionar { grid-area: adicionar; }
 .area-integradores { grid-area: integradores; }
+.area-concluidas { grid-area: concluidas; }
 
 @media (max-width: 900px) {
     .p1-topo { grid-template-columns: 1fr; }
     .p1-corpo { grid-template-columns: 1fr; }
-    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores"; }
+    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores" "concluidas"; }
 }
 
 .seletor-container { margin-bottom: 20px; }
@@ -199,7 +233,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ffc229; color: white; }
-.status-nao-iniciado { background: #f44336; color: white; }
+.status-nao-iniciado { background: #4f0b06; color: white; }
 .status-faltam-dados { background: #00802D; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .action-buttons .btn { flex: 1; min-width: 150px; }
@@ -217,14 +251,19 @@ h2 { color: #333; font-size: 1.8rem; }
 .modal-card { background: white; border-radius: 12px; padding: 30px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #ffbd17; }
 .modal-close { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: #f0f0f0; border: none; border-radius: 50%; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .modal-close:hover { background: #f44336; color: white; }
+
+
+
+
+
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>📌 Visualização de Projetos Atuais 🪨</h1>
 
     <!-- SEÇÃO DE VERIFICAÇÃO DE SENHA -->
     <div id="secaoVerificacao" class="section">
+		<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRejI_5r0R1whefw8AOCBIkthVQxw0BsLOLQcKl6lA25vZP0SCWo9s1EE2U&s=10" alt="Login" class="imagem-login">
         <div class="section-header"><h2>🔍 Verificação</h2></div>
         <p style="color:#666; margin-bottom:10px;">Digite o código e clique em Verificar para liberar o acesso:</p>
         <div class="verificacao-container">
@@ -236,7 +275,8 @@ h2 { color: #333; font-size: 1.8rem; }
 
     <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
-        <!-- TOPO: Status + Botão Ir à 2ª Página -->
+		<h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
+	
         <div class="p1-topo">
             <div class="painel-com-rotulo">
                 <div class="rotulo-vertical">ESTADO DE CADA SERVIÇO</div>
@@ -249,10 +289,8 @@ h2 { color: #333; font-size: 1.8rem; }
             </button>
         </div>
 
-        <!-- CORPO: Esquerda (Prazos + Lista) / Direita (Visualização Dinâmica Vertical) -->
         <div class="p1-corpo">
             <div class="p1-corpo-esquerda">
-                <!-- Prazos -->
                 <div class="painel-com-rotulo">
                     <div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
                     <div id="gridPrazosCaixas" class="grid-caixas-prazos">
@@ -260,7 +298,6 @@ h2 { color: #333; font-size: 1.8rem; }
                     </div>
                 </div>
 
-                <!-- Lista de Tarefas Pendentes -->
                 <div class="container-lista-pendentes">
                     <div id="listaPendentesVertical" class="lista-vertical-pendentes">
                         <div class="loading">Carregando tarefas...</div>
@@ -268,7 +305,6 @@ h2 { color: #333; font-size: 1.8rem; }
                 </div>
             </div>
 
-            <!-- Área de Visualização Dinâmica Vertical Integrada -->
             <div class="container-vis-dinamica">
                 <div class="vis-dinamica-titulo">⚡ Visualização Dinâmica</div>
                 <div class="vis-dinamica-viewport">
@@ -285,9 +321,9 @@ h2 { color: #333; font-size: 1.8rem; }
         </div>
 
         <div id="conteudoProtegido" class="app-layout">
-            <!-- Tarefas -->
+            <!-- Tarefas Em Andamento -->
             <div id="secaoTarefas" class="section area-tarefas">
-                <div class="section-header"><h2>📌 Tarefas</h2></div>
+                <div class="section-header"><h2>📌 Tarefas em Andamento</h2></div>
                 <div class="seletor-container">
                     <label for="selectTarefas">Selecione uma tarefa:</label>
                     <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
@@ -308,7 +344,7 @@ h2 { color: #333; font-size: 1.8rem; }
                     <select id="tipoElemento" onchange="atualizarFormulario()">
                         <option value="">-- Selecione o tipo --</option>
                         <option value="tarefa">📌 Tarefa</option>
-                        <option value="integrador">🪨 Integrador</option>
+                        <option value="integrador">🛠️​ Integrador</option>
                     </select>
                 </div>
 
@@ -320,7 +356,6 @@ h2 { color: #333; font-size: 1.8rem; }
                         <label for="statusTarefa">Status:</label>
                         <select id="statusTarefa">
                             <option value="">-- Selecione o status --</option>
-                            <option value="concluído">✅ Concluído</option>
                             <option value="em progresso">⏩ Em progresso</option>
                             <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
                             <option value="faltam dados">🗂️ Faltam dados necessários</option>
@@ -345,7 +380,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
             <!-- Integradores -->
             <div id="secaoIntegradores" class="section area-integradores">
-                <div class="section-header"><h2>🪨 Integradores</h2></div>
+                <div class="section-header"><h2>🛠️​ Integradores</h2></div>
                 <div class="seletor-container">
                     <label for="selectIntegradores">Selecione um integrador:</label>
                     <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
@@ -355,6 +390,18 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="integradoresLoading" class="loading" style="display:none;">Carregando integradores...</div>
                 <div id="integradoresError" class="error" style="display:none;"></div>
                 <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
+            </div>
+
+            <!-- Tarefas Concluídas (Tabela trfsconcluidas) -->
+            <div id="secaoConcluidas" class="section area-concluidas">
+                <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
+                <div class="seletor-container">
+                    <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
+                    <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
+                        <option value="">-- Escolha uma tarefa concluída --</option>
+                    </select>
+                </div>
+                <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
             </div>
         </div>
     </div>
@@ -375,6 +422,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
 let dadosTarefas = [];
 let dadosIntegradores = [];
 let dadosIntensidades = [];
+let dadosTrfsConcluidas = [];
 
 function irParaPagina2() {
     document.getElementById('pagina1').classList.add('hidden');
@@ -450,7 +498,20 @@ document.getElementById('inputVerificacao').addEventListener('keypress', e => {
 async function carregarDadosIniciais() {
     await carregarIntegradores();
     await carregarTarefas();
+    await carregarTrfsConcluidas();
     await carregarPagina1();
+	await verificarEArquivarAutomatico();
+	
+	setInterval(async () => {
+		await carregarTarefas();
+		await verificarEArquivarAutomatico();
+		await carregarTrfsConcluidas();
+        await carregarPagina1();
+		
+    }, 30000);
+	
+	
+	
 }
 
 async function carregarPagina1() {
@@ -481,7 +542,7 @@ function getCorPorStatus(status) {
     if (s.includes('progresso')) return { bg: '#ff9800', text: '#ffffff' };
     if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
     if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#4f0b06', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
@@ -503,13 +564,12 @@ function getCorPrazo(dataISO) {
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
     const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDias > 8) return '#4caf50'; // Dentro do prazo
-    if (diffDias >= 2) return '#ffc229'; // Prazo próximo
-    if (diffDias >= 0) return '#80004c'; // No limite
-    return '#d32f2f'; // Atrasado
+    if (diffDias > 8) return '#4caf50';
+    if (diffDias >= 2) return '#ffc229';
+    if (diffDias >= 0) return '#80004c';
+    return '#d32f2f';
 }
 
-// Renderiza Caixas de Status com Emoji apenas nas categorias de Status
 function renderizarCaixasStatus() {
     const container = document.getElementById('gridStatusCaixas');
     if (!dadosIntensidades || dadosIntensidades.length === 0) {
@@ -535,7 +595,6 @@ function renderizarCaixasStatus() {
     }).join('');
 }
 
-// Renderiza Círculos de Prazos (sem emoji na categoria)
 function renderizarCaixasPrazos() {
     const container = document.getElementById('gridPrazosCaixas');
     
@@ -580,7 +639,6 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
-// Renderiza Lista Pendentes
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
     const pendentes = dadosTarefas.filter(t => {
@@ -604,13 +662,12 @@ function renderizarListaPendentes() {
                     <span>${emoji}</span>
                     <span>${t.nome}</span>
                 </div>
-                <span>${dataFormatada}</span>
+                <span>Até: ${dataFormatada}</span>
             </div>
         `;
     }).join('');
 }
 
-// Formatadores de texto simples (sem fundo colorido) para a Visualização Dinâmica
 function getTextoStatusSemFundo(status) {
     if (!status) return 'Não definido';
     const s = status.toLowerCase();
@@ -635,7 +692,6 @@ function getTextoPrazoSemFundo(dataISO) {
     return '❌ ATRASADO';
 }
 
-// Renderiza Visualização Dinâmica (sem coloração de fundo nos textos)
 function renderizarVisualizacaoDinamicaVertical() {
     const track = document.getElementById('visDinamicaTrack');
     if (!dadosTarefas || dadosTarefas.length === 0) {
@@ -692,6 +748,98 @@ async function carregarIntegradores() {
     } catch (err) { console.error(err); }
 }
 
+// --- GERENCIAMENTO DE TRFSCONCLUIDAS ---
+async function carregarTrfsConcluidas() {
+    const select = document.getElementById('selectTrfsConcluidas');
+    try {
+        dadosTrfsConcluidas = await buscarDados('trfsconcluidas');
+        select.innerHTML = '<option value="">-- Escolha uma tarefa concluída --</option>';
+        dadosTrfsConcluidas.forEach((item, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `${item.nome} (${formatarData(item.data_finalizado)})`;
+            select.appendChild(opt);
+        });
+    } catch (err) { console.error(err); }
+}
+
+function mostrarDetalhesTrfConcluida() {
+    const select = document.getElementById('selectTrfsConcluidas');
+    const div = document.getElementById('detalhesTrfConcluida');
+    const idx = select.value;
+    if (idx === '') { div.style.display = 'none'; return; }
+
+    const tc = dadosTrfsConcluidas[idx];
+    div.innerHTML = `
+        <h3>${tc.nome}</h3>
+        <p><span class="label">Tipo:</span> ${tc.tipo || 'Não informado'}</p>
+        <p><span class="label">Integrador responsável:</span> <span class="badge" style="background:#00bcd4;">👤 ${tc.intg_fz || 'N/A'}</span></p>
+        <p><span class="label">Descrição:</span> ${tc.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data de Finalização:</span> ${formatarData(tc.data_finalizado)}</p>
+        <div class="action-buttons">
+            <button class="btn btn-danger" onclick="removerTrfConcluida(${idx})">🗑️ Remover do Histórico</button>
+        </div>
+    `;
+    div.style.display = 'block';
+}
+
+async function concluirEArquivarTarefa(index) {
+    const tarefa = dadosTarefas[index];
+    const integrador = dadosIntegradores.find(i => i.id === tarefa.intg_id);
+    const integradorNome = integrador ? integrador.nome : 'Não especificado';
+
+    if (!confirm(`Deseja marcar a tarefa "${tarefa.nome}" como concluída e movê-la para o histórico?`)) return;
+
+    try {
+        // 1. Insere na tabela trfsconcluidas
+        const resInsert = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: tarefa.nome,
+                tipo: tarefa.tipo,
+                descricao: tarefa.descricao,
+                intg_fz: integradorNome,
+                data_finalizado: new Date().toISOString().split('T')[0]
+            })
+        });
+
+        if (!resInsert.ok) throw new Error('Erro ao arquivar tarefa concluída.');
+
+        // 2. Remove da tabela tarefas
+        await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+
+        document.getElementById('detalhesTarefa').style.display = 'none';
+        await carregarTarefas();
+        await carregarTrfsConcluidas();
+        await carregarPagina1();
+        alert('✅ Tarefa concluída e arquivada com sucesso!');
+    } catch (err) {
+        alert(`❌ Erro: ${err.message}`);
+    }
+}
+
+async function removerTrfConcluida(index) {
+    const tc = dadosTrfsConcluidas[index];
+    if (!confirm(`Remover "${tc.nome}" do histórico de concluídas?`)) return;
+
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas?id=eq.${tc.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        await carregarTrfsConcluidas();
+        document.getElementById('detalhesTrfConcluida').style.display = 'none';
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
 function popularSelectIntegrador(selectId, valorAtual = '') {
     const select = document.getElementById(selectId);
     if (!select) return;
@@ -743,6 +891,7 @@ function mostrarDetalhesTarefa() {
         <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
         <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
+            <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">​🧾 Concluir & Arquivar</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
             <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
         </div>
@@ -781,7 +930,6 @@ function abrirEdicaoTarefa(index) {
         <div class="form-group">
             <label>Status:</label>
             <select id="editStatusTarefa">
-                <option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
                 <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
                 <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
                 <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️ Faltam dados necessários</option>
@@ -862,6 +1010,7 @@ async function adicionarTarefa() {
         if (!response.ok) throw new Error('Erro ao adicionar');
         await carregarTarefas();
         alert('✅ Tarefa adicionada!');
+		resetarFormularioAdicao();
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
@@ -881,6 +1030,7 @@ async function adicionarIntegrador() {
         if (!response.ok) throw new Error('Erro ao adicionar');
         await carregarIntegradores();
         alert('✅ Integrador adicionado!');
+		resetarFormularioAdicao();
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
@@ -922,6 +1072,87 @@ function obterBadgePrazo(dataISO) {
     if (diffDias >= 0) return '<span class="status-badge prazo-limite">🚨 DIA LIMITE</span>';
     return '<span class="status-badge prazo-atrasado">❌ ATRASADO</span>';
 }
+
+function resetarFormularioAdicao() {
+    // Retorna o select principal para o valor padrão
+    document.getElementById('tipoElemento').value = '';
+
+    // Limpa os campos de entrada de Tarefa
+    document.getElementById('nomeTarefa').value = '';
+    document.getElementById('tipoTarefa').value = '';
+    document.getElementById('statusTarefa').value = '';
+    document.getElementById('dataEsperadaTarefa').value = '';
+    document.getElementById('integradorTarefa').value = '';
+    document.getElementById('descricaoTarefa').value = '';
+
+    // Limpa os campos de entrada de Integrador
+    document.getElementById('nomeIntegrador').value = '';
+    document.getElementById('ncpfIntegrador').value = '';
+
+    // Esconde os formulários abertos
+    atualizarFormulario();
+}
+
+
+
+async function verificarEArquivarAutomatico() {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    for (const tarefa of dadosTarefas) {
+        const status = (tarefa.status || '').toLowerCase();
+        const eConcluida = status.includes('conclu');
+
+        if (eConcluida && tarefa.data_para_termino) {
+            const [ano, mes, dia] = tarefa.data_para_termino.split('T')[0].split('-');
+            const dataTarefa = new Date(ano, mes - 1, dia);
+
+            // Calcula a diferença em dias entre a data atual e a data da tarefa
+            const diffDias = Math.floor((hoje.getTime() - dataTarefa.getTime()) / (1000 * 60 * 60 * 24));
+
+            // Se for igual ou superior a 60 dias (2 meses)
+            if (diffDias >= 60) {
+                try {
+                    const integrador = dadosIntegradores.find(i => i.id === tarefa.intg_id);
+                    const integradorNome = integrador ? integrador.nome : 'Não especificado';
+
+                    // 1. Move para o histórico trfsconcluidas
+                    const resInsert = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            nome: tarefa.nome,
+                            tipo: tarefa.tipo,
+                            descricao: tarefa.descricao,
+                            intg_fz: integradorNome,
+                            data_finalizado: tarefa.data_para_termino.split('T')[0]
+                        })
+                    });
+
+                    // 2. Remove da lista de tarefas ativas
+                    if (resInsert.ok) {
+                        await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+                            method: 'DELETE',
+                            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                        });
+                    }
+                } catch (err) {
+                    console.error(`Erro ao arquivar tarefa ID ${tarefa.id}:`, err);
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
 </script>
 </body>
 </html>
