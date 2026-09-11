@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS tarefas;
 DROP TABLE IF EXISTS integradores;
 DROP TABLE IF EXISTS intensidades;
 DROP TABLE IF EXISTS configuracoes;
+DROP TABLE IF EXISTS trfsconcluidas;
 
 -- =====================================================
 -- 2. TABELA DE CONFIGURAÇÕES (senha)
@@ -54,16 +55,23 @@ CREATE TABLE tarefas (
     tipo varchar(30),
     descricao text,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
-    intg_id uuid REFERENCES integradores(id)
+    intg_id uuid REFERENCES integradores(id),
+    status varchar(30) CHECK (status IN ('concluído', 'em progresso', 'aguardando equatorial', 'não iniciado', 'faltam dados')),
+    data_para_termino date
 );
 
--- Colunas extras
-ALTER TABLE tarefas 
-ADD COLUMN status varchar(30) CHECK (status IN ('concluído', 'em progresso', 'aguardando equatorial', 'não iniciado', 'faltam dados'));
+
+CREATE TABLE trfsconcluidas (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    nome varchar(50) NOT NULL,
+    tipo varchar(30),
+    descricao text,
+    intg_fz varchar(25),
+    data_finalizado date
+);
 
 
-ALTER TABLE tarefas 
-ADD COLUMN data_para_termino date;
+
 
 -- =====================================================
 -- 6. DADOS INICIAIS
@@ -83,24 +91,32 @@ ALTER TABLE configuracoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE integradores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trfsconcluidas ENABLE ROW LEVEL SECURITY;
+
 
 -- SELECT
 CREATE POLICY "Permitir leitura pública de tarefas" ON tarefas FOR SELECT USING (true);
 CREATE POLICY "Permitir leitura pública de integradores" ON integradores FOR SELECT USING (true);
 CREATE POLICY "Permitir leitura pública de intensidades" ON intensidades FOR SELECT USING (true);
+CREATE POLICY "Permitir leitura pública de trfsconcluidas" ON trfsconcluidas FOR SELECT USING (true);
 CREATE POLICY "Bloquear leitura direta de configuracoes" ON configuracoes FOR SELECT USING (false);
+
+
 
 -- INSERT
 CREATE POLICY "Permitir inserção pública de tarefas" ON tarefas FOR INSERT WITH CHECK (true);
 CREATE POLICY "Permitir inserção pública de integradores" ON integradores FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir inserção pública de trfsconcluidas" ON trfsconcluidas FOR INSERT WITH CHECK (true);
 
 -- UPDATE
 CREATE POLICY "Permitir atualização pública de tarefas" ON tarefas FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir atualização pública de integradores" ON integradores FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública de trfsconcluidas" ON trfsconcluidas FOR UPDATE USING (true) WITH CHECK (true);
 
 -- DELETE
 CREATE POLICY "Permitir remoção pública de tarefas" ON tarefas FOR DELETE USING (true);
 CREATE POLICY "Permitir remoção pública de integradores" ON integradores FOR DELETE USING (true);
+CREATE POLICY "Permitir remoção pública de trfsconcluidas" ON trfsconcluidas FOR DELETE USING (true);
 
 -- =====================================================
 -- 8. FUNÇÃO DE SENHA
@@ -127,6 +143,8 @@ $$;
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON tarefas TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON integradores TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON trfsconcluidas TO anon;
+
 GRANT SELECT ON intensidades TO anon;
 
 
@@ -164,7 +182,7 @@ BEGIN
             NOW()
         ),
         (
-            'atrasado', 
+            'atrasado',  ---Não é usado----
             (SELECT COUNT(*) FROM tarefas WHERE LOWER(status) = 'atrasado'), 
             NOW()
         )
@@ -283,6 +301,125 @@ VALUES
 
 
 
-
-
   SELECT calcular_intensidades();
+
+
+
+
+
+
+
+  INSERT INTO trfsconcluidas (nome, tipo, data_finalizado, intg_fz, descricao)
+VALUES 
+  (
+    'REPOSITORIO 1', 
+    'Instalação solar',
+    '2024-06-26', 
+    'Alisson', 
+    'Theta Psi Omega'
+  ),
+   (
+    'REPOSITORIO 2', 
+    'Instalação solar',
+    '2024-08-29', 
+    'Alisson', 
+    'Omicron Theta Ro'
+  ),
+  (
+    'REPOSITORIO 3', 
+    'Instalação solar',
+    '2024-09-13', 
+    'Amarante', 
+    'Chi Psi Theta'
+  ),
+  (
+    'REPOSITORIO 4', 
+    'Instalação solar',
+    '2024-09-23', 
+    'Alisson', 
+    'Tau  Psi Omega'
+  ),
+  (
+    'REPOSITORIO 5', 
+    'Instalação solar',
+    '2024-10-21', 
+    'Amarante', 
+    'Chi Tau  Omega'
+  ),
+  (
+    'REPOSITORIO 6', 
+    'Instalação solar',
+    '2025-01-15', 
+    'Amarante', 
+    'Chi Psi Tau '
+  ),
+  (
+    'REPOSITORIO 7', 
+    'Instalação solar',
+    '2025-02-06', 
+    'Borges', 
+    'Delta  Psi Omega'
+  ),
+  (
+    'REPOSITORIO 8', 
+    'Instalação solar',
+    '2025-03-09', 
+    'Amarante', 
+    'Chi Delta  Omega'
+  ),
+  (
+    'REPOSITORIO 9', 
+    'Instalação solar',
+    '2025-12-11', 
+    'Alisson', 
+    'Chi Psi Delta '
+  ),
+  (
+    'REPOSITORIO 10', 
+    'Instalação solar',
+    '2026-01-26', 
+    'Alisson', 
+    'Épsilon  Psi Omega'
+  ),
+  (
+    'REPOSITORIO 11', 
+    'Instalação solar',
+    '2026-03-17', 
+    'Amarante', 
+    'Chi Épsilon  Omega'
+  ),
+    (
+    'REPOSITORIO 12', 
+    'Instalação solar',
+    '2026-04-24', 
+    'Alisson', 
+    'Chi Psi Épsilon '
+  ),
+  (
+    'REPOSITORIO 13', 
+    'Instalação solar',
+    '2026-06-25', 
+    'Borges', 
+    'Zeta Psi Omega'
+  ),
+  (
+    'REPOSITORIO 14', 
+    'Instalação solar',
+    '2026-06-29', 
+    'Borges', 
+    'Chi Zeta Omega'
+  ),
+  (
+    'REPOSITORIO 15', 
+    'Instalação solar',
+    '2026-06-30', 
+    'Amarante', 
+    'Chi Psi Zeta'
+  ),
+  (
+    'REPOSITORIO 16', 
+    'Instalação solar',
+    '2026-06-30', 
+    'Amarante', 
+    'Chi Psi Alfa '
+  );
