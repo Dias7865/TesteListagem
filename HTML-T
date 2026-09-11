@@ -81,7 +81,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
 .detalhes-card .label { font-weight: bold; color: #764ba2; }
 .detalhes-card .badge {
-    display: inline-block; background: #00730d; color: white;    //---- Cor de fundo
+    display: inline-block; background: #00730d; color: white;
     padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px;
 }
 .status-badge {
@@ -146,7 +146,7 @@ h2 { color: #333; font-size: 1.8rem; }
 /* --- ESTRUTURA DE LAYOUT EM GRID --- */
 .app-layout {
     display: grid;
-    grid-template-columns: 1.6fr 1fr; /* Coluna esquerda maior que a direita */
+    grid-template-columns: 1.6fr 1fr;
     grid-template-areas:
         "tarefas dashboard"
         "tarefas adicionar"
@@ -160,7 +160,6 @@ h2 { color: #333; font-size: 1.8rem; }
 .area-adicionar { grid-area: adicionar; }
 .area-integradores { grid-area: integradores; }
 
-/* Responsividade para telas menores */
 @media (max-width: 850px) {
     .app-layout {
         grid-template-columns: 1fr;
@@ -172,20 +171,62 @@ h2 { color: #333; font-size: 1.8rem; }
     }
 }
 
-/* Badges de Sinalização de Prazo */
 .prazo-no-prazo { background: #4caf50; color: white; }
 .prazo-proximo  { background: #ff9800; color: white; }
 .prazo-limite   { background: #d32f2f; color: white; }
 .prazo-atrasado { background: #8b0000; color: white; }
 
-
-
-
-
-
-
-
-
+/* --- Modal Pop-up para Edição de Tarefa --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.active {
+    display: flex;
+}
+.modal-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 550px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border: 4px solid #ffbd17;
+    animation: slideIn 0.3s ease-out;
+}
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+.modal-close:hover {
+    background: #f44336;
+    color: white;
+}
 </style>
 </head>
 <body>
@@ -310,6 +351,14 @@ h2 { color: #333; font-size: 1.8rem; }
 
     </div> <!-- /conteudoProtegido -->
 </div> <!-- /container -->
+
+<!-- Modal Pop-up de Edição de Tarefa -->
+<div id="modalEditTarefa" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="fecharModalEditTarefa()">✕</button>
+        <div id="conteudoModalEditTarefa"></div>
+    </div>
+</div>
 
 <!-- Dashboard Overlay -->
 <div id="dashboardOverlay" class="dashboard-overlay">
@@ -534,7 +583,6 @@ function mostrarDetalhesTarefa() {
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
             <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
         </div>
-        <div id="editFormTarefa"></div>
     `;
     div.style.display = 'block';
 }
@@ -559,59 +607,62 @@ function mostrarDetalhesIntegrador() {
     div.style.display = 'block';
 }
 
-// --- EDIÇÃO TAREFA ---
+// --- EDIÇÃO TAREFA EM POP-UP ---
 function abrirEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
-    const editFormDiv = document.getElementById('editFormTarefa');
+    const modalContent = document.getElementById('conteudoModalEditTarefa');
     const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
 
-    editFormDiv.innerHTML = `
-        <div class="edit-form">
-            <h4>✏️ Editando: ${tarefa.nome}</h4>
-            <div class="form-group">
-                <label for="editNomeTarefa">Nome:</label>
-                <input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}">
-            </div>
-            <div class="form-group">
-                <label for="editTipoTarefa">Tipo:</label>
-                <input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}">
-            </div>
-            <div class="form-group">
-                <label for="editStatusTarefa">Status:</label>
-			<select id="editStatusTarefa">
-				<option value="">-- Selecione o status --</option>
-				<option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
-				<option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
-				<option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
-				<option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️​ Faltam dados necessários</option>
-				<option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
-			</select>
-            </div>
-            <div class="form-group">
-                <label for="editDataEsperadaTarefa">Data Para Esperada:</label>
-                <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
-            </div>
-            <div class="form-group">
-                <label for="editIntegradorTarefa">Integrador Associado:</label>
-                <select id="editIntegradorTarefa"></select>
-            </div>
-            <div class="form-group">
-                <label for="editDescricaoTarefa">Descrição:</label>
-                <textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea>
-            </div>
-            <div class="action-buttons">
-                <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
-                <button class="btn btn-secondary" onclick="cancelarEdicaoTarefa()">❌ Cancelar</button>
-            </div>
-            <div id="editMsgTarefa" style="margin-top:10px;"></div>
+    modalContent.innerHTML = `
+        <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">✏️ Editando: ${tarefa.nome}</h3>
+        <div class="form-group">
+            <label for="editNomeTarefa">Nome:</label>
+            <input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}">
         </div>
+        <div class="form-group">
+            <label for="editTipoTarefa">Tipo:</label>
+            <input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}">
+        </div>
+        <div class="form-group">
+            <label for="editStatusTarefa">Status:</label>
+            <select id="editStatusTarefa">
+                <option value="">-- Selecione o status --</option>
+                <option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
+                <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
+                <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
+                <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️​ Faltam dados necessários</option>
+                <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="editDataEsperadaTarefa">Data Esperada para Entrega:</label>
+            <input type="date" id="editDataEsperadaTarefa" value="${dataISO}">
+        </div>
+        <div class="form-group">
+            <label for="editIntegradorTarefa">Integrador Associado:</label>
+            <select id="editIntegradorTarefa"></select>
+        </div>
+        <div class="form-group">
+            <label for="editDescricaoTarefa">Descrição:</label>
+            <textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
+            <button class="btn btn-secondary" onclick="fecharModalEditTarefa()">❌ Cancelar</button>
+        </div>
+        <div id="editMsgTarefa" style="margin-top:10px;"></div>
     `;
     
     popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
+    document.getElementById('modalEditTarefa').classList.add('active');
+}
+
+function fecharModalEditTarefa() {
+    document.getElementById('modalEditTarefa').classList.remove('active');
 }
 
 function cancelarEdicaoTarefa() {
-    document.getElementById('editFormTarefa').innerHTML = '';
+    fecharModalEditTarefa();
 }
 
 async function salvarEdicaoTarefa(index) {
@@ -656,6 +707,7 @@ async function salvarEdicaoTarefa(index) {
         const select = document.getElementById('selectTarefas');
         select.options[select.selectedIndex].textContent = nome;
         mostrarDetalhesTarefa();
+        fecharModalEditTarefa();
     } catch (err) {
         msgDiv.innerHTML = `<div class="error">❌ Erro ao salvar: ${err.message}</div>`;
         console.error('Erro:', err);
@@ -919,15 +971,12 @@ function fecharDashboard() {
 function obterBadgePrazo(dataISO) {
     if (!dataISO) return '';
 
-    // Extrai ano, mês e dia para evitar problemas com fuso horário (UTC)
     const [ano, mes, dia] = dataISO.split('T')[0].split('-');
     const dataTermino = new Date(ano, mes - 1, dia);
 
-    // Data atual zerada (00:00:00)
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    // Diferença em dias
     const diffTempo = dataTermino.getTime() - hoje.getTime();
     const diffDias = Math.round(diffTempo / (1000 * 60 * 60 * 24));
 
@@ -941,13 +990,6 @@ function obterBadgePrazo(dataISO) {
         return '<span class="status-badge prazo-atrasado">❌ ATRASADO</span>';
     }
 }
-
-
-
-
-
-
-
 </script>
 </body>
 </html>
