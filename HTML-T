@@ -58,7 +58,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
 /* --- ESTRUTURA LAYOUT DA 1ª PÁGINA --- */
 .p1-topo {
-    display: grid; grid-template-columns: 1fr 180px; gap: 15px; margin-bottom: 15px; align-items: stretch;
+    display: grid; grid-template-columns: 1fr 200px; gap: 15px; margin-bottom: 15px; align-items: stretch;
 }
 
 .painel-com-rotulo {
@@ -74,12 +74,13 @@ h2 { color: #333; font-size: 1.8rem; }
     text-transform: uppercase; letter-spacing: 1px;
 }
 
+/* Alinhamento superior alinhando caixas topo a topo */
 .grid-caixas-status, .grid-caixas-prazos {
-    display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: center; flex: 1;
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start; flex: 1;
 }
 
 .item-caixa-status, .item-caixa-prazo {
-    display: flex; flex-direction: column; align-items: center; width: 110px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 110px;
 }
 
 /* Quadrado para os status */
@@ -87,7 +88,7 @@ h2 { color: #333; font-size: 1.8rem; }
     width: 100%; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
     font-size: 2rem; font-weight: bold; color: #ffffff; border-radius: 8px;
-    box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
 }
 
 /* Círculo para os prazos */
@@ -95,7 +96,7 @@ h2 { color: #333; font-size: 1.8rem; }
     width: 75px; height: 75px; border: 4px solid #1a1a1a; background: #f9f9f9;
     display: flex; align-items: center; justify-content: center;
     font-size: 2rem; font-weight: bold; color: #ffffff; border-radius: 50%;
-    box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
 }
 
 .nome-status-caixa, .nome-prazo-caixa {
@@ -114,7 +115,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
 
 .p1-corpo {
-    display: grid; grid-template-columns: 1fr 300px; gap: 15px; align-items: stretch;
+    display: grid; grid-template-columns: 1fr 320px; gap: 15px; align-items: stretch;
 }
 .p1-corpo-esquerda { display: flex; flex-direction: column; gap: 15px; }
 
@@ -133,7 +134,7 @@ h2 { color: #333; font-size: 1.8rem; }
 }
 .item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
 
-/* Visualização Dinâmica Vertical Integrada */
+/* Visualização Dinâmica Vertical Integrada (Sem fundo colorido nos textos) */
 .container-vis-dinamica {
     background: white; border: 4px solid #1a1a1a; border-radius: 12px;
     padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -155,10 +156,10 @@ h2 { color: #333; font-size: 1.8rem; }
 .vis-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white; border-radius: 10px; padding: 15px; border: 2px solid #1a1a1a;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.95rem;
 }
-.vis-card h4 { font-size: 1.1rem; margin-bottom: 6px; }
-.vis-card p { margin: 4px 0; }
+.vis-card h4 { font-size: 1.15rem; margin-bottom: 8px; }
+.vis-card p { margin: 6px 0; }
 
 /* --- ESTRUTURA DE LAYOUT DA 2ª PÁGINA --- */
 .app-layout {
@@ -197,7 +198,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
-.status-aguardando { background: #ff9800; color: white; }
+.status-aguardando { background: #ffc229; color: white; }
 .status-nao-iniciado { background: #f44336; color: white; }
 .status-faltam-dados { background: #00802D; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
@@ -207,8 +208,8 @@ h2 { color: #333; font-size: 1.8rem; }
 
 .prazo-no-prazo { background: #4caf50; color: white; }
 .prazo-proximo  { background: #ff9800; color: white; }
-.prazo-limite   { background: #d32f2f; color: white; }
-.prazo-atrasado { background: #8b0000; color: white; }
+.prazo-limite   { background: #80004c; color: white; }
+.prazo-atrasado { background: #d32f2f; color: white; }
 
 /* Modal */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -238,7 +239,7 @@ h2 { color: #333; font-size: 1.8rem; }
         <!-- TOPO: Status + Botão Ir à 2ª Página -->
         <div class="p1-topo">
             <div class="painel-com-rotulo">
-                <div class="rotulo-vertical">Estado de Cada Serviço</div>
+                <div class="rotulo-vertical">ESTADO DE CADA SERVIÇO</div>
                 <div id="gridStatusCaixas" class="grid-caixas-status">
                     <div class="loading">Carregando contadores...</div>
                 </div>
@@ -253,7 +254,7 @@ h2 { color: #333; font-size: 1.8rem; }
             <div class="p1-corpo-esquerda">
                 <!-- Prazos -->
                 <div class="painel-com-rotulo">
-                    <div class="rotulo-vertical">Estado de Cada Prazo</div>
+                    <div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
                     <div id="gridPrazosCaixas" class="grid-caixas-prazos">
                         <div class="loading">Carregando prazos...</div>
                     </div>
@@ -477,9 +478,9 @@ function getCorPorStatus(status) {
     if (!status) return { bg: '#f9f9f9', text: '#1a1a1a' };
     const s = status.toLowerCase();
     if (s.includes('conclu')) return { bg: '#2196f3', text: '#ffffff' };
-    if (s.includes('progresso')) return { bg: '#4caf50', text: '#ffffff' };
-    if (s.includes('aguardando')) return { bg: '#ff9800', text: '#ffffff' };
-    if (s.includes('faltam')) return { bg: '#00802D', text: '#ffffff' };
+    if (s.includes('progresso')) return { bg: '#ff9800', text: '#ffffff' };
+    if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
+    if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
     if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
@@ -487,6 +488,7 @@ function getCorPorStatus(status) {
 function getEmojiStatus(status) {
     if (!status) return '❌';
     const s = status.toLowerCase();
+    if (s.includes('conclu')) return '✅';
     if (s.includes('progresso')) return '⏩';
     if (s.includes('aguardando')) return '⏳';
     if (s.includes('faltam')) return '🗂️';
@@ -502,12 +504,12 @@ function getCorPrazo(dataISO) {
     const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
 
     if (diffDias > 8) return '#4caf50'; // Dentro do prazo
-    if (diffDias >= 2) return '#ff9800'; // Prazo próximo
-    if (diffDias >= 0) return '#d32f2f'; // No limite
-    return '#8b0000'; // Atrasado
+    if (diffDias >= 2) return '#ffc229'; // Prazo próximo
+    if (diffDias >= 0) return '#80004c'; // No limite
+    return '#d32f2f'; // Atrasado
 }
 
-// Renderiza Caixas de Status (Sem 'atrasados')
+// Renderiza Caixas de Status com Emoji apenas nas categorias de Status
 function renderizarCaixasStatus() {
     const container = document.getElementById('gridStatusCaixas');
     if (!dadosIntensidades || dadosIntensidades.length === 0) {
@@ -521,18 +523,19 @@ function renderizarCaixasStatus() {
 
     container.innerHTML = intensidadesFiltradas.map(item => {
         const cores = getCorPorStatus(item.status_nome);
+        const emoji = getEmojiStatus(item.status_nome);
         return `
             <div class="item-caixa-status">
                 <div class="caixa-quantidade" style="background-color: ${cores.bg}; color: ${cores.text};">
                     ${item.valor_intensidade}
                 </div>
-                <div class="nome-status-caixa">${item.status_nome}</div>
+                <div class="nome-status-caixa">${emoji} ${item.status_nome}</div>
             </div>
         `;
     }).join('');
 }
 
-// Renderiza Círculos de Prazos
+// Renderiza Círculos de Prazos (sem emoji na categoria)
 function renderizarCaixasPrazos() {
     const container = document.getElementById('gridPrazosCaixas');
     
@@ -561,10 +564,10 @@ function renderizarCaixasPrazos() {
     });
 
     const listaPrazos = [
-        { label: 'dentro do prazo', qtd: contadoresPrazos['dentro do prazo'], bg: '#4caf50' },
-        { label: 'prazo próximo', qtd: contadoresPrazos['prazo próximo'], bg: '#ff9800' },
-        { label: 'no limite', qtd: contadoresPrazos['no limite'], bg: '#d32f2f' },
-        { label: 'atrasado', qtd: contadoresPrazos['atrasado'], bg: '#8b0000' }
+        { label: 'Dentro Do Prazo', qtd: contadoresPrazos['dentro do prazo'], bg: '#4caf50' },
+        { label: 'Prazo Próximo', qtd: contadoresPrazos['prazo próximo'], bg: '#ffc229' },
+        { label: 'No Limite', qtd: contadoresPrazos['no limite'], bg: '#80004c' },
+        { label: 'Atrasado', qtd: contadoresPrazos['atrasado'], bg: '#d32f2f' }
     ];
 
     container.innerHTML = listaPrazos.map(item => `
@@ -577,7 +580,7 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
-// Renderiza Lista Pendentes (Emoji + Nome + Data dd/mm/yyyy na mesma linha com a cor do prazo no fundo)
+// Renderiza Lista Pendentes
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
     const pendentes = dadosTarefas.filter(t => {
@@ -607,7 +610,32 @@ function renderizarListaPendentes() {
     }).join('');
 }
 
-// Renderiza Visualização Dinâmica Vertical Integrada na Página 1
+// Formatadores de texto simples (sem fundo colorido) para a Visualização Dinâmica
+function getTextoStatusSemFundo(status) {
+    if (!status) return 'Não definido';
+    const s = status.toLowerCase();
+    if (s.includes('concl')) return `✅ ${status}`;
+    if (s.includes('progresso')) return `⏩ ${status}`;
+    if (s.includes('equatorial')) return `⏳ ${status}`;
+    if (s.includes('faltam')) return `🗂️ ${status}`;
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return `❌ ${status}`;
+    return status;
+}
+
+function getTextoPrazoSemFundo(dataISO) {
+    if (!dataISO) return '';
+    const [ano, mes, dia] = dataISO.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDias > 8) return '🟢 No prazo';
+    if (diffDias >= 2) return '⚠️ PRAZO PRÓXIMO';
+    if (diffDias >= 0) return '🚨 DIA LIMITE';
+    return '❌ ATRASADO';
+}
+
+// Renderiza Visualização Dinâmica (sem coloração de fundo nos textos)
 function renderizarVisualizacaoDinamicaVertical() {
     const track = document.getElementById('visDinamicaTrack');
     if (!dadosTarefas || dadosTarefas.length === 0) {
@@ -618,8 +646,8 @@ function renderizarVisualizacaoDinamicaVertical() {
     const cardsHTML = dadosTarefas.map(t => `
         <div class="vis-card">
             <h4>${t.nome}</h4>
-            <p><b>Status:</b> ${getStatusBadge(t.status)}</p>
-            <p><b>Data:</b> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
+            <p><b>Status:</b> ${getTextoStatusSemFundo(t.status)}</p>
+            <p><b>Data:</b> ${formatarData(t.data_para_termino)} - ${getTextoPrazoSemFundo(t.data_para_termino)}</p>
         </div>
     `).join('');
 
