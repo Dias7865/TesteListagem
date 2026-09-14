@@ -56,7 +56,7 @@ CREATE TABLE tarefas (
     descricao text,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     intg_id uuid REFERENCES integradores(id),
-    status varchar(30) CHECK (status IN ('concluído', 'em progresso', 'aguardando equatorial', 'não iniciado', 'faltam dados')),
+    status varchar(30) CHECK (status IN ('concluído', 'em progresso', 'aguardando equatorial', 'não iniciado', 'faltam dados', 'reprovado pela equatorial')),
     data_para_termino date
 );
 
@@ -182,8 +182,8 @@ BEGIN
             NOW()
         ),
         (
-            'atrasado',  ---Não é usado----
-            (SELECT COUNT(*) FROM tarefas WHERE LOWER(status) = 'atrasado'), 
+            'reprovado pela equatorial',
+            (SELECT COUNT(*) FROM tarefas WHERE LOWER(status) = 'reprovado pela equatorial'), 
             NOW()
         )
     ON CONFLICT (status_nome) 
@@ -193,6 +193,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+ SELECT calcular_intensidades();
 
 
 
@@ -213,7 +215,7 @@ VALUES
   (
     'CASA 1', 
     'Instalação solar', 
-    'em progresso', 
+    'reprovado pela equatorial', 
     '2026-10-15', 
     (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 
     'Alfa'
@@ -301,9 +303,7 @@ VALUES
 
 
 
-  SELECT calcular_intensidades();
-
-
+ 
 
 
 
