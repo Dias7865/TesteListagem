@@ -137,7 +137,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
 
 .p1-corpo {
-    display: grid; grid-template-columns: 1fr 320px; gap: 15px; align-items: stretch;
+    display: grid; grid-template-columns: 1fr 400px; gap: 15px; align-items: stretch;
 }
 .p1-corpo-esquerda { display: flex; flex-direction: column; gap: 15px; }
 
@@ -235,6 +235,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .status-aguardando { background: #ffc229; color: white; }
 .status-nao-iniciado { background: #4f0b06; color: white; }
 .status-faltam-dados { background: #00802D; color: white; }
+.status-reprovado { background: #757575; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .action-buttons .btn { flex: 1; min-width: 150px; }
 
@@ -253,7 +254,25 @@ h2 { color: #333; font-size: 1.8rem; }
 .modal-close:hover { background: #f44336; color: white; }
 
 
+.sync-indicator {
+    text-align: right;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 8px;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+}
 
+/* Efeito de iluminação discreto nos painéis ao atualizar */
+.pulse-update {
+    animation: brilhoSuave 1s ease-in-out;
+}
+
+@keyframes brilhoSuave {
+    0% { border-color: #1a1a1a; }
+    50% { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
+    100% { border-color: #1a1a1a; }
+}
 
 
 </style>
@@ -276,7 +295,8 @@ h2 { color: #333; font-size: 1.8rem; }
     <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
 		<h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
-	
+		<div id="syncIndicator" class="sync-indicator">🟢 Sincronizado agora</div>
+		
         <div class="p1-topo">
             <div class="painel-com-rotulo">
                 <div class="rotulo-vertical">ESTADO DE CADA SERVIÇO</div>
@@ -356,10 +376,12 @@ h2 { color: #333; font-size: 1.8rem; }
                         <label for="statusTarefa">Status:</label>
                         <select id="statusTarefa">
                             <option value="">-- Selecione o status --</option>
+							<option value="concluído">✅ Concluído</option>
                             <option value="em progresso">⏩ Em progresso</option>
                             <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
                             <option value="faltam dados">🗂️ Faltam dados necessários</option>
-                            <option value="não iniciado">❌ Não iniciado</option>
+							<option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
+							<option value="não iniciado">❌ Não iniciado</option>
                         </select>
                     </div>
                     <div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
@@ -500,18 +522,15 @@ async function carregarDadosIniciais() {
     await carregarTarefas();
     await carregarTrfsConcluidas();
     await carregarPagina1();
-	await verificarEArquivarAutomatico();
+    await verificarEArquivarAutomatico();
 	
-	setInterval(async () => {
-		await carregarTarefas();
-		await verificarEArquivarAutomatico();
-		await carregarTrfsConcluidas();
-        await carregarPagina1();
-		
-    }, 30000);
-	
-	
-	
+    // Executa a busca e recálculo a cada 60 segundos (60000 ms)
+    setInterval(async () => {
+        await carregarTarefas();
+        await verificarEArquivarAutomatico();
+        await carregarTrfsConcluidas();
+        await carregarPagina1(); // Chama o procedimento RPC calcular_intensidades() e atualiza as caixas
+    }, 15000);
 }
 
 async function carregarPagina1() {
@@ -530,6 +549,8 @@ async function carregarPagina1() {
         renderizarCaixasPrazos();
         renderizarListaPendentes();
         renderizarVisualizacaoDinamicaVertical();
+		
+		notificarSincronizacao();
     } catch (e) {
         console.error('Erro ao atualizar página 1:', e);
     }
@@ -542,7 +563,8 @@ function getCorPorStatus(status) {
     if (s.includes('progresso')) return { bg: '#ff9800', text: '#ffffff' };
     if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
     if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#4f0b06', text: '#ffffff' };
+    if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' }; /* Cinza */
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
@@ -553,6 +575,7 @@ function getEmojiStatus(status) {
     if (s.includes('progresso')) return '⏩';
     if (s.includes('aguardando')) return '⏳';
     if (s.includes('faltam')) return '🗂️';
+    if (s.includes('reprovado')) return '❕';
     if (s.includes('não iniciado') || s.includes('nao iniciado')) return '❌';
     return '📌';
 }
@@ -671,8 +694,9 @@ function renderizarListaPendentes() {
 function getTextoStatusSemFundo(status) {
     if (!status) return 'Não definido';
     const s = status.toLowerCase();
-    if (s.includes('concl')) return `✅ ${status}`;
+    if (s.includes('conclu')) return `✅ ${status}`;
     if (s.includes('progresso')) return `⏩ ${status}`;
+    if (s.includes('reprovado')) return `❕ ${status}`;
     if (s.includes('equatorial')) return `⏳ ${status}`;
     if (s.includes('faltam')) return `🗂️ ${status}`;
     if (s.includes('não iniciado') || s.includes('nao iniciado')) return `❌ ${status}`;
@@ -871,6 +895,7 @@ function getStatusBadge(status) {
     if (s === 'concluído' || s === 'concluido') return `<span class="status-badge status-concluido">✅ ${status}</span>`;
     if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
     if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
+    if (s === 'reprovado') return `<span class="status-badge status-reprovado">❕ ${status}</span>`;
     if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️ ${status}</span>`;
     return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
 }
@@ -930,9 +955,11 @@ function abrirEdicaoTarefa(index) {
         <div class="form-group">
             <label>Status:</label>
             <select id="editStatusTarefa">
+				<option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
                 <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
                 <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
                 <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️ Faltam dados necessários</option>
+				<option value="reprovado pela equatorial" ${tarefa.status === 'reprovado pela equatorial' ? 'selected' : ''}>❕ Reprovado pela Equatorial</option>
                 <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
             </select>
         </div>
@@ -1149,7 +1176,25 @@ async function verificarEArquivarAutomatico() {
 }
 
 
+function notificarSincronizacao() {
+    // 1. Atualiza o texto do horário no topo
+    const ind = document.getElementById('syncIndicator');
+    if (ind) {
+        const agora = new Date();
+        const hora = String(agora.getHours()).padStart(2, '0');
+        const min = String(agora.getMinutes()).padStart(2, '0');
+        const seg = String(agora.getSeconds()).padStart(2, '0');
+        ind.textContent = `🟢 Sincronizado às ${hora}:${min}:${seg}`;
+    }
 
+    // 2. Dispara uma piscada verde suave nas bordas dos painéis
+    const paineis = document.querySelectorAll('.painel-com-rotulo');
+    paineis.forEach(p => p.classList.add('pulse-update'));
+
+    setTimeout(() => {
+        paineis.forEach(p => p.classList.remove('pulse-update'));
+    }, 1000);
+}
 
 
 
