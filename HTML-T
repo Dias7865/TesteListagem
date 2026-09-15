@@ -11,6 +11,7 @@ body {
     background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
+	zoom: 75%;
 }
 
 .container { max-width: 1250px; margin: 0 auto; }
@@ -47,29 +48,28 @@ h2 { color: #333; font-size: 1.8rem; }
 
 .imagem-login {
     width: 100%;
-    max-width: 400px; /* Mesma largura máxima definida na caixa de senha */
-    height: 180px; /* Define uma altura proporcional para não cobrir a tela */
-    object-fit: cover; /* Corta os excessos mantendo a proporção da imagem sem distorcer */
+    max-width: 400px;
+    height: 180px;
+    object-fit: cover;
     border-radius: 8px;
     display: block;
-    margin: 0 auto 15px auto; /* Centraliza horizontalmente e dá espaçamento abaixo */
+    margin: 0 auto 15px auto;
 }
-
-
 
 #secaoVerificacao {
     max-width: 800px;
-    margin: 18vh auto 20px auto; /* O '18vh' empurra a caixa para baixo proporcionalmente à tela */
+    margin: 18vh auto 20px auto;
     text-align: center;
 }
 
 .verificacao-container {
-	display: flex;
+    display: flex;
     gap: 10px;
     align-items: center;
     justify-content: center;
     max-width: 400px;
-    margin: 15px auto 0 auto; }
+    margin: 15px auto 0 auto;
+}
 .verificacao-container input {
     flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0;
     border-radius: 8px; font-size: 16px;
@@ -105,7 +105,6 @@ h2 { color: #333; font-size: 1.8rem; }
 
 .item-caixa-status, .item-caixa-prazo {
     display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 140px;
-	
 }
 
 .item-caixa-status .caixa-quantidade {
@@ -136,8 +135,9 @@ h2 { color: #333; font-size: 1.8rem; }
 }
 .btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
 
+/* GRID DE 2 COLUNAS NA PÁGINA 1 */
 .p1-corpo {
-    display: grid; grid-template-columns: 1fr 400px; gap: 15px; align-items: stretch;
+    display: grid; grid-template-columns: 1.8fr 1.4fr; gap: 15px; align-items: stretch;
 }
 .p1-corpo-esquerda { display: flex; flex-direction: column; gap: 15px; }
 
@@ -156,13 +156,20 @@ h2 { color: #333; font-size: 1.8rem; }
 }
 .item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
 
+/* VISUALIZAÇÃO DINÂMICA EM 2 COLUNAS IGUAIS */
+.grid-vis-dinamica {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
 .container-vis-dinamica {
     background: white; border: 4px solid #1a1a1a; border-radius: 12px;
     padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     overflow: hidden; display: flex; flex-direction: column; height: 100%; min-height: 400px; max-height: 480px;
 }
 .vis-dinamica-titulo {
-    font-size: 1.1rem; font-weight: bold; text-align: center; margin-bottom: 12px;
+    font-size: 1rem; font-weight: bold; text-align: center; margin-bottom: 12px;
     padding-bottom: 8px; border-bottom: 2px solid #eee; color: #1a1a1a;
 }
 .vis-dinamica-viewport { overflow: hidden; flex: 1; position: relative; }
@@ -180,18 +187,17 @@ h2 { color: #333; font-size: 1.8rem; }
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-
 @keyframes scrollUp {
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
 }
 .vis-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white; border-radius: 10px; padding: 15px; border: 2px solid #1a1a1a;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.95rem;
+    color: white; border-radius: 10px; padding: 12px; border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
 }
-.vis-card h4 { font-size: 1.15rem; margin-bottom: 8px; }
-.vis-card p { margin: 6px 0; }
+.vis-card h4 { font-size: 1.05rem; margin-bottom: 6px; }
+.vis-card p { margin: 4px 0; }
 
 /* --- ESTRUTURA DE LAYOUT DA 2ª PÁGINA --- */
 .app-layout {
@@ -210,6 +216,7 @@ h2 { color: #333; font-size: 1.8rem; }
 @media (max-width: 900px) {
     .p1-topo { grid-template-columns: 1fr; }
     .p1-corpo { grid-template-columns: 1fr; }
+    .grid-vis-dinamica { grid-template-columns: 1fr; }
     .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores" "concluidas"; }
 }
 
@@ -253,7 +260,6 @@ h2 { color: #333; font-size: 1.8rem; }
 .modal-close { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: #f0f0f0; border: none; border-radius: 50%; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .modal-close:hover { background: #f44336; color: white; }
 
-
 .sync-indicator {
     text-align: right;
     font-size: 0.82rem;
@@ -263,7 +269,6 @@ h2 { color: #333; font-size: 1.8rem; }
     transition: opacity 0.3s ease;
 }
 
-/* Efeito de iluminação discreto nos painéis ao atualizar */
 .pulse-update {
     animation: brilhoSuave 1s ease-in-out;
 }
@@ -273,8 +278,6 @@ h2 { color: #333; font-size: 1.8rem; }
     50% { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
     100% { border-color: #1a1a1a; }
 }
-
-
 </style>
 </head>
 <body>
@@ -282,7 +285,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
     <!-- SEÇÃO DE VERIFICAÇÃO DE SENHA -->
     <div id="secaoVerificacao" class="section">
-		<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRejI_5r0R1whefw8AOCBIkthVQxw0BsLOLQcKl6lA25vZP0SCWo9s1EE2U&s=10" alt="Login" class="imagem-login">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRejI_5r0R1whefw8AOCBIkthVQxw0BsLOLQcKl6lA25vZP0SCWo9s1EE2U&s=10" alt="Login" class="imagem-login">
         <div class="section-header"><h2>🔍 Verificação</h2></div>
         <p style="color:#666; margin-bottom:10px;">Digite o código e clique em Verificar para liberar o acesso:</p>
         <div class="verificacao-container">
@@ -294,9 +297,9 @@ h2 { color: #333; font-size: 1.8rem; }
 
     <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
-		<h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
-		<div id="syncIndicator" class="sync-indicator">🟢 Sincronizado agora</div>
-		
+        <h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
+        <div id="syncIndicator" class="sync-indicator">🟢 Sincronizado agora</div>
+        
         <div class="p1-topo">
             <div class="painel-com-rotulo">
                 <div class="rotulo-vertical">ESTADO DE CADA SERVIÇO</div>
@@ -325,10 +328,26 @@ h2 { color: #333; font-size: 1.8rem; }
                 </div>
             </div>
 
-            <div class="container-vis-dinamica">
-                <div class="vis-dinamica-titulo">⚡ Visualização Dinâmica</div>
-                <div class="vis-dinamica-viewport">
-                    <div id="visDinamicaTrack" class="vis-dinamica-track"></div>
+            <!-- VISUALIZAÇÃO DINÂMICA DIVIDIDA EM 2 COLUNAS -->
+            <div class="grid-vis-dinamica">
+                <!-- Coluna 1: No Prazo / Prazo Próximo -->
+                <div class="container-vis-dinamica">
+                    <div class="vis-dinamica-titulo" style="color: #2e7d32;">
+                        🟢 Dentro do Prazo & Próximo
+                    </div>
+                    <div class="vis-dinamica-viewport">
+                        <div id="trackPrazoOk" class="vis-dinamica-track"></div>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Dia Limite / Atrasado -->
+                <div class="container-vis-dinamica">
+                    <div class="vis-dinamica-titulo" style="color: #c62828;">
+                        🔴 Prazo Limite & Atrasado
+                    </div>
+                    <div class="vis-dinamica-viewport">
+                        <div id="trackPrazoCritico" class="vis-dinamica-track"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -364,7 +383,7 @@ h2 { color: #333; font-size: 1.8rem; }
                     <select id="tipoElemento" onchange="atualizarFormulario()">
                         <option value="">-- Selecione o tipo --</option>
                         <option value="tarefa">📌 Tarefa</option>
-                        <option value="integrador">🛠️​ Integrador</option>
+                        <option value="integrador">🛠️ Integrador</option>
                     </select>
                 </div>
 
@@ -376,12 +395,12 @@ h2 { color: #333; font-size: 1.8rem; }
                         <label for="statusTarefa">Status:</label>
                         <select id="statusTarefa">
                             <option value="">-- Selecione o status --</option>
-							<option value="concluído">✅ Concluído</option>
+                            <option value="concluído">✅ Concluído</option>
                             <option value="em progresso">⏩ Em progresso</option>
                             <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
                             <option value="faltam dados">🗂️ Faltam dados necessários</option>
-							<option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
-							<option value="não iniciado">❌ Não iniciado</option>
+                            <option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
+                            <option value="não iniciado">❌ Não iniciado</option>
                         </select>
                     </div>
                     <div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
@@ -402,7 +421,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
             <!-- Integradores -->
             <div id="secaoIntegradores" class="section area-integradores">
-                <div class="section-header"><h2>🛠️​ Integradores</h2></div>
+                <div class="section-header"><h2>🛠️ Integradores</h2></div>
                 <div class="seletor-container">
                     <label for="selectIntegradores">Selecione um integrador:</label>
                     <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
@@ -523,13 +542,12 @@ async function carregarDadosIniciais() {
     await carregarTrfsConcluidas();
     await carregarPagina1();
     await verificarEArquivarAutomatico();
-	
-    // Executa a busca e recálculo a cada 60 segundos (60000 ms)
+    
     setInterval(async () => {
         await carregarTarefas();
         await verificarEArquivarAutomatico();
         await carregarTrfsConcluidas();
-        await carregarPagina1(); // Chama o procedimento RPC calcular_intensidades() e atualiza as caixas
+        await carregarPagina1();
     }, 15000);
 }
 
@@ -549,8 +567,8 @@ async function carregarPagina1() {
         renderizarCaixasPrazos();
         renderizarListaPendentes();
         renderizarVisualizacaoDinamicaVertical();
-		
-		notificarSincronizacao();
+        
+        notificarSincronizacao();
     } catch (e) {
         console.error('Erro ao atualizar página 1:', e);
     }
@@ -563,7 +581,7 @@ function getCorPorStatus(status) {
     if (s.includes('progresso')) return { bg: '#ff9800', text: '#ffffff' };
     if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
     if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
-    if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' }; /* Cinza */
+    if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' };
     if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
@@ -662,22 +680,23 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
+/* ATUALIZAÇÃO 2: MOSTRA TAREFAS PENDENTES E CONCLUÍDAS COM RÓTULOS PERSONALIZADOS */
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
-    const pendentes = dadosTarefas.filter(t => {
-        const s = (t.status || '').toLowerCase();
-        return s !== 'concluído' && s !== 'concluido';
-    });
 
-    if (pendentes.length === 0) {
-        container.innerHTML = '<p style="color:#666; text-align:center;">🎉 Nenhuma tarefa pendente no momento!</p>';
+    if (!dadosTarefas || dadosTarefas.length === 0) {
+        container.innerHTML = '<p style="color:#666; text-align:center;">🎉 Nenhuma tarefa cadastrada no momento!</p>';
         return;
     }
 
-    container.innerHTML = pendentes.map(t => {
+    container.innerHTML = dadosTarefas.map(t => {
+        const s = (t.status || '').toLowerCase();
+        const isConcluido = s.includes('conclu');
         const emoji = getEmojiStatus(t.status);
-        const bgCor = getCorPrazo(t.data_para_termino);
+        
+        const bgCor = isConcluido ? '#2196f3' : getCorPrazo(t.data_para_termino);
         const dataFormatada = formatarData(t.data_para_termino);
+        const rotuloData = isConcluido ? 'Terminado' : 'Até';
 
         return `
             <div class="item-pendente" style="background-color: ${bgCor};">
@@ -685,7 +704,7 @@ function renderizarListaPendentes() {
                     <span>${emoji}</span>
                     <span>${t.nome}</span>
                 </div>
-                <span>Até: ${dataFormatada}</span>
+                <span>${rotuloData}: ${dataFormatada}</span>
             </div>
         `;
     }).join('');
@@ -717,23 +736,69 @@ function getTextoPrazoSemFundo(dataISO) {
 }
 
 function renderizarVisualizacaoDinamicaVertical() {
-    const track = document.getElementById('visDinamicaTrack');
+    const trackOk = document.getElementById('trackPrazoOk');
+    const trackCritico = document.getElementById('trackPrazoCritico');
+
+    if (!trackOk || !trackCritico) return;
+
     if (!dadosTarefas || dadosTarefas.length === 0) {
-        track.innerHTML = '<p style="text-align:center; color:#666;">Sem dados para exibir.</p>';
+        trackOk.innerHTML = '<p style="text-align:center; color:#666; padding:10px;">Sem dados.</p>';
+        trackCritico.innerHTML = '<p style="text-align:center; color:#666; padding:10px;">Sem dados.</p>';
         return;
     }
 
-    const cardsHTML = dadosTarefas.map(t => `
-        <div class="vis-card">
-            <h4>${t.nome}</h4>
-            <p><b>Status:</b> ${getTextoStatusSemFundo(t.status)}</p>
-            <p><b>Data:</b> ${formatarData(t.data_para_termino)} - ${getTextoPrazoSemFundo(t.data_para_termino)}</p>
-        </div>
-    `).join('');
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
 
-    track.innerHTML = cardsHTML + cardsHTML;
-    const tempoTotal = Math.max(12, dadosTarefas.length * 5);
-    track.style.setProperty('--animation-duration-v', `${tempoTotal}s`);
+    const pendentes = dadosTarefas.filter(t => {
+        const s = (t.status || '').toLowerCase();
+        return s !== 'concluído' && s !== 'concluido';
+    });
+
+    const cardsOk = [];
+    const cardsCritico = [];
+
+    pendentes.forEach(t => {
+        const cardHtml = `
+            <div class="vis-card">
+                <h4>${t.nome}</h4>
+                <p><b>Status:</b> ${getTextoStatusSemFundo(t.status)}</p>
+                <p><b>Data:</b> ${formatarData(t.data_para_termino)} - ${getTextoPrazoSemFundo(t.data_para_termino)}</p>
+            </div>
+        `;
+
+        if (t.data_para_termino) {
+            const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+            const dataTermino = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias >= 2) {
+                cardsOk.push(cardHtml);
+            } else {
+                cardsCritico.push(cardHtml);
+            }
+        } else {
+            cardsOk.push(cardHtml);
+        }
+    });
+
+    if (cardsOk.length > 0) {
+        const html = cardsOk.join('');
+        trackOk.innerHTML = html + html;
+        const tempo = Math.max(10, cardsOk.length * 4);
+        trackOk.style.setProperty('--animation-duration-v', `${tempo}s`);
+    } else {
+        trackOk.innerHTML = '<p style="text-align:center; color:#666; padding:15px; font-size:0.85rem;">Sem tarefas regulares.</p>';
+    }
+
+    if (cardsCritico.length > 0) {
+        const html = cardsCritico.join('');
+        trackCritico.innerHTML = html + html;
+        const tempo = Math.max(10, cardsCritico.length * 4);
+        trackCritico.style.setProperty('--animation-duration-v', `${tempo}s`);
+    } else {
+        trackCritico.innerHTML = '<p style="text-align:center; color:#666; padding:15px; font-size:0.85rem;">Sem tarefas críticas ou atrasadas.</p>';
+    }
 }
 
 // --- BUSCAR DADOS GENÉRICOS ---
@@ -815,7 +880,6 @@ async function concluirEArquivarTarefa(index) {
     if (!confirm(`Deseja marcar a tarefa "${tarefa.nome}" como concluída e movê-la para o histórico?`)) return;
 
     try {
-        // 1. Insere na tabela trfsconcluidas
         const resInsert = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
             method: 'POST',
             headers: {
@@ -828,13 +892,12 @@ async function concluirEArquivarTarefa(index) {
                 tipo: tarefa.tipo,
                 descricao: tarefa.descricao,
                 intg_fz: integradorNome,
-                data_finalizado: new Date().toISOString().split('T')[0]
+                data_finalizado: obterDataHojeLocal()
             })
         });
 
         if (!resInsert.ok) throw new Error('Erro ao arquivar tarefa concluída.');
 
-        // 2. Remove da tabela tarefas
         await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'DELETE',
             headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
@@ -885,9 +948,22 @@ function getIntegradorBadge(integradorId) {
 
 function formatarData(dataISO) {
     if (!dataISO) return 'Não definida';
-    const d = new Date(dataISO);
-    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+    // Pega apenas a parte da data YYYY-MM-DD e divide os blocos
+    const partes = dataISO.split('T')[0].split('-');
+    if (partes.length < 3) return dataISO;
+    
+    const [ano, mes, dia] = partes;
+    return `${dia}/${mes}/${ano}`;
 }
+
+function obterDataHojeLocal() {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+}
+
 
 function getStatusBadge(status) {
     if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
@@ -916,7 +992,7 @@ function mostrarDetalhesTarefa() {
         <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
         <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
-            <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">​🧾 Concluir & Arquivar</button>
+            <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
             <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
         </div>
@@ -942,7 +1018,7 @@ function mostrarDetalhesIntegrador() {
     div.style.display = 'block';
 }
 
-// --- EDIÇÃO DE TAREFA ---
+/* ATUALIZAÇÃO 1: MONITORANDO MUDANÇA DE STATUS PARA MUDAR DATA AUTOMATICAMENTE */
 function abrirEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
     const modalContent = document.getElementById('conteudoModalEditTarefa');
@@ -955,11 +1031,11 @@ function abrirEdicaoTarefa(index) {
         <div class="form-group">
             <label>Status:</label>
             <select id="editStatusTarefa">
-				<option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
+                <option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
                 <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
                 <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
                 <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️ Faltam dados necessários</option>
-				<option value="reprovado pela equatorial" ${tarefa.status === 'reprovado pela equatorial' ? 'selected' : ''}>❕ Reprovado pela Equatorial</option>
+                <option value="reprovado pela equatorial" ${tarefa.status === 'reprovado pela equatorial' ? 'selected' : ''}>❕ Reprovado pela Equatorial</option>
                 <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
             </select>
         </div>
@@ -972,6 +1048,15 @@ function abrirEdicaoTarefa(index) {
         </div>
     `;
     popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
+
+    // Evento em tempo real: ao alterar para "concluído", preenche a data de hoje no campo de data
+    document.getElementById('editStatusTarefa').addEventListener('change', function() {
+        if (this.value.toLowerCase().includes('conclu')) {
+            const hoje = obterDataHojeLocal();
+            document.getElementById('editDataEsperadaTarefa').value = hoje;
+        }
+    });
+
     document.getElementById('modalEditTarefa').classList.add('active');
 }
 
@@ -984,6 +1069,14 @@ async function salvarEdicaoTarefa(index) {
     const nome = document.getElementById('editNomeTarefa').value.trim();
     if (!nome) return;
 
+    let statusVal = document.getElementById('editStatusTarefa').value || null;
+    let dataVal = document.getElementById('editDataEsperadaTarefa').value || null;
+
+    // Garantia no salvamento: Se o status for concluído, define a data para hoje
+    if (statusVal && statusVal.toLowerCase().includes('conclu')) {
+        dataVal = obterDataHojeLocal();
+    }
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
@@ -991,8 +1084,8 @@ async function salvarEdicaoTarefa(index) {
             body: JSON.stringify({
                 nome: nome,
                 tipo: document.getElementById('editTipoTarefa').value.trim() || null,
-                status: document.getElementById('editStatusTarefa').value || null,
-                data_para_termino: document.getElementById('editDataEsperadaTarefa').value || null,
+                status: statusVal,
+                data_para_termino: dataVal,
                 intg_id: document.getElementById('editIntegradorTarefa').value || null, 
                 descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
             })
@@ -1037,7 +1130,7 @@ async function adicionarTarefa() {
         if (!response.ok) throw new Error('Erro ao adicionar');
         await carregarTarefas();
         alert('✅ Tarefa adicionada!');
-		resetarFormularioAdicao();
+        resetarFormularioAdicao();
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
@@ -1057,7 +1150,7 @@ async function adicionarIntegrador() {
         if (!response.ok) throw new Error('Erro ao adicionar');
         await carregarIntegradores();
         alert('✅ Integrador adicionado!');
-		resetarFormularioAdicao();
+        resetarFormularioAdicao();
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
@@ -1101,10 +1194,8 @@ function obterBadgePrazo(dataISO) {
 }
 
 function resetarFormularioAdicao() {
-    // Retorna o select principal para o valor padrão
     document.getElementById('tipoElemento').value = '';
 
-    // Limpa os campos de entrada de Tarefa
     document.getElementById('nomeTarefa').value = '';
     document.getElementById('tipoTarefa').value = '';
     document.getElementById('statusTarefa').value = '';
@@ -1112,15 +1203,11 @@ function resetarFormularioAdicao() {
     document.getElementById('integradorTarefa').value = '';
     document.getElementById('descricaoTarefa').value = '';
 
-    // Limpa os campos de entrada de Integrador
     document.getElementById('nomeIntegrador').value = '';
     document.getElementById('ncpfIntegrador').value = '';
 
-    // Esconde os formulários abertos
     atualizarFormulario();
 }
-
-
 
 async function verificarEArquivarAutomatico() {
     const hoje = new Date();
@@ -1133,17 +1220,13 @@ async function verificarEArquivarAutomatico() {
         if (eConcluida && tarefa.data_para_termino) {
             const [ano, mes, dia] = tarefa.data_para_termino.split('T')[0].split('-');
             const dataTarefa = new Date(ano, mes - 1, dia);
-
-            // Calcula a diferença em dias entre a data atual e a data da tarefa
             const diffDias = Math.floor((hoje.getTime() - dataTarefa.getTime()) / (1000 * 60 * 60 * 24));
 
-            // Se for igual ou superior a 60 dias (2 meses)
             if (diffDias >= 60) {
                 try {
                     const integrador = dadosIntegradores.find(i => i.id === tarefa.intg_id);
                     const integradorNome = integrador ? integrador.nome : 'Não especificado';
 
-                    // 1. Move para o histórico trfsconcluidas
                     const resInsert = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
                         method: 'POST',
                         headers: {
@@ -1160,7 +1243,6 @@ async function verificarEArquivarAutomatico() {
                         })
                     });
 
-                    // 2. Remove da lista de tarefas ativas
                     if (resInsert.ok) {
                         await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
                             method: 'DELETE',
@@ -1175,9 +1257,7 @@ async function verificarEArquivarAutomatico() {
     }
 }
 
-
 function notificarSincronizacao() {
-    // 1. Atualiza o texto do horário no topo
     const ind = document.getElementById('syncIndicator');
     if (ind) {
         const agora = new Date();
@@ -1187,7 +1267,6 @@ function notificarSincronizacao() {
         ind.textContent = `🟢 Sincronizado às ${hora}:${min}:${seg}`;
     }
 
-    // 2. Dispara uma piscada verde suave nas bordas dos painéis
     const paineis = document.querySelectorAll('.painel-com-rotulo');
     paineis.forEach(p => p.classList.add('pulse-update'));
 
@@ -1195,9 +1274,6 @@ function notificarSincronizacao() {
         paineis.forEach(p => p.classList.remove('pulse-update'));
     }, 1000);
 }
-
-
-
 </script>
 </body>
 </html>
