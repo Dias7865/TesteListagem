@@ -1,367 +1,1279 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leitor de Dados - Árvores e Metais</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leitor de Dados - Matssa</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+	zoom: 75%;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+.container { max-width: 1250px; margin: 0 auto; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+h1 {
+    text-align: center; color: white; margin-bottom: 25px;
+    font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.section {
+    background: white; border-radius: 12px; padding: 30px;
+    margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.section-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;
+}
+h2 { color: #333; font-size: 1.8rem; }
+.btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
+    color: white; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 16px; font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-success { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); }
+.btn-warning { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
+.btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+.btn-secondary { background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%); }
 
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+.loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
+.error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
 
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+.imagem-login {
+    width: 100%;
+    max-width: 400px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 15px auto;
+}
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 15px;
-        }
+#secaoVerificacao {
+    max-width: 800px;
+    margin: 18vh auto 20px auto;
+    text-align: center;
+}
 
-        h2 {
-            color: #333;
-            font-size: 1.8rem;
-        }
+.verificacao-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    max-width: 400px;
+    margin: 15px auto 0 auto;
+}
+.verificacao-container input {
+    flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0;
+    border-radius: 8px; font-size: 16px;
+}
+.mensagem-resultado {
+    margin-top: 15px; padding: 15px 20px; border-radius: 8px;
+    font-size: 1.2rem; font-weight: bold; text-align: center; display: none;
+}
+.mensagem-sucesso { background: #e8f5e9; border: 2px solid #4caf50; color: #2e7d32; }
+.mensagem-erro { background: #fce4ec; border: 2px solid #f44336; color: #c62828; }
 
-        .btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+/* --- ESTRUTURA LAYOUT DA 1ª PÁGINA --- */
+.p1-topo {
+    display: grid; grid-template-columns: 1fr 200px; gap: 15px; margin-bottom: 15px; align-items: stretch;
+}
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
+.painel-com-rotulo {
+    background: white; border: 4px solid #1a1a1a; border-radius: 12px;
+    padding: 15px; display: flex; align-items: center; gap: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
 
-        .btn:active {
-            transform: translateY(0);
-        }
+.rotulo-vertical {
+    writing-mode: vertical-rl; transform: rotate(180deg); text-align: center;
+    font-weight: bold; font-size: 1.1rem; color: #1a1a1a;
+    border-left: 3px solid #1a1a1a; padding-left: 8px; white-space: nowrap;
+    text-transform: uppercase; letter-spacing: 1px;
+}
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+.grid-caixas-status, .grid-caixas-prazos {
+    display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start; flex: 1;
+}
 
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #667eea;
-            font-size: 1.1rem;
-        }
+.item-caixa-status, .item-caixa-prazo {
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 140px;
+}
 
-        .error {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
+.item-caixa-status .caixa-quantidade {
+    width: 100%; height: 105px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem; font-weight: bold; color: #ffffff; border-radius: 8px;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
+}
 
-        .cards-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
+.item-caixa-prazo .caixa-quantidade {
+    width: 120px; height: 120px; border: 4px solid #1a1a1a; background: #f9f9f9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.8rem; font-weight: bold; color: #ffffff; border-radius: 50%;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1); flex-shrink: 0;
+}
 
-        .card {
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            border-left: 4px solid #667eea;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+.nome-status-caixa, .nome-prazo-caixa {
+    margin-top: 8px; font-weight: bold; color: #333; text-align: center;
+    font-size: 0.9rem; text-transform: capitalize; line-height: 1.2;
+}
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
+.btn-p1-lateral {
+    border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
+    font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 15px; transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; height: 100%;
+}
+.btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
 
-        .card h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
-        }
+/* GRID DE 2 COLUNAS NA PÁGINA 1 */
+.p1-corpo {
+    display: grid; grid-template-columns: 1.8fr 1.4fr; gap: 15px; align-items: stretch;
+}
+.p1-corpo-esquerda { display: flex; flex-direction: column; gap: 15px; }
 
-        .card p {
-            color: #666;
-            margin: 8px 0;
-            line-height: 1.6;
-        }
+.container-lista-pendentes {
+    flex: 1; background: white; border: 4px solid #1a1a1a; border-radius: 12px;
+    padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); min-height: 250px;
+}
+.lista-vertical-pendentes {
+    display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;
+}
+.item-pendente {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 8px; font-size: 1rem; font-weight: bold;
+    color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
 
-        .card .label {
-            font-weight: bold;
-            color: #764ba2;
-        }
+/* VISUALIZAÇÃO DINÂMICA EM 2 COLUNAS IGUAIS */
+.grid-vis-dinamica {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
 
-        .badge {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-top: 8px;
-        }
+.container-vis-dinamica {
+    background: white; border: 4px solid #1a1a1a; border-radius: 12px;
+    padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    overflow: hidden; display: flex; flex-direction: column; height: 100%; min-height: 400px; max-height: 480px;
+}
+.vis-dinamica-titulo {
+    font-size: 1rem; font-weight: bold; text-align: center; margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 2px solid #eee; color: #1a1a1a;
+}
+.vis-dinamica-viewport { overflow: hidden; flex: 1; position: relative; }
+.vis-dinamica-track {
+    display: flex; flex-direction: column; gap: 15px;
+    animation: scrollUp var(--animation-duration-v, 20s) linear infinite;
+}
 
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
+.p1-titulo-periodo {
+    text-align: center;
+    color: white;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
 
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
+@keyframes scrollUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+.vis-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white; border-radius: 10px; padding: 12px; border: 2px solid #1a1a1a;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
+}
+.vis-card h4 { font-size: 1.05rem; margin-bottom: 6px; }
+.vis-card p { margin: 4px 0; }
 
-        .stat-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            text-align: center;
-        }
+/* --- ESTRUTURA DE LAYOUT DA 2ª PÁGINA --- */
+.app-layout {
+    display: grid; grid-template-columns: 1.4fr 1fr;
+    grid-template-areas:
+        "tarefas adicionar"
+        "tarefas integradores"
+        "concluidas concluidas";
+    gap: 20px; align-items: start;
+}
+.area-tarefas { grid-area: tarefas; }
+.area-adicionar { grid-area: adicionar; }
+.area-integradores { grid-area: integradores; }
+.area-concluidas { grid-area: concluidas; }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            display: block;
-        }
+@media (max-width: 900px) {
+    .p1-topo { grid-template-columns: 1fr; }
+    .p1-corpo { grid-template-columns: 1fr; }
+    .grid-vis-dinamica { grid-template-columns: 1fr; }
+    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores" "concluidas"; }
+}
 
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-    </style>
+.seletor-container { margin-bottom: 20px; }
+.seletor-container label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+.seletor-container select {
+    width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; background-color: white; cursor: pointer;
+}
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; font-family: inherit;
+}
+.form-group textarea { resize: vertical; min-height: 80px; }
+.detalhes-card { background: #f9f9f9; border-radius: 10px; padding: 25px; border-left: 4px solid #00730d; margin-top: 20px; }
+.detalhes-card h3 { color: #333; margin-bottom: 15px; font-size: 1.6rem; }
+.detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
+.detalhes-card .label { font-weight: bold; color: #764ba2; }
+.detalhes-card .badge { display: inline-block; background: #00730d; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px; }
+.status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+.status-concluido { background: #2196f3; color: white; }
+.status-em-progresso { background: #4caf50; color: white; }
+.status-aguardando { background: #ffc229; color: white; }
+.status-nao-iniciado { background: #4f0b06; color: white; }
+.status-faltam-dados { background: #00802D; color: white; }
+.status-reprovado { background: #757575; color: white; }
+.action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.action-buttons .btn { flex: 1; min-width: 150px; }
+
+.hidden { display: none !important; }
+
+.prazo-no-prazo { background: #4caf50; color: white; }
+.prazo-proximo  { background: #ff9800; color: white; }
+.prazo-limite   { background: #80004c; color: white; }
+.prazo-atrasado { background: #d32f2f; color: white; }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.active { display: flex; }
+.modal-card { background: white; border-radius: 12px; padding: 30px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #ffbd17; }
+.modal-close { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: #f0f0f0; border: none; border-radius: 50%; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { background: #f44336; color: white; }
+
+.sync-indicator {
+    text-align: right;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 8px;
+    font-weight: 600;
+    transition: opacity 0.3s ease;
+}
+
+.pulse-update {
+    animation: brilhoSuave 1s ease-in-out;
+}
+
+@keyframes brilhoSuave {
+    0% { border-color: #1a1a1a; }
+    50% { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
+    100% { border-color: #1a1a1a; }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌳 Leitor de Dados Supabase 🪨</h1>
+<div class="container">
 
-        <!-- Seção de Árvores -->
-        <div class="section">
-            <div class="section-header">
-                <h2>🌳 Árvores</h2>
-                <button class="btn" onclick="buscarArvores()" id="btnArvores">
-                    Carregar Árvores
-                </button>
+    <!-- SEÇÃO DE VERIFICAÇÃO DE SENHA -->
+    <div id="secaoVerificacao" class="section">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRejI_5r0R1whefw8AOCBIkthVQxw0BsLOLQcKl6lA25vZP0SCWo9s1EE2U&s=10" alt="Login" class="imagem-login">
+        <div class="section-header"><h2>🔍 Verificação</h2></div>
+        <p style="color:#666; margin-bottom:10px;">Digite o código e clique em Verificar para liberar o acesso:</p>
+        <div class="verificacao-container">
+            <input type="text" id="inputVerificacao" placeholder="Digite o código aqui..." autocomplete="off">
+            <button class="btn" onclick="verificarCodigo()" id="btnVerificar">Verificar</button>
+        </div>
+        <div id="mensagemResultado" class="mensagem-resultado"></div>
+    </div>
+
+    <!-- ==================== PÁGINA 1 ==================== -->
+    <div id="pagina1" class="hidden">
+        <h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
+        <div id="syncIndicator" class="sync-indicator">🟢 Sincronizado agora</div>
+        
+        <div class="p1-topo">
+            <div class="painel-com-rotulo">
+                <div class="rotulo-vertical">ESTADO DE CADA SERVIÇO</div>
+                <div id="gridStatusCaixas" class="grid-caixas-status">
+                    <div class="loading">Carregando contadores...</div>
+                </div>
             </div>
-            <div id="arvoresStats" class="stats" style="display: none;"></div>
-            <div id="arvoresLoading" class="loading" style="display: none;">
-                Carregando árvores...
-            </div>
-            <div id="arvoresError" class="error" style="display: none;"></div>
-            <div id="arvoresContainer" class="cards-container"></div>
-            <div id="arvoresEmpty" class="empty-state" style="display: none;">
-                Nenhuma árvore encontrada. Clique em "Carregar Árvores" para começar.
-            </div>
+            <button class="btn-p1-lateral" onclick="irParaPagina2()">
+                vai à 2ªpag ➔
+            </button>
         </div>
 
-        <!-- Seção de Metais -->
-        <div class="section">
-            <div class="section-header">
-                <h2>🪨 Metais</h2>
-                <button class="btn" onclick="buscarMetais()" id="btnMetais">
-                    Carregar Metais
-                </button>
+        <div class="p1-corpo">
+            <div class="p1-corpo-esquerda">
+                <div class="painel-com-rotulo">
+                    <div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
+                    <div id="gridPrazosCaixas" class="grid-caixas-prazos">
+                        <div class="loading">Carregando prazos...</div>
+                    </div>
+                </div>
+
+                <div class="container-lista-pendentes">
+                    <div id="listaPendentesVertical" class="lista-vertical-pendentes">
+                        <div class="loading">Carregando tarefas...</div>
+                    </div>
+                </div>
             </div>
-            <div id="metaisStats" class="stats" style="display: none;"></div>
-            <div id="metaisLoading" class="loading" style="display: none;">
-                Carregando metais...
-            </div>
-            <div id="metaisError" class="error" style="display: none;"></div>
-            <div id="metaisContainer" class="cards-container"></div>
-            <div id="metaisEmpty" class="empty-state" style="display: none;">
-                Nenhum metal encontrado. Clique em "Carregar Metais" para começar.
+
+            <!-- VISUALIZAÇÃO DINÂMICA DIVIDIDA EM 2 COLUNAS -->
+            <div class="grid-vis-dinamica">
+                <!-- Coluna 1: No Prazo / Prazo Próximo -->
+                <div class="container-vis-dinamica">
+                    <div class="vis-dinamica-titulo" style="color: #2e7d32;">
+                        🟢 Dentro do Prazo & Próximo
+                    </div>
+                    <div class="vis-dinamica-viewport">
+                        <div id="trackPrazoOk" class="vis-dinamica-track"></div>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Dia Limite / Atrasado -->
+                <div class="container-vis-dinamica">
+                    <div class="vis-dinamica-titulo" style="color: #c62828;">
+                        🔴 Prazo Limite & Atrasado
+                    </div>
+                    <div class="vis-dinamica-viewport">
+                        <div id="trackPrazoCritico" class="vis-dinamica-track"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Configuração do Supabase
-        const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN'; // Substitua pela sua chave anon
+    <!-- ==================== PÁGINA 2 ==================== -->
+    <div id="pagina2" class="hidden">
+        <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="irParaPagina1()">⬅️ Voltar à 1ª Página</button>
+        </div>
 
-        // Função genérica para fazer requisições ao Supabase
-        async function buscarDados(tabela) {
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
+        <div id="conteudoProtegido" class="app-layout">
+            <!-- Tarefas Em Andamento -->
+            <div id="secaoTarefas" class="section area-tarefas">
+                <div class="section-header"><h2>📌 Tarefas em Andamento</h2></div>
+                <div class="seletor-container">
+                    <label for="selectTarefas">Selecione uma tarefa:</label>
+                    <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
+                        <option value="">-- Escolha uma tarefa --</option>
+                    </select>
+                </div>
+                <div id="tarefasLoading" class="loading" style="display:none;">Carregando tarefas...</div>
+                <div id="tarefasError" class="error" style="display:none;"></div>
+                <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
+            </div>
+
+            <!-- Adicionar Elemento -->
+            <div id="secaoAdicionar" class="section area-adicionar">
+                <div class="section-header"><h2>➕ Adicionar Elemento</h2></div>
+                <p style="color:#666; margin-bottom:20px;">Crie um novo elemento para uma das listas existentes:</p>
+                <div class="form-group">
+                    <label for="tipoElemento">Tipo de Elemento:</label>
+                    <select id="tipoElemento" onchange="atualizarFormulario()">
+                        <option value="">-- Selecione o tipo --</option>
+                        <option value="tarefa">📌 Tarefa</option>
+                        <option value="integrador">🛠️ Integrador</option>
+                    </select>
+                </div>
+
+                <!-- Form Tarefa -->
+                <div id="formTarefa" class="hidden">
+                    <div class="form-group"><label for="nomeTarefa">Nome da Tarefa:</label><input type="text" id="nomeTarefa" placeholder="Ex: CASA 10"></div>
+                    <div class="form-group"><label for="tipoTarefa">Tipo:</label><input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar"></div>
+                    <div class="form-group">
+                        <label for="statusTarefa">Status:</label>
+                        <select id="statusTarefa">
+                            <option value="">-- Selecione o status --</option>
+                            <option value="concluído">✅ Concluído</option>
+                            <option value="em progresso">⏩ Em progresso</option>
+                            <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
+                            <option value="faltam dados">🗂️ Faltam dados necessários</option>
+                            <option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
+                            <option value="não iniciado">❌ Não iniciado</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
+                    <div class="form-group"><label for="integradorTarefa">Integrador Associado:</label><select id="integradorTarefa"><option value="">-- Selecione o integrador --</option></select></div>
+                    <div class="form-group"><label for="descricaoTarefa">Descrição:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
+                    <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
+                </div>
+
+                <!-- Form Integrador -->
+                <div id="formIntegrador" class="hidden">
+                    <div class="form-group"><label for="nomeIntegrador">Nome do Integrador:</label><input type="text" id="nomeIntegrador" placeholder="Ex: João"></div>
+                    <div class="form-group"><label for="ncpfIntegrador">nº do CPF:</label><input type="text" id="ncpfIntegrador" placeholder="Ex: 123456789" maxlength="15"></div>
+                    <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
+                </div>
+
+                <div id="mensagemAdicionar" style="margin-top:15px;"></div>
+            </div>
+
+            <!-- Integradores -->
+            <div id="secaoIntegradores" class="section area-integradores">
+                <div class="section-header"><h2>🛠️ Integradores</h2></div>
+                <div class="seletor-container">
+                    <label for="selectIntegradores">Selecione um integrador:</label>
+                    <select id="selectIntegradores" onchange="mostrarDetalhesIntegrador()">
+                        <option value="">-- Escolha um integrador --</option>
+                    </select>
+                </div>
+                <div id="integradoresLoading" class="loading" style="display:none;">Carregando integradores...</div>
+                <div id="integradoresError" class="error" style="display:none;"></div>
+                <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
+            </div>
+
+            <!-- Tarefas Concluídas (Tabela trfsconcluidas) -->
+            <div id="secaoConcluidas" class="section area-concluidas">
+                <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
+                <div class="seletor-container">
+                    <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
+                    <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
+                        <option value="">-- Escolha uma tarefa concluída --</option>
+                    </select>
+                </div>
+                <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Tarefa -->
+<div id="modalEditTarefa" class="modal-overlay">
+    <div class="modal-card">
+        <button class="modal-close" onclick="fecharModalEditTarefa()">✕</button>
+        <div id="conteudoModalEditTarefa"></div>
+    </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
+
+let dadosTarefas = [];
+let dadosIntegradores = [];
+let dadosIntensidades = [];
+let dadosTrfsConcluidas = [];
+
+function irParaPagina2() {
+    document.getElementById('pagina1').classList.add('hidden');
+    document.getElementById('pagina2').classList.remove('hidden');
+}
+
+function irParaPagina1() {
+    document.getElementById('pagina2').classList.add('hidden');
+    document.getElementById('pagina1').classList.remove('hidden');
+    carregarPagina1();
+}
+
+// --- VERIFICAÇÃO DE CÓDIGO ---
+async function verificarCodigo() {
+    const input = document.getElementById('inputVerificacao');
+    const texto = input.value;
+    const mensagem = document.getElementById('mensagemResultado');
+    const btn = document.getElementById('btnVerificar');
+
+    if (!texto) {
+        mensagem.textContent = '⚠️ Por favor, digite algo!';
+        mensagem.className = 'mensagem-resultado mensagem-erro';
+        mensagem.style.display = 'block';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/verificar_senha`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ texto_inserido: texto })
+        });
+
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
+        const resultado = await response.json();
+
+        if (resultado === true) {
+            mensagem.textContent = '✅ Tudo certo — acesso liberado!';
+            mensagem.className = 'mensagem-resultado mensagem-sucesso';
+            mensagem.style.display = 'block';
+            setTimeout(async () => {
+                document.getElementById('secaoVerificacao').classList.add('hidden');
+                document.getElementById('pagina1').classList.remove('hidden');
+                await carregarDadosIniciais();
+            }, 800);
+        } else {
+            mensagem.textContent = '❌ Deu Errado';
+            mensagem.className = 'mensagem-resultado mensagem-erro';
+            mensagem.style.display = 'block';
+        }
+    } catch (err) {
+        mensagem.textContent = '❌ Erro ao verificar no servidor!';
+        mensagem.className = 'mensagem-resultado mensagem-erro';
+        mensagem.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verificar';
+    }
+}
+
+document.getElementById('inputVerificacao').addEventListener('keypress', e => {
+    if (e.key === 'Enter') verificarCodigo();
+});
+
+// --- CARREGAMENTO DE DADOS ---
+async function carregarDadosIniciais() {
+    await carregarIntegradores();
+    await carregarTarefas();
+    await carregarTrfsConcluidas();
+    await carregarPagina1();
+    await verificarEArquivarAutomatico();
+    
+    setInterval(async () => {
+        await carregarTarefas();
+        await verificarEArquivarAutomatico();
+        await carregarTrfsConcluidas();
+        await carregarPagina1();
+    }, 15000);
+}
+
+async function carregarPagina1() {
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/rpc/calcular_intensidades`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        
+        const resInt = await fetch(`${SUPABASE_URL}/rest/v1/intensidades?select=*&order=id.asc`, {
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        dadosIntensidades = await resInt.json();
+        
+        renderizarCaixasStatus();
+        renderizarCaixasPrazos();
+        renderizarListaPendentes();
+        renderizarVisualizacaoDinamicaVertical();
+        
+        notificarSincronizacao();
+    } catch (e) {
+        console.error('Erro ao atualizar página 1:', e);
+    }
+}
+
+function getCorPorStatus(status) {
+    if (!status) return { bg: '#f9f9f9', text: '#1a1a1a' };
+    const s = status.toLowerCase();
+    if (s.includes('conclu')) return { bg: '#2196f3', text: '#ffffff' };
+    if (s.includes('progresso')) return { bg: '#ff9800', text: '#ffffff' };
+    if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
+    if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
+    if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' };
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
+    return { bg: '#e0e0e0', text: '#333333' };
+}
+
+function getEmojiStatus(status) {
+    if (!status) return '❌';
+    const s = status.toLowerCase();
+    if (s.includes('conclu')) return '✅';
+    if (s.includes('progresso')) return '⏩';
+    if (s.includes('aguardando')) return '⏳';
+    if (s.includes('faltam')) return '🗂️';
+    if (s.includes('reprovado')) return '❕';
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return '❌';
+    return '📌';
+}
+
+function getCorPrazo(dataISO) {
+    if (!dataISO) return '#757575';
+    const [ano, mes, dia] = dataISO.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDias > 8) return '#4caf50';
+    if (diffDias >= 2) return '#ffc229';
+    if (diffDias >= 0) return '#80004c';
+    return '#d32f2f';
+}
+
+function renderizarCaixasStatus() {
+    const container = document.getElementById('gridStatusCaixas');
+    if (!dadosIntensidades || dadosIntensidades.length === 0) {
+        container.innerHTML = '<p>Nenhuma intensidade cadastrada.</p>';
+        return;
+    }
+
+    const intensidadesFiltradas = dadosIntensidades.filter(item => 
+        !item.status_nome.toLowerCase().includes('atrasad')
+    );
+
+    container.innerHTML = intensidadesFiltradas.map(item => {
+        const cores = getCorPorStatus(item.status_nome);
+        const emoji = getEmojiStatus(item.status_nome);
+        return `
+            <div class="item-caixa-status">
+                <div class="caixa-quantidade" style="background-color: ${cores.bg}; color: ${cores.text};">
+                    ${item.valor_intensidade}
+                </div>
+                <div class="nome-status-caixa">${emoji} ${item.status_nome}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderizarCaixasPrazos() {
+    const container = document.getElementById('gridPrazosCaixas');
+    
+    const contadoresPrazos = {
+        'dentro do prazo': 0,
+        'prazo próximo': 0,
+        'no limite': 0,
+        'atrasado': 0
+    };
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    dadosTarefas.forEach(t => {
+        const s = (t.status || '').toLowerCase();
+        if (s !== 'concluído' && s !== 'concluido' && t.data_para_termino) {
+            const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+            const dataTermino = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias > 8) contadoresPrazos['dentro do prazo']++;
+            else if (diffDias >= 2) contadoresPrazos['prazo próximo']++;
+            else if (diffDias >= 0) contadoresPrazos['no limite']++;
+            else contadoresPrazos['atrasado']++;
+        }
+    });
+
+    const listaPrazos = [
+        { label: 'Dentro Do Prazo', qtd: contadoresPrazos['dentro do prazo'], bg: '#4caf50' },
+        { label: 'Prazo Próximo', qtd: contadoresPrazos['prazo próximo'], bg: '#ffc229' },
+        { label: 'No Limite', qtd: contadoresPrazos['no limite'], bg: '#80004c' },
+        { label: 'Atrasado', qtd: contadoresPrazos['atrasado'], bg: '#d32f2f' }
+    ];
+
+    container.innerHTML = listaPrazos.map(item => `
+        <div class="item-caixa-prazo">
+            <div class="caixa-quantidade" style="background-color: ${item.bg}; color: #ffffff;">
+                ${item.qtd}
+            </div>
+            <div class="nome-prazo-caixa">${item.label}</div>
+        </div>
+    `).join('');
+}
+
+/* ATUALIZAÇÃO 2: MOSTRA TAREFAS PENDENTES E CONCLUÍDAS COM RÓTULOS PERSONALIZADOS */
+function renderizarListaPendentes() {
+    const container = document.getElementById('listaPendentesVertical');
+
+    if (!dadosTarefas || dadosTarefas.length === 0) {
+        container.innerHTML = '<p style="color:#666; text-align:center;">🎉 Nenhuma tarefa cadastrada no momento!</p>';
+        return;
+    }
+
+    container.innerHTML = dadosTarefas.map(t => {
+        const s = (t.status || '').toLowerCase();
+        const isConcluido = s.includes('conclu');
+        const emoji = getEmojiStatus(t.status);
+        
+        const bgCor = isConcluido ? '#2196f3' : getCorPrazo(t.data_para_termino);
+        const dataFormatada = formatarData(t.data_para_termino);
+        const rotuloData = isConcluido ? 'Terminado' : 'Até';
+
+        return `
+            <div class="item-pendente" style="background-color: ${bgCor};">
+                <div class="item-pendente-esquerda">
+                    <span>${emoji}</span>
+                    <span>${t.nome}</span>
+                </div>
+                <span>${rotuloData}: ${dataFormatada}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function getTextoStatusSemFundo(status) {
+    if (!status) return 'Não definido';
+    const s = status.toLowerCase();
+    if (s.includes('conclu')) return `✅ ${status}`;
+    if (s.includes('progresso')) return `⏩ ${status}`;
+    if (s.includes('reprovado')) return `❕ ${status}`;
+    if (s.includes('equatorial')) return `⏳ ${status}`;
+    if (s.includes('faltam')) return `🗂️ ${status}`;
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return `❌ ${status}`;
+    return status;
+}
+
+function getTextoPrazoSemFundo(dataISO) {
+    if (!dataISO) return '';
+    const [ano, mes, dia] = dataISO.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDias > 8) return '🟢 No prazo';
+    if (diffDias >= 2) return '⚠️ PRAZO PRÓXIMO';
+    if (diffDias >= 0) return '🚨 DIA LIMITE';
+    return '❌ ATRASADO';
+}
+
+function renderizarVisualizacaoDinamicaVertical() {
+    const trackOk = document.getElementById('trackPrazoOk');
+    const trackCritico = document.getElementById('trackPrazoCritico');
+
+    if (!trackOk || !trackCritico) return;
+
+    if (!dadosTarefas || dadosTarefas.length === 0) {
+        trackOk.innerHTML = '<p style="text-align:center; color:#666; padding:10px;">Sem dados.</p>';
+        trackCritico.innerHTML = '<p style="text-align:center; color:#666; padding:10px;">Sem dados.</p>';
+        return;
+    }
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const pendentes = dadosTarefas.filter(t => {
+        const s = (t.status || '').toLowerCase();
+        return s !== 'concluído' && s !== 'concluido';
+    });
+
+    const cardsOk = [];
+    const cardsCritico = [];
+
+    pendentes.forEach(t => {
+        const cardHtml = `
+            <div class="vis-card">
+                <h4>${t.nome}</h4>
+                <p><b>Status:</b> ${getTextoStatusSemFundo(t.status)}</p>
+                <p><b>Data:</b> ${formatarData(t.data_para_termino)} - ${getTextoPrazoSemFundo(t.data_para_termino)}</p>
+            </div>
+        `;
+
+        if (t.data_para_termino) {
+            const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+            const dataTermino = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias >= 2) {
+                cardsOk.push(cardHtml);
+            } else {
+                cardsCritico.push(cardHtml);
+            }
+        } else {
+            cardsOk.push(cardHtml);
+        }
+    });
+
+    if (cardsOk.length > 0) {
+        const html = cardsOk.join('');
+        trackOk.innerHTML = html + html;
+        const tempo = Math.max(10, cardsOk.length * 4);
+        trackOk.style.setProperty('--animation-duration-v', `${tempo}s`);
+    } else {
+        trackOk.innerHTML = '<p style="text-align:center; color:#666; padding:15px; font-size:0.85rem;">Sem tarefas regulares.</p>';
+    }
+
+    if (cardsCritico.length > 0) {
+        const html = cardsCritico.join('');
+        trackCritico.innerHTML = html + html;
+        const tempo = Math.max(10, cardsCritico.length * 4);
+        trackCritico.style.setProperty('--animation-duration-v', `${tempo}s`);
+    } else {
+        trackCritico.innerHTML = '<p style="text-align:center; color:#666; padding:15px; font-size:0.85rem;">Sem tarefas críticas ou atrasadas.</p>';
+    }
+}
+
+// --- BUSCAR DADOS GENÉRICOS ---
+async function buscarDados(tabela) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    return await response.json();
+}
+
+async function carregarTarefas() {
+    const select = document.getElementById('selectTarefas');
+    try {
+        dadosTarefas = await buscarDados('tarefas');
+        select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
+        dadosTarefas.forEach((t, i) => {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = t.nome;
+            select.appendChild(opt);
+        });
+    } catch (err) { console.error(err); }
+}
+
+async function carregarIntegradores() {
+    const select = document.getElementById('selectIntegradores');
+    try {
+        dadosIntegradores = await buscarDados('integradores');
+        select.innerHTML = '<option value="">-- Escolha um integrador --</option>';
+        dadosIntegradores.forEach((i, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx; opt.textContent = i.nome;
+            select.appendChild(opt);
+        });
+        popularSelectIntegrador('integradorTarefa');
+    } catch (err) { console.error(err); }
+}
+
+// --- GERENCIAMENTO DE TRFSCONCLUIDAS ---
+async function carregarTrfsConcluidas() {
+    const select = document.getElementById('selectTrfsConcluidas');
+    try {
+        dadosTrfsConcluidas = await buscarDados('trfsconcluidas');
+        select.innerHTML = '<option value="">-- Escolha uma tarefa concluída --</option>';
+        dadosTrfsConcluidas.forEach((item, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `${item.nome} (${formatarData(item.data_finalizado)})`;
+            select.appendChild(opt);
+        });
+    } catch (err) { console.error(err); }
+}
+
+function mostrarDetalhesTrfConcluida() {
+    const select = document.getElementById('selectTrfsConcluidas');
+    const div = document.getElementById('detalhesTrfConcluida');
+    const idx = select.value;
+    if (idx === '') { div.style.display = 'none'; return; }
+
+    const tc = dadosTrfsConcluidas[idx];
+    div.innerHTML = `
+        <h3>${tc.nome}</h3>
+        <p><span class="label">Tipo:</span> ${tc.tipo || 'Não informado'}</p>
+        <p><span class="label">Integrador responsável:</span> <span class="badge" style="background:#00bcd4;">👤 ${tc.intg_fz || 'N/A'}</span></p>
+        <p><span class="label">Descrição:</span> ${tc.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data de Finalização:</span> ${formatarData(tc.data_finalizado)}</p>
+        <div class="action-buttons">
+            <button class="btn btn-danger" onclick="removerTrfConcluida(${idx})">🗑️ Remover do Histórico</button>
+        </div>
+    `;
+    div.style.display = 'block';
+}
+
+async function concluirEArquivarTarefa(index) {
+    const tarefa = dadosTarefas[index];
+    const integrador = dadosIntegradores.find(i => i.id === tarefa.intg_id);
+    const integradorNome = integrador ? integrador.nome : 'Não especificado';
+
+    if (!confirm(`Deseja marcar a tarefa "${tarefa.nome}" como concluída e movê-la para o histórico?`)) return;
+
+    try {
+        const resInsert = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: tarefa.nome,
+                tipo: tarefa.tipo,
+                descricao: tarefa.descricao,
+                intg_fz: integradorNome,
+                data_finalizado: obterDataHojeLocal()
+            })
+        });
+
+        if (!resInsert.ok) throw new Error('Erro ao arquivar tarefa concluída.');
+
+        await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+
+        document.getElementById('detalhesTarefa').style.display = 'none';
+        await carregarTarefas();
+        await carregarTrfsConcluidas();
+        await carregarPagina1();
+        alert('✅ Tarefa concluída e arquivada com sucesso!');
+    } catch (err) {
+        alert(`❌ Erro: ${err.message}`);
+    }
+}
+
+async function removerTrfConcluida(index) {
+    const tc = dadosTrfsConcluidas[index];
+    if (!confirm(`Remover "${tc.nome}" do histórico de concluídas?`)) return;
+
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas?id=eq.${tc.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        await carregarTrfsConcluidas();
+        document.getElementById('detalhesTrfConcluida').style.display = 'none';
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+function popularSelectIntegrador(selectId, valorAtual = '') {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    select.innerHTML = '<option value="">-- Selecione o integrador --</option>';
+    dadosIntegradores.forEach(integrador => {
+        const opt = document.createElement('option');
+        opt.value = integrador.id;
+        opt.textContent = integrador.nome;
+        if (valorAtual && valorAtual === integrador.id) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
+
+function getIntegradorBadge(integradorId) {
+    const integrador = dadosIntegradores.find(i => i.id === integradorId);
+    if (!integrador) return '<span class="badge" style="background:#9e9e9e;">Não definido</span>';
+    return `<span class="badge" style="background:#00bcd4;">👤 ${integrador.nome}</span>`;
+}
+
+function formatarData(dataISO) {
+    if (!dataISO) return 'Não definida';
+    // Pega apenas a parte da data YYYY-MM-DD e divide os blocos
+    const partes = dataISO.split('T')[0].split('-');
+    if (partes.length < 3) return dataISO;
+    
+    const [ano, mes, dia] = partes;
+    return `${dia}/${mes}/${ano}`;
+}
+
+function obterDataHojeLocal() {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+}
+
+
+function getStatusBadge(status) {
+    if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
+    const s = status.toLowerCase();
+    if (s === 'concluído' || s === 'concluido') return `<span class="status-badge status-concluido">✅ ${status}</span>`;
+    if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
+    if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
+    if (s === 'reprovado') return `<span class="status-badge status-reprovado">❕ ${status}</span>`;
+    if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️ ${status}</span>`;
+    return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
+}
+
+function mostrarDetalhesTarefa() {
+    const select = document.getElementById('selectTarefas');
+    const div = document.getElementById('detalhesTarefa');
+    const idx = select.value;
+    if (idx === '') { div.style.display = 'none'; return; }
+
+    const t = dadosTarefas[idx];
+    div.innerHTML = `
+        <h3>${t.nome}</h3>
+        <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
+        <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
+        <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
+        <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
+        <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
+            <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
+            <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
+        </div>
+    `;
+    div.style.display = 'block';
+}
+
+function mostrarDetalhesIntegrador() {
+    const select = document.getElementById('selectIntegradores');
+    const div = document.getElementById('detalhesIntegrador');
+    const idx = select.value;
+    if (idx === '') { div.style.display = 'none'; return; }
+
+    const i = dadosIntegradores[idx];
+    div.innerHTML = `
+        <h3>${i.nome}</h3>
+        <p><span class="label">nº do CPF:</span> <span class="badge">${i.integrador_cpf || 'N/A'}</span></p>
+        <p><span class="label">Criado em:</span> ${new Date(i.created_at).toLocaleString('pt-BR')}</p>
+        <div class="action-buttons">
+            <button class="btn btn-danger" onclick="removerIntegrador(${idx})">🗑️ Remover Elemento</button>
+        </div>
+    `;
+    div.style.display = 'block';
+}
+
+/* ATUALIZAÇÃO 1: MONITORANDO MUDANÇA DE STATUS PARA MUDAR DATA AUTOMATICAMENTE */
+function abrirEdicaoTarefa(index) {
+    const tarefa = dadosTarefas[index];
+    const modalContent = document.getElementById('conteudoModalEditTarefa');
+    const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
+
+    modalContent.innerHTML = `
+        <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">✏️ Editando: ${tarefa.nome}</h3>
+        <div class="form-group"><label>Nome:</label><input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}"></div>
+        <div class="form-group"><label>Tipo:</label><input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}"></div>
+        <div class="form-group">
+            <label>Status:</label>
+            <select id="editStatusTarefa">
+                <option value="concluído" ${tarefa.status === 'concluído' ? 'selected' : ''}>✅ Concluído</option>
+                <option value="em progresso" ${tarefa.status === 'em progresso' ? 'selected' : ''}>⏩ Em progresso</option>
+                <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
+                <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️ Faltam dados necessários</option>
+                <option value="reprovado pela equatorial" ${tarefa.status === 'reprovado pela equatorial' ? 'selected' : ''}>❕ Reprovado pela Equatorial</option>
+                <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Data Esperada:</label><input type="date" id="editDataEsperadaTarefa" value="${dataISO}"></div>
+        <div class="form-group"><label>Integrador:</label><select id="editIntegradorTarefa"></select></div>
+        <div class="form-group"><label>Descrição:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
+            <button class="btn btn-secondary" onclick="fecharModalEditTarefa()">❌ Cancelar</button>
+        </div>
+    `;
+    popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
+
+    // Evento em tempo real: ao alterar para "concluído", preenche a data de hoje no campo de data
+    document.getElementById('editStatusTarefa').addEventListener('change', function() {
+        if (this.value.toLowerCase().includes('conclu')) {
+            const hoje = obterDataHojeLocal();
+            document.getElementById('editDataEsperadaTarefa').value = hoje;
+        }
+    });
+
+    document.getElementById('modalEditTarefa').classList.add('active');
+}
+
+function fecharModalEditTarefa() {
+    document.getElementById('modalEditTarefa').classList.remove('active');
+}
+
+async function salvarEdicaoTarefa(index) {
+    const tarefa = dadosTarefas[index];
+    const nome = document.getElementById('editNomeTarefa').value.trim();
+    if (!nome) return;
+
+    let statusVal = document.getElementById('editStatusTarefa').value || null;
+    let dataVal = document.getElementById('editDataEsperadaTarefa').value || null;
+
+    // Garantia no salvamento: Se o status for concluído, define a data para hoje
+    if (statusVal && statusVal.toLowerCase().includes('conclu')) {
+        dataVal = obterDataHojeLocal();
+    }
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'PATCH',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            body: JSON.stringify({
+                nome: nome,
+                tipo: document.getElementById('editTipoTarefa').value.trim() || null,
+                status: statusVal,
+                data_para_termino: dataVal,
+                intg_id: document.getElementById('editIntegradorTarefa').value || null, 
+                descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
+            })
+        });
+
+        if (!response.ok) throw new Error('Erro ao atualizar');
+        const atualizada = await response.json();
+        dadosTarefas[index] = atualizada[0];
+        mostrarDetalhesTarefa();
+        fecharModalEditTarefa();
+        await carregarTarefas();
+        await carregarPagina1();
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+// --- ADICIONAR TAREFAS / INTEGRADORES ---
+function atualizarFormulario() {
+    const tipo = document.getElementById('tipoElemento').value;
+    document.getElementById('formTarefa').classList.add('hidden');
+    document.getElementById('formIntegrador').classList.add('hidden');
+    if (tipo === 'tarefa') document.getElementById('formTarefa').classList.remove('hidden');
+    else if (tipo === 'integrador') document.getElementById('formIntegrador').classList.remove('hidden');
+}
+
+async function adicionarTarefa() {
+    const nome = document.getElementById('nomeTarefa').value.trim();
+    if (!nome) return alert('⚠️ Digite o nome da tarefa');
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            body: JSON.stringify({
+                nome: nome,
+                tipo: document.getElementById('tipoTarefa').value.trim() || null,
+                status: document.getElementById('statusTarefa').value || null,
+                data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
+                intg_id: document.getElementById('integradorTarefa').value || null, 
+                descricao: document.getElementById('descricaoTarefa').value.trim() || null
+            })
+        });
+        if (!response.ok) throw new Error('Erro ao adicionar');
+        await carregarTarefas();
+        alert('✅ Tarefa adicionada!');
+        resetarFormularioAdicao();
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+async function adicionarIntegrador() {
+    const nome = document.getElementById('nomeIntegrador').value.trim();
+    if (!nome) return alert('⚠️ Digite o nome do integrador');
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/integradores`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            body: JSON.stringify({
+                nome: nome,
+                integrador_cpf: document.getElementById('ncpfIntegrador').value.trim() || null
+            })
+        });
+        if (!response.ok) throw new Error('Erro ao adicionar');
+        await carregarIntegradores();
+        alert('✅ Integrador adicionado!');
+        resetarFormularioAdicao();
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+async function removerTarefa(index) {
+    const t = dadosTarefas[index];
+    if (!confirm(`Remover "${t.nome}"?`)) return;
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${t.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        await carregarTarefas();
+        document.getElementById('detalhesTarefa').style.display = 'none';
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+async function removerIntegrador(index) {
+    const i = dadosIntegradores[index];
+    if (!confirm(`Remover "${i.nome}"?`)) return;
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/integradores?id=eq.${i.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        await carregarIntegradores();
+        document.getElementById('detalhesIntegrador').style.display = 'none';
+    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+}
+
+function obterBadgePrazo(dataISO) {
+    if (!dataISO) return '';
+    const [ano, mes, dia] = dataISO.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDias > 8) return '<span class="status-badge prazo-no-prazo">🟢 No prazo</span>';
+    if (diffDias > 1) return '<span class="status-badge prazo-proximo">⚠️ PRAZO PRÓXIMO</span>';
+    if (diffDias >= 0) return '<span class="status-badge prazo-limite">🚨 DIA LIMITE</span>';
+    return '<span class="status-badge prazo-atrasado">❌ ATRASADO</span>';
+}
+
+function resetarFormularioAdicao() {
+    document.getElementById('tipoElemento').value = '';
+
+    document.getElementById('nomeTarefa').value = '';
+    document.getElementById('tipoTarefa').value = '';
+    document.getElementById('statusTarefa').value = '';
+    document.getElementById('dataEsperadaTarefa').value = '';
+    document.getElementById('integradorTarefa').value = '';
+    document.getElementById('descricaoTarefa').value = '';
+
+    document.getElementById('nomeIntegrador').value = '';
+    document.getElementById('ncpfIntegrador').value = '';
+
+    atualizarFormulario();
+}
+
+async function verificarEArquivarAutomatico() {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    for (const tarefa of dadosTarefas) {
+        const status = (tarefa.status || '').toLowerCase();
+        const eConcluida = status.includes('conclu');
+
+        if (eConcluida && tarefa.data_para_termino) {
+            const [ano, mes, dia] = tarefa.data_para_termino.split('T')[0].split('-');
+            const dataTarefa = new Date(ano, mes - 1, dia);
+            const diffDias = Math.floor((hoje.getTime() - dataTarefa.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias >= 60) {
+                try {
+                    const integrador = dadosIntegradores.find(i => i.id === tarefa.intg_id);
+                    const integradorNome = integrador ? integrador.nome : 'Não especificado';
+
+                    const resInsert = await fetch(`${SUPABASE_URL}/rest/v1/trfsconcluidas`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            nome: tarefa.nome,
+                            tipo: tarefa.tipo,
+                            descricao: tarefa.descricao,
+                            intg_fz: integradorNome,
+                            data_finalizado: tarefa.data_para_termino.split('T')[0]
+                        })
+                    });
+
+                    if (resInsert.ok) {
+                        await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+                            method: 'DELETE',
+                            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                        });
                     }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erro na requisição: ${response.status}`);
+                } catch (err) {
+                    console.error(`Erro ao arquivar tarefa ID ${tarefa.id}:`, err);
                 }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error(`Erro ao buscar ${tabela}:`, error);
-                throw error;
             }
         }
+    }
+}
 
-        // Função para buscar e exibir árvores
-        async function buscarArvores() {
-            const loading = document.getElementById('arvoresLoading');
-            const error = document.getElementById('arvoresError');
-            const container = document.getElementById('arvoresContainer');
-            const empty = document.getElementById('arvoresEmpty');
-            const stats = document.getElementById('arvoresStats');
-            const btn = document.getElementById('btnArvores');
+function notificarSincronizacao() {
+    const ind = document.getElementById('syncIndicator');
+    if (ind) {
+        const agora = new Date();
+        const hora = String(agora.getHours()).padStart(2, '0');
+        const min = String(agora.getMinutes()).padStart(2, '0');
+        const seg = String(agora.getSeconds()).padStart(2, '0');
+        ind.textContent = `🟢 Sincronizado às ${hora}:${min}:${seg}`;
+    }
 
-            // Resetar estados
-            error.style.display = 'none';
-            container.innerHTML = '';
-            empty.style.display = 'none';
-            stats.style.display = 'none';
-            loading.style.display = 'block';
-            btn.disabled = true;
+    const paineis = document.querySelectorAll('.painel-com-rotulo');
+    paineis.forEach(p => p.classList.add('pulse-update'));
 
-            try {
-                const arvores = await buscarDados('arvores');
-                loading.style.display = 'none';
-
-                if (arvores.length === 0) {
-                    empty.style.display = 'block';
-                } else {
-                    // Mostrar estatísticas
-                    stats.innerHTML = `
-                        <div class="stat-box">
-                            <span class="stat-number">${arvores.length}</span>
-                            <span class="stat-label">Árvores Encontradas</span>
-                        </div>
-                    `;
-                    stats.style.display = 'flex';
-
-                    // Criar cards
-                    arvores.forEach(arvore => {
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.innerHTML = `
-                            <h3>${arvore.nome}</h3>
-                            <p><span class="label">Tipo:</span> ${arvore.tipo || 'Não informado'}</p>
-                            <p><span class="label">Descrição:</span> ${arvore.descricao || 'Sem descrição'}</p>
-                            <p><span class="label">ID:</span> <code>${arvore.id}</code></p>
-                            <p><span class="label">Criado em:</span> ${new Date(arvore.created_at).toLocaleString('pt-BR')}</p>
-                        `;
-                        container.appendChild(card);
-                    });
-                }
-            } catch (err) {
-                loading.style.display = 'none';
-                error.textContent = `❌ Erro ao carregar árvores: ${err.message}`;
-                error.style.display = 'block';
-            } finally {
-                btn.disabled = false;
-            }
-        }
-
-        // Função para buscar e exibir metais
-        async function buscarMetais() {
-            const loading = document.getElementById('metaisLoading');
-            const error = document.getElementById('metaisError');
-            const container = document.getElementById('metaisContainer');
-            const empty = document.getElementById('metaisEmpty');
-            const stats = document.getElementById('metaisStats');
-            const btn = document.getElementById('btnMetais');
-
-            // Resetar estados
-            error.style.display = 'none';
-            container.innerHTML = '';
-            empty.style.display = 'none';
-            stats.style.display = 'none';
-            loading.style.display = 'block';
-            btn.disabled = true;
-
-            try {
-                const metais = await buscarDados('metais');
-                loading.style.display = 'none';
-
-                if (metais.length === 0) {
-                    empty.style.display = 'block';
-                } else {
-                    // Mostrar estatísticas
-                    stats.innerHTML = `
-                        <div class="stat-box">
-                            <span class="stat-number">${metais.length}</span>
-                            <span class="stat-label">Metais Encontrados</span>
-                        </div>
-                    `;
-                    stats.style.display = 'flex';
-
-                    // Criar cards
-                    metais.forEach(metal => {
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.innerHTML = `
-                            <h3>${metal.nome}</h3>
-                            <p><span class="label">Símbolo Químico:</span> <span class="badge">${metal.simbolo_quimico || 'N/A'}</span></p>
-                            <p><span class="label">Descrição:</span> ${metal.descricao || 'Sem descrição'}</p>
-                            <p><span class="label">ID:</span> <code>${metal.id}</code></p>
-                            <p><span class="label">Criado em:</span> ${new Date(metal.created_at).toLocaleString('pt-BR')}</p>
-                        `;
-                        container.appendChild(card);
-                    });
-                }
-            } catch (err) {
-                loading.style.display = 'none';
-                error.textContent = `❌ Erro ao carregar metais: ${err.message}`;
-                error.style.display = 'block';
-            } finally {
-                btn.disabled = false;
-            }
-        }
-
-        // Mostrar estado inicial vazio
-        document.getElementById('arvoresEmpty').style.display = 'block';
-        document.getElementById('metaisEmpty').style.display = 'block';
-    </script>
+    setTimeout(() => {
+        paineis.forEach(p => p.classList.remove('pulse-update'));
+    }, 1000);
+}
+</script>
 </body>
 </html>
