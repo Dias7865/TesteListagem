@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leitor de Dados - Matssa</title>
+<link rel="icon" type="image/webp" href="https://iajsciazkrtyqhlurvsi.supabase.co/storage/v1/object/public/D78Imagens/fvfvsf.webp">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
+	background-image: url('https://iajsciazkrtyqhlurvsi.supabase.co/storage/v1/object/public/D78Imagens/plano%20de%20fundo2.webp');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+
     min-height: 100vh;
     padding: 20px;
-	zoom: 75%;
+    zoom: 75%;
 }
 
 .container { max-width: 1250px; margin: 0 auto; }
@@ -31,17 +36,17 @@ h1 {
 h2 { color: #333; font-size: 1.8rem; }
 .btn {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
+    background: #4f46e5; /* Azul/Roxo fosco */
     color: white; border: none; border-radius: 8px; cursor: pointer;
     font-size: 16px; font-weight: bold;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-success { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); }
-.btn-warning { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
-.btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
-.btn-secondary { background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%); }
+.btn-success { background: #2e7d32; } /* Verde fosco */
+.btn-warning { background: #e65100; } /* Laranja fosco */
+.btn-danger  { background: #c62828; } /* Vermelho fosco */
+.btn-secondary { background: #616161; } /* Cinza fosco */
 
 .loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
@@ -126,6 +131,16 @@ h2 { color: #333; font-size: 1.8rem; }
     font-size: 0.9rem; text-transform: capitalize; line-height: 1.2;
 }
 
+.p1-botoes-laterais {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+.p1-botoes-laterais .btn-p1-lateral {
+    flex: 1;
+}
+
 .btn-p1-lateral {
     border: 4px solid #1a1a1a; background: #fff; color: #1a1a1a;
     font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 12px;
@@ -192,7 +207,7 @@ h2 { color: #333; font-size: 1.8rem; }
     100% { transform: translateY(-50%); }
 }
 .vis-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0e136b; /* Cor fosco */
     color: white; border-radius: 10px; padding: 12px; border: 2px solid #1a1a1a;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
 }
@@ -204,8 +219,7 @@ h2 { color: #333; font-size: 1.8rem; }
     display: grid; grid-template-columns: 1.4fr 1fr;
     grid-template-areas:
         "tarefas adicionar"
-        "tarefas integradores"
-        "concluidas concluidas";
+        "tarefas integradores";
     gap: 20px; align-items: start;
 }
 .area-tarefas { grid-area: tarefas; }
@@ -217,7 +231,7 @@ h2 { color: #333; font-size: 1.8rem; }
     .p1-topo { grid-template-columns: 1fr; }
     .p1-corpo { grid-template-columns: 1fr; }
     .grid-vis-dinamica { grid-template-columns: 1fr; }
-    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores" "concluidas"; }
+    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores"; }
 }
 
 .seletor-container { margin-bottom: 20px; }
@@ -254,7 +268,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .prazo-atrasado { background: #d32f2f; color: white; }
 
 /* Modal */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay {position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center;justify-content: center;padding: 20px; }
 .modal-overlay.active { display: flex; }
 .modal-card { background: white; border-radius: 12px; padding: 30px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #ffbd17; }
 .modal-close { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: #f0f0f0; border: none; border-radius: 50%; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -297,7 +311,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
     <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
-        <h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
+        <h2 class="p1-titulo-periodo">DADOS DOS ÚLTIMOS 2 MESES</h2>
         <div id="syncIndicator" class="sync-indicator">🟢 Sincronizado agora</div>
         
         <div class="p1-topo">
@@ -307,9 +321,15 @@ h2 { color: #333; font-size: 1.8rem; }
                     <div class="loading">Carregando contadores...</div>
                 </div>
             </div>
-            <button class="btn-p1-lateral" onclick="irParaPagina2()">
-                vai à 2ªpag ➔
-            </button>
+            
+            <div class="p1-botoes-laterais">
+                <button class="btn-p1-lateral" onclick="irParaPagina2()">
+                    Mudar Itens ➔
+                </button>
+                <button class="btn-p1-lateral" onclick="irParaPagina3()">
+                    Histórico ➔
+                </button>
+            </div>
         </div>
 
         <div class="p1-corpo">
@@ -432,18 +452,25 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="integradoresError" class="error" style="display:none;"></div>
                 <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
             </div>
+        </div>
+    </div>
 
-            <!-- Tarefas Concluídas (Tabela trfsconcluidas) -->
-            <div id="secaoConcluidas" class="section area-concluidas">
-                <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
-                <div class="seletor-container">
-                    <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
-                    <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
-                        <option value="">-- Escolha uma tarefa concluída --</option>
-                    </select>
-                </div>
-                <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
+    <!-- ==================== PÁGINA 3 (HISTÓRICO) ==================== -->
+    <div id="pagina3" class="hidden">
+        <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="irParaPagina1()">⬅️ Voltar à 1ª Página</button>
+        </div>
+
+        <!-- Tarefas Concluídas (Tabela trfsconcluidas) -->
+        <div id="secaoConcluidas" class="section area-concluidas">
+            <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
+            <div class="seletor-container">
+                <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
+                <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
+                    <option value="">-- Escolha uma tarefa concluída --</option>
+                </select>
             </div>
+            <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
         </div>
     </div>
 </div>
@@ -467,11 +494,19 @@ let dadosTrfsConcluidas = [];
 
 function irParaPagina2() {
     document.getElementById('pagina1').classList.add('hidden');
+    document.getElementById('pagina3').classList.add('hidden');
     document.getElementById('pagina2').classList.remove('hidden');
+}
+
+function irParaPagina3() {
+    document.getElementById('pagina1').classList.add('hidden');
+    document.getElementById('pagina2').classList.add('hidden');
+    document.getElementById('pagina3').classList.remove('hidden');
 }
 
 function irParaPagina1() {
     document.getElementById('pagina2').classList.add('hidden');
+    document.getElementById('pagina3').classList.add('hidden');
     document.getElementById('pagina1').classList.remove('hidden');
     carregarPagina1();
 }
@@ -582,7 +617,7 @@ function getCorPorStatus(status) {
     if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
     if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
     if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' };
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
+    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f55f62', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
@@ -593,7 +628,7 @@ function getEmojiStatus(status) {
     if (s.includes('progresso')) return '⏩';
     if (s.includes('aguardando')) return '⏳';
     if (s.includes('faltam')) return '🗂️';
-    if (s.includes('reprovado')) return '❕';
+    if (s.includes('reprovado')) return '❕​❕';
     if (s.includes('não iniciado') || s.includes('nao iniciado')) return '❌';
     return '📌';
 }
@@ -680,7 +715,28 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
-/* ATUALIZAÇÃO 2: MOSTRA TAREFAS PENDENTES E CONCLUÍDAS COM RÓTULOS PERSONALIZADOS */
+function obterPesoOrdem(t) {
+    const status = (t.status || '').toLowerCase();
+    
+    // REGRA 1: Tarefas concluídas vão FORÇADAMENTE para o final da lista (peso máximo)
+    if (status.includes('conclu')) return 10;
+
+    if (!t.data_para_termino) return 9; // Sem data fica logo acima das concluídas
+
+    const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); 
+    hoje.setHours(0, 0, 0, 0);
+
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    // REGRA 2: Ordem de urgência para as tarefas NÃO concluídas
+    if (diffDias < 0) return 1;   // 🔴 Atrasado
+    if (diffDias < 2) return 2;   // 🚨 No Limite
+    if (diffDias <= 8) return 3;  // ⚠️ Próximo
+    return 4;                     // 🟢 No Prazo
+}
+
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
 
@@ -689,7 +745,23 @@ function renderizarListaPendentes() {
         return;
     }
 
-    container.innerHTML = dadosTarefas.map(t => {
+    const tarefasOrdenadas = [...dadosTarefas].sort((a, b) => {
+        const pesoA = obterPesoOrdem(a);
+        const pesoB = obterPesoOrdem(b);
+
+        // Separa por grupo (Atrasado -> No Limite -> Próximo -> No Prazo -> Concluído)
+        if (pesoA !== pesoB) {
+            return pesoA - pesoB;
+        }
+
+        // Desempate dentro do mesmo grupo: data mais antiga/próxima primeiro
+        if (a.data_para_termino && b.data_para_termino) {
+            return new Date(a.data_para_termino) - new Date(b.data_para_termino);
+        }
+        return 0;
+    });
+
+    container.innerHTML = tarefasOrdenadas.map(t => {
         const s = (t.status || '').toLowerCase();
         const isConcluido = s.includes('conclu');
         const emoji = getEmojiStatus(t.status);
@@ -781,6 +853,8 @@ function renderizarVisualizacaoDinamicaVertical() {
             cardsOk.push(cardHtml);
         }
     });
+	
+
 
     if (cardsOk.length > 0) {
         const html = cardsOk.join('');
@@ -948,7 +1022,6 @@ function getIntegradorBadge(integradorId) {
 
 function formatarData(dataISO) {
     if (!dataISO) return 'Não definida';
-    // Pega apenas a parte da data YYYY-MM-DD e divide os blocos
     const partes = dataISO.split('T')[0].split('-');
     if (partes.length < 3) return dataISO;
     
@@ -963,7 +1036,6 @@ function obterDataHojeLocal() {
     const dia = String(hoje.getDate()).padStart(2, '0');
     return `${ano}-${mes}-${dia}`;
 }
-
 
 function getStatusBadge(status) {
     if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
@@ -1018,7 +1090,6 @@ function mostrarDetalhesIntegrador() {
     div.style.display = 'block';
 }
 
-/* ATUALIZAÇÃO 1: MONITORANDO MUDANÇA DE STATUS PARA MUDAR DATA AUTOMATICAMENTE */
 function abrirEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
     const modalContent = document.getElementById('conteudoModalEditTarefa');
@@ -1049,7 +1120,6 @@ function abrirEdicaoTarefa(index) {
     `;
     popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
 
-    // Evento em tempo real: ao alterar para "concluído", preenche a data de hoje no campo de data
     document.getElementById('editStatusTarefa').addEventListener('change', function() {
         if (this.value.toLowerCase().includes('conclu')) {
             const hoje = obterDataHojeLocal();
@@ -1072,7 +1142,6 @@ async function salvarEdicaoTarefa(index) {
     let statusVal = document.getElementById('editStatusTarefa').value || null;
     let dataVal = document.getElementById('editDataEsperadaTarefa').value || null;
 
-    // Garantia no salvamento: Se o status for concluído, define a data para hoje
     if (statusVal && statusVal.toLowerCase().includes('conclu')) {
         dataVal = obterDataHojeLocal();
     }
