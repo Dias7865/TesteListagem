@@ -417,27 +417,40 @@ h2 { color: #333; font-size: 1.8rem; }
                     </select>
                 </div>
 
-                <!-- Form Tarefa -->
-                <div id="formTarefa" class="hidden">
-                    <div class="form-group"><label for="nomeTarefa">Nome da Tarefa:</label><input type="text" id="nomeTarefa" placeholder="Ex: CASA 10"></div>
-                    <div class="form-group"><label for="tipoTarefa">Tipo:</label><input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar"></div>
-                    <div class="form-group">
-                        <label for="statusTarefa">Status:</label>
-                        <select id="statusTarefa">
-                            <option value="">-- Selecione o status --</option>
-                            <option value="concluído">✅ Concluído</option>
-                            <option value="em progresso">⏩ Em progresso</option>
-                            <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
-                            <option value="faltam dados">🗂️ Faltam dados necessários</option>
-                            <option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
-                            <option value="não iniciado">❌ Não iniciado</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
-                    <div class="form-group"><label for="integradorTarefa">Integrador Associado:</label><select id="integradorTarefa"><option value="">-- Selecione o integrador --</option></select></div>
-                    <div class="form-group"><label for="descricaoTarefa">Descrição:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
-                    <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
-                </div>
+				<!-- Form Tarefa -->
+				<div id="formTarefa" class="hidden">
+					<div class="form-group"><label for="nomeTarefa">Nome da Tarefa:</label><input type="text" id="nomeTarefa" placeholder="Ex: CASA 10"></div>
+					<div class="form-group"><label for="tipoTarefa">Tipo:</label><input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar"></div>
+					<div class="form-group">
+						<label for="statusTarefa">Status:</label>
+						<select id="statusTarefa">
+							<option value="">-- Selecione o status --</option>
+							<option value="concluído">✅ Concluído</option>
+							<option value="em progresso">⏩ Em progresso</option>
+							<option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
+							<option value="faltam dados">🗂️ Faltam dados necessários</option>
+							<option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
+							<option value="não iniciado">❌ Não iniciado</option>
+						</select>
+					</div>
+					<div class="form-group"><label for="enderecoTarefa">Endereço:</label><input type="text" id="enderecoTarefa" placeholder="Ex: Av. Central, 123 - Centro"></div>
+					<div class="form-group"><label for="dataInicioObraTarefa">Data de Início da Obra:</label><input type="date" id="dataInicioObraTarefa"></div>
+					<div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
+					<div class="form-group"><label for="integradorTarefa">Integrador Associado:</label><select id="integradorTarefa"><option value="">-- Selecione o integrador --</option></select></div>
+					<div class="form-group">
+						<label for="statusMaterialTarefa">Status do Material:</label>
+						<select id="statusMaterialTarefa">
+							<option value="">-- Selecione o status do material --</option>
+							<option value="Falta">❌ Falta</option>
+							<option value="Arranjado">✅ Arranjado</option>
+						</select>
+					</div>
+					<div class="form-group"><label for="materiaisFaltandoTarefa">Materiais Faltando (digite um por linha):</label><textarea id="materiaisFaltandoTarefa" placeholder="Ex: Cabo 10mm&#10;Inversor 5kW&#10;Disjuntor 32A"></textarea></div>
+					<div class="form-group"><label for="pendenciasTarefa">Pendências a Resolver:</label><textarea id="pendenciasTarefa" placeholder="Descreva em detalhes as pendências do caso..."></textarea></div>
+					<div class="form-group"><label for="relatorioAtividadesTarefa">Relatório de Atividades Desenvolvidas:</label><textarea id="relatorioAtividadesTarefa" placeholder="Relatório de atividades diárias..."></textarea></div>
+					<div class="form-group"><label for="descricaoTarefa">Descrição Geral:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
+					<button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
+				</div>
 
                 <!-- Form Integrador -->
                 <div id="formIntegrador" class="hidden">
@@ -941,12 +954,23 @@ function mostrarDetalhesTrfConcluida() {
     if (idx === '') { div.style.display = 'none'; return; }
 
     const tc = dadosTrfsConcluidas[idx];
+    
+    const listaMateriais = Array.isArray(tc.materiais_faltando) && tc.materiais_faltando.length > 0
+        ? `<ul>${tc.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
+        : 'Nenhum material pendente';
+
     div.innerHTML = `
         <h3>${tc.nome}</h3>
         <p><span class="label">Tipo:</span> ${tc.tipo || 'Não informado'}</p>
+        <p><span class="label">Endereço:</span> ${tc.endereco || 'Não informado'}</p>
         <p><span class="label">Integrador responsável:</span> <span class="badge" style="background:#00bcd4;">👤 ${tc.intg_fz || 'N/A'}</span></p>
-        <p><span class="label">Descrição:</span> ${tc.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data de Início da Obra:</span> ${formatarData(tc.data_inicio_obra)}</p>
         <p><span class="label">Data de Finalização:</span> ${formatarData(tc.data_finalizado)}</p>
+        <p><span class="label">Status do Material:</span> ${tc.status_material || 'N/A'}</p>
+        <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
+        <p><span class="label">Pendências:</span> ${tc.pendencias || 'Nenhuma'}</p>
+        <p><span class="label">Relatório de Atividades:</span> ${tc.relatorio_atividades || 'Sem relatório'}</p>
+        <p><span class="label">Descrição Geral:</span> ${tc.descricao || 'Sem descrição'}</p>
         <div class="action-buttons">
             <button class="btn btn-danger" onclick="removerTrfConcluida(${idx})">🗑️ Remover do Histórico</button>
         </div>
@@ -974,7 +998,13 @@ async function concluirEArquivarTarefa(index) {
                 tipo: tarefa.tipo,
                 descricao: tarefa.descricao,
                 intg_fz: integradorNome,
-                data_finalizado: obterDataHojeLocal()
+                data_finalizado: obterDataHojeLocal(),
+                endereco: tarefa.endereco,
+                data_inicio_obra: tarefa.data_inicio_obra,
+                status_material: tarefa.status_material,
+                materiais_faltando: tarefa.materiais_faltando,
+                pendencias: tarefa.pendencias,
+                relatorio_atividades: tarefa.relatorio_atividades
             })
         });
 
@@ -1063,13 +1093,25 @@ function mostrarDetalhesTarefa() {
     if (idx === '') { div.style.display = 'none'; return; }
 
     const t = dadosTarefas[idx];
+    
+    // Formatação da lista de materiais
+    const listaMateriais = Array.isArray(t.materiais_faltando) && t.materiais_faltando.length > 0
+        ? `<ul>${t.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
+        : 'Nenhum material pendente';
+
     div.innerHTML = `
         <h3>${t.nome}</h3>
         <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
+        <p><span class="label">Endereço:</span> ${t.endereco || 'Não informado'}</p>
         <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
         <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
-        <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data de Início da Obra:</span> ${formatarData(t.data_inicio_obra)}</p>
         <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
+        <p><span class="label">Status do Material:</span> ${t.status_material ? `<strong>${t.status_material}</strong>` : 'Não definido'}</p>
+        <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
+        <p><span class="label">Pendências a Resolver:</span> ${t.pendencias || 'Sem pendências'}</p>
+        <p><span class="label">Relatório de Atividades:</span> ${t.relatorio_atividades || 'Nenhum relatório registrado'}</p>
+        <p><span class="label">Descrição Geral:</span> ${t.descricao || 'Sem descrição'}</p>
         <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
@@ -1102,11 +1144,14 @@ function abrirEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
     const modalContent = document.getElementById('conteudoModalEditTarefa');
     const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
+    const dataInicioISO = tarefa.data_inicio_obra ? new Date(tarefa.data_inicio_obra).toISOString().split('T')[0] : '';
+    const matTexto = Array.isArray(tarefa.materiais_faltando) ? tarefa.materiais_faltando.join('\n') : '';
 
     modalContent.innerHTML = `
         <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">✏️ Editando: ${tarefa.nome}</h3>
         <div class="form-group"><label>Nome:</label><input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}"></div>
         <div class="form-group"><label>Tipo:</label><input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}"></div>
+        <div class="form-group"><label>Endereço:</label><input type="text" id="editEnderecoTarefa" value="${tarefa.endereco || ''}"></div>
         <div class="form-group">
             <label>Status:</label>
             <select id="editStatusTarefa">
@@ -1118,22 +1163,27 @@ function abrirEdicaoTarefa(index) {
                 <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
             </select>
         </div>
+        <div class="form-group"><label>Data Início da Obra:</label><input type="date" id="editDataInicioObraTarefa" value="${dataInicioISO}"></div>
         <div class="form-group"><label>Data Esperada:</label><input type="date" id="editDataEsperadaTarefa" value="${dataISO}"></div>
         <div class="form-group"><label>Integrador:</label><select id="editIntegradorTarefa"></select></div>
-        <div class="form-group"><label>Descrição:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
+        <div class="form-group">
+            <label>Status do Material:</label>
+            <select id="editStatusMaterialTarefa">
+                <option value="" ${!tarefa.status_material ? 'selected' : ''}>-- Selecione --</option>
+                <option value="Falta" ${tarefa.status_material === 'Falta' ? 'selected' : ''}>❌ Falta</option>
+                <option value="Arranjado" ${tarefa.status_material === 'Arranjado' ? 'selected' : ''}>✅ Arranjado</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Materiais Faltando (um por linha):</label><textarea id="editMateriaisFaltandoTarefa">${matTexto}</textarea></div>
+        <div class="form-group"><label>Pendências a Resolver:</label><textarea id="editPendenciasTarefa">${tarefa.pendencias || ''}</textarea></div>
+        <div class="form-group"><label>Relatório de Atividades:</label><textarea id="editRelatorioAtividadesTarefa">${tarefa.relatorio_atividades || ''}</textarea></div>
+        <div class="form-group"><label>Descrição Geral:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
         <div class="action-buttons">
             <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
             <button class="btn btn-secondary" onclick="fecharModalEditTarefa()">❌ Cancelar</button>
         </div>
     `;
     popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
-
-    document.getElementById('editStatusTarefa').addEventListener('change', function() {
-        if (this.value.toLowerCase().includes('conclu')) {
-            const hoje = obterDataHojeLocal();
-            document.getElementById('editDataEsperadaTarefa').value = hoje;
-        }
-    });
 
     document.getElementById('modalEditTarefa').classList.add('active');
 }
@@ -1154,6 +1204,9 @@ async function salvarEdicaoTarefa(index) {
         dataVal = obterDataHojeLocal();
     }
 
+    const matTexto = document.getElementById('editMateriaisFaltandoTarefa').value.trim();
+    const materiaisArray = matTexto ? matTexto.split('\n').map(i => i.trim()).filter(Boolean) : [];
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
@@ -1162,8 +1215,14 @@ async function salvarEdicaoTarefa(index) {
                 nome: nome,
                 tipo: document.getElementById('editTipoTarefa').value.trim() || null,
                 status: statusVal,
+                endereco: document.getElementById('editEnderecoTarefa').value.trim() || null,
+                data_inicio_obra: document.getElementById('editDataInicioObraTarefa').value || null,
                 data_para_termino: dataVal,
                 intg_id: document.getElementById('editIntegradorTarefa').value || null, 
+                status_material: document.getElementById('editStatusMaterialTarefa').value || null,
+                materiais_faltando: materiaisArray.length > 0 ? materiaisArray : null,
+                pendencias: document.getElementById('editPendenciasTarefa').value.trim() || null,
+                relatorio_atividades: document.getElementById('editRelatorioAtividadesTarefa').value.trim() || null,
                 descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
             })
         });
@@ -1191,6 +1250,10 @@ async function adicionarTarefa() {
     const nome = document.getElementById('nomeTarefa').value.trim();
     if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
+    // Transforma a lista de materiais (separados por quebra de linha) em um Array
+    const matTexto = document.getElementById('materiaisFaltandoTarefa').value.trim();
+    const materiaisArray = matTexto ? matTexto.split('\n').map(i => i.trim()).filter(Boolean) : [];
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
             method: 'POST',
@@ -1199,8 +1262,14 @@ async function adicionarTarefa() {
                 nome: nome,
                 tipo: document.getElementById('tipoTarefa').value.trim() || null,
                 status: document.getElementById('statusTarefa').value || null,
+                endereco: document.getElementById('enderecoTarefa').value.trim() || null,
+                data_inicio_obra: document.getElementById('dataInicioObraTarefa').value || null,
                 data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
-                intg_id: document.getElementById('integradorTarefa').value || null, 
+                intg_id: document.getElementById('integradorTarefa').value || null,
+                status_material: document.getElementById('statusMaterialTarefa').value || null,
+                materiais_faltando: materiaisArray.length > 0 ? materiaisArray : null,
+                pendencias: document.getElementById('pendenciasTarefa').value.trim() || null,
+                relatorio_atividades: document.getElementById('relatorioAtividadesTarefa').value.trim() || null,
                 descricao: document.getElementById('descricaoTarefa').value.trim() || null
             })
         });
@@ -1272,17 +1341,20 @@ function obterBadgePrazo(dataISO) {
 
 function resetarFormularioAdicao() {
     document.getElementById('tipoElemento').value = '';
-
     document.getElementById('nomeTarefa').value = '';
     document.getElementById('tipoTarefa').value = '';
     document.getElementById('statusTarefa').value = '';
+    document.getElementById('enderecoTarefa').value = '';
+    document.getElementById('dataInicioObraTarefa').value = '';
     document.getElementById('dataEsperadaTarefa').value = '';
     document.getElementById('integradorTarefa').value = '';
+    document.getElementById('statusMaterialTarefa').value = '';
+    document.getElementById('materiaisFaltandoTarefa').value = '';
+    document.getElementById('pendenciasTarefa').value = '';
+    document.getElementById('relatorioAtividadesTarefa').value = '';
     document.getElementById('descricaoTarefa').value = '';
-
     document.getElementById('nomeIntegrador').value = '';
     document.getElementById('ncpfIntegrador').value = '';
-
     atualizarFormulario();
 }
 
@@ -1316,7 +1388,13 @@ async function verificarEArquivarAutomatico() {
                             tipo: tarefa.tipo,
                             descricao: tarefa.descricao,
                             intg_fz: integradorNome,
-                            data_finalizado: tarefa.data_para_termino.split('T')[0]
+                            data_finalizado: tarefa.data_para_termino.split('T')[0],
+                            endereco: tarefa.endereco,
+                            data_inicio_obra: tarefa.data_inicio_obra,
+                            status_material: tarefa.status_material,
+                            materiais_faltando: tarefa.materiais_faltando,
+                            pendencias: tarefa.pendencias,
+                            relatorio_atividades: tarefa.relatorio_atividades
                         })
                     });
 
