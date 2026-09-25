@@ -52,7 +52,13 @@ CREATE TABLE tarefas (
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     intg_id uuid REFERENCES integradores(id),
     status varchar(30) CHECK (status IN ('concluído', 'em progresso', 'aguardando equatorial', 'não iniciado', 'faltam dados', 'reprovado pela equatorial')),
-    data_para_termino date
+    data_para_termino date,
+    endereco text,
+    pendencias text,
+    data_inicio_obra date,
+    status_material varchar(20) CHECK (status_material IN ('Falta', 'Arranjado')),
+    materiais_faltando text[],
+    relatorio_atividades text
 );
 
 CREATE TABLE trfsconcluidas (
@@ -61,7 +67,10 @@ CREATE TABLE trfsconcluidas (
     tipo varchar(30),
     descricao text,
     intg_fz varchar(25),
-    data_finalizado date
+    data_finalizado date,
+    endereco text,
+    data_inicio_obra date,
+    relatorio_atividades text
 );
 
 -- =====================================================
@@ -196,32 +205,6 @@ GRANT SELECT ON intensidades TO anon;
 -- Funções RPC
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
 GRANT EXECUTE ON FUNCTION calcular_intensidades() TO anon;
-
-
-
-
--------------------------------------------------------------------
--- Adicionar os novos campos na tabela de tarefas ativas
-ALTER TABLE tarefas
-ADD COLUMN endereco text,
-ADD COLUMN pendencias text,
-ADD COLUMN data_inicio_obra date,
-ADD COLUMN status_material varchar(20) CHECK (status_material IN ('Falta', 'Arranjado')),
-ADD COLUMN materiais_faltando text[],
-ADD COLUMN relatorio_atividades text;
-
--- Adicionar os mesmos campos na tabela de tarefas concluídas (histórico)
-ALTER TABLE trfsconcluidas
-ADD COLUMN endereco text,
-ADD COLUMN pendencias text,
-ADD COLUMN data_inicio_obra date,
-ADD COLUMN status_material varchar(20),
-ADD COLUMN materiais_faltando text[],
-ADD COLUMN relatorio_atividades text;
----------------------------------------------------------------------------------------
-
-
-
 
 
 
