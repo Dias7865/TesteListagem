@@ -197,6 +197,34 @@ GRANT SELECT ON intensidades TO anon;
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
 GRANT EXECUTE ON FUNCTION calcular_intensidades() TO anon;
 
+
+
+
+-------------------------------------------------------------------
+-- Adicionar os novos campos na tabela de tarefas ativas
+ALTER TABLE tarefas
+ADD COLUMN endereco text,
+ADD COLUMN pendencias text,
+ADD COLUMN data_inicio_obra date,
+ADD COLUMN status_material varchar(20) CHECK (status_material IN ('Falta', 'Arranjado')),
+ADD COLUMN materiais_faltando text[],
+ADD COLUMN relatorio_atividades text;
+
+-- Adicionar os mesmos campos na tabela de tarefas concluídas (histórico)
+ALTER TABLE trfsconcluidas
+ADD COLUMN endereco text,
+ADD COLUMN pendencias text,
+ADD COLUMN data_inicio_obra date,
+ADD COLUMN status_material varchar(20),
+ADD COLUMN materiais_faltando text[],
+ADD COLUMN relatorio_atividades text;
+---------------------------------------------------------------------------------------
+
+
+
+
+
+
 -- =====================================================
 -- 7. CARGA DE DADOS INICIAIS (SEED DATA)
 -- =====================================================
@@ -225,6 +253,7 @@ VALUES
   ('Restaurante do I618', 'Instalação solar', 'concluído', '2026-09-06', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Iota'),
   ('Auto Peças do J375', 'Rateio', 'em progresso', '2026-08-16', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Kapa'),
   ('Frutaria do K196', 'Rateio', 'faltam dados', '2026-09-15', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Lambda');
+
 
 -- Tarefas Concluídas (Histórico)
 INSERT INTO trfsconcluidas (nome, tipo, data_finalizado, intg_fz, descricao)
