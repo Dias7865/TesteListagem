@@ -259,6 +259,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .detalhes-card h3 { color: #333; margin-bottom: 15px; font-size: 1.6rem; }
 .detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
 .detalhes-card .label { font-weight: bold; color: #764ba2; }
+.detalhes-card .label2 { font-weight: bold; color: #9b8cab; }
 .detalhes-card .badge { display: inline-block; background: #00730d; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px; }
 .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 .status-concluido { background: #2196f3; color: white; }
@@ -954,17 +955,28 @@ function mostrarDetalhesTrfConcluida() {
     if (idx === '') { div.style.display = 'none'; return; }
 
     const tc = dadosTrfsConcluidas[idx];
-    
+
+    // Formatação do Relatório de Atividades para Tarefas Concluídas
+    let listaRelatorio = 'Sem relatório';
+    if (tc.relatorio_atividades) {
+        const linhasRelatorio = Array.isArray(tc.relatorio_atividades)
+            ? tc.relatorio_atividades
+            : tc.relatorio_atividades.split('\n').map(r => r.trim()).filter(Boolean);
+
+        if (linhasRelatorio.length > 0) {
+            listaRelatorio = `<ul style="padding-left: 30px; list-style-type: '- '; margin-top: 5px;">${linhasRelatorio.map(r => `<li>${r}</li>`).join('')}</ul>`;
+        }
+    }
 
     div.innerHTML = `
         <h3>${tc.nome}</h3>
         <p><span class="label">Tipo:</span> ${tc.tipo || 'Não informado'}</p>
         <p><span class="label">Endereço:</span> ${tc.endereco || 'Não informado'}</p>
+		<p><span class="label">Descrição Geral:</span> ${tc.descricao || 'Sem descrição'}</p>
         <p><span class="label">Integrador responsável:</span> <span class="badge" style="background:#00bcd4;">👤 ${tc.intg_fz || 'N/A'}</span></p>
         <p><span class="label">Data de Início da Obra:</span> ${formatarData(tc.data_inicio_obra)}</p>
         <p><span class="label">Data de Finalização:</span> ${formatarData(tc.data_finalizado)}</p>
-        <p><span class="label">Relatório de Atividades:</span> ${tc.relatorio_atividades || 'Sem relatório'}</p>
-        <p><span class="label">Descrição Geral:</span> ${tc.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Relatório de Atividades:</span> ${listaRelatorio}</p>
         <div class="action-buttons">
             <button class="btn btn-danger" onclick="removerTrfConcluida(${idx})">🗑️ Remover do Histórico</button>
         </div>
@@ -1085,15 +1097,28 @@ function mostrarDetalhesTarefa() {
 
     const t = dadosTarefas[idx];
     
-	// Formatação da lista de materiais com recuo à esquerda
-	const listaMateriais = Array.isArray(t.materiais_faltando) && t.materiais_faltando.length > 0
-		? `<ul style="padding-left: 30px; margin-top: 5px;">${t.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
-		: 'Nenhum material pendente';
+    // 1. Formatação da lista de Materiais Faltando
+    const listaMateriais = Array.isArray(t.materiais_faltando) && t.materiais_faltando.length > 0
+        ? `<ul style="padding-left: 30px; margin-top: 5px;">${t.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
+        : 'Nenhum material pendente';
+
+    // 2. Formatação do Relatório de Atividades
+    let listaRelatorio = 'Nenhum relatório registrado';
+    if (t.relatorio_atividades) {
+        const linhasRelatorio = Array.isArray(t.relatorio_atividades)
+            ? t.relatorio_atividades
+            : t.relatorio_atividades.split('\n').map(r => r.trim()).filter(Boolean);
+
+        if (linhasRelatorio.length > 0) {
+            listaRelatorio = `<ul style="padding-left: 30px; margin-top: 5px;">${linhasRelatorio.map(r => `<li>${r}</li>`).join('')}</ul>`;
+        }
+    }
 
     div.innerHTML = `
         <h3>${t.nome}</h3>
         <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
         <p><span class="label">Endereço:</span> ${t.endereco || 'Não informado'}</p>
+        <p><span class="label">Descrição Geral:</span> ${t.descricao || 'Sem descrição'}</p>
         <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
         <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
         <p><span class="label">Data de Início da Obra:</span> ${formatarData(t.data_inicio_obra)}</p>
@@ -1101,9 +1126,8 @@ function mostrarDetalhesTarefa() {
         <p><span class="label">Status do Material:</span> ${t.status_material ? `<strong>${t.status_material}</strong>` : 'Não definido'}</p>
         <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
         <p><span class="label">Pendências a Resolver:</span> ${t.pendencias || 'Sem pendências'}</p>
-        <p><span class="label">Relatório de Atividades:</span> ${t.relatorio_atividades || 'Nenhum relatório registrado'}</p>
-        <p><span class="label">Descrição Geral:</span> ${t.descricao || 'Sem descrição'}</p>
-        <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
+        <p><span class="label">Relatório de Atividades:</span> ${listaRelatorio}</p>
+        <p><span class="label2" style="margin-left: 30px;">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
@@ -1123,7 +1147,7 @@ function mostrarDetalhesIntegrador() {
     div.innerHTML = `
         <h3>${i.nome}</h3>
         <p><span class="label">nº do CPF:</span> <span class="badge">${i.integrador_cpf || 'N/A'}</span></p>
-        <p><span class="label">Criado em:</span> ${new Date(i.created_at).toLocaleString('pt-BR')}</p>
+        <p><span class="label2">Criado em:</span> ${new Date(i.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-danger" onclick="removerIntegrador(${idx})">🗑️ Remover Elemento</button>
         </div>
