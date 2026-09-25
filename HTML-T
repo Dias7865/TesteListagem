@@ -955,9 +955,6 @@ function mostrarDetalhesTrfConcluida() {
 
     const tc = dadosTrfsConcluidas[idx];
     
-    const listaMateriais = Array.isArray(tc.materiais_faltando) && tc.materiais_faltando.length > 0
-        ? `<ul>${tc.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
-        : 'Nenhum material pendente';
 
     div.innerHTML = `
         <h3>${tc.nome}</h3>
@@ -966,9 +963,6 @@ function mostrarDetalhesTrfConcluida() {
         <p><span class="label">Integrador responsável:</span> <span class="badge" style="background:#00bcd4;">👤 ${tc.intg_fz || 'N/A'}</span></p>
         <p><span class="label">Data de Início da Obra:</span> ${formatarData(tc.data_inicio_obra)}</p>
         <p><span class="label">Data de Finalização:</span> ${formatarData(tc.data_finalizado)}</p>
-        <p><span class="label">Status do Material:</span> ${tc.status_material || 'N/A'}</p>
-        <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
-        <p><span class="label">Pendências:</span> ${tc.pendencias || 'Nenhuma'}</p>
         <p><span class="label">Relatório de Atividades:</span> ${tc.relatorio_atividades || 'Sem relatório'}</p>
         <p><span class="label">Descrição Geral:</span> ${tc.descricao || 'Sem descrição'}</p>
         <div class="action-buttons">
@@ -1001,9 +995,6 @@ async function concluirEArquivarTarefa(index) {
                 data_finalizado: obterDataHojeLocal(),
                 endereco: tarefa.endereco,
                 data_inicio_obra: tarefa.data_inicio_obra,
-                status_material: tarefa.status_material,
-                materiais_faltando: tarefa.materiais_faltando,
-                pendencias: tarefa.pendencias,
                 relatorio_atividades: tarefa.relatorio_atividades
             })
         });
@@ -1094,10 +1085,10 @@ function mostrarDetalhesTarefa() {
 
     const t = dadosTarefas[idx];
     
-    // Formatação da lista de materiais
-    const listaMateriais = Array.isArray(t.materiais_faltando) && t.materiais_faltando.length > 0
-        ? `<ul>${t.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
-        : 'Nenhum material pendente';
+	// Formatação da lista de materiais com recuo à esquerda
+	const listaMateriais = Array.isArray(t.materiais_faltando) && t.materiais_faltando.length > 0
+		? `<ul style="padding-left: 30px; margin-top: 5px;">${t.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
+		: 'Nenhum material pendente';
 
     div.innerHTML = `
         <h3>${t.nome}</h3>
@@ -1391,9 +1382,6 @@ async function verificarEArquivarAutomatico() {
                             data_finalizado: tarefa.data_para_termino.split('T')[0],
                             endereco: tarefa.endereco,
                             data_inicio_obra: tarefa.data_inicio_obra,
-                            status_material: tarefa.status_material,
-                            materiais_faltando: tarefa.materiais_faltando,
-                            pendencias: tarefa.pendencias,
                             relatorio_atividades: tarefa.relatorio_atividades
                         })
                     });
