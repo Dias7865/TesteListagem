@@ -265,7 +265,6 @@ h2 { color: #333; font-size: 1.8rem; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ffc229; color: white; }
-.status-nao-iniciado { background: #4f0b06; color: white; }
 .status-faltam-dados { background: #00802D; color: white; }
 .status-reprovado { background: #757575; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
@@ -335,7 +334,7 @@ h2 { color: #333; font-size: 1.8rem; }
             
             <div class="p1-botoes-laterais">
                 <button class="btn-p1-lateral" onclick="irParaPagina2()">
-                    Mudar Itens ➔
+                    Itens Listados ➔
                 </button>
                 <button class="btn-p1-lateral" onclick="irParaPagina3()">
                     Histórico ➔
@@ -431,7 +430,6 @@ h2 { color: #333; font-size: 1.8rem; }
 							<option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
 							<option value="faltam dados">🗂️ Faltam dados necessários</option>
 							<option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
-							<option value="não iniciado">❌ Não iniciado</option>
 						</select>
 					</div>
 					<div class="form-group"><label for="enderecoTarefa">Endereço:</label><input type="text" id="enderecoTarefa" placeholder="Ex: Av. Central, 123 - Centro"></div>
@@ -506,6 +504,24 @@ h2 { color: #333; font-size: 1.8rem; }
         <div id="conteudoModalEditTarefa"></div>
     </div>
 </div>
+
+<!-- Modal Secundário de Pendências -->
+<div id="modalPendencias" class="modal-overlay" style="z-index: 10002;">
+    <div class="modal-card">
+        <button class="modal-close" onclick="fecharModalPendencias()">✕</button>
+        <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">⚠️ Pendências a Resolver</h3>
+        <div class="form-group">
+            <label for="textoPendenciasModal">Descreva ou atualize as pendências do elemento:</label>
+            <textarea id="textoPendenciasModal" rows="6" placeholder="Descreva em detalhes as pendências a resolver..."></textarea>
+        </div>
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="salvarPendenciasModal()">💾 Salvar Pendências</button>
+            <button class="btn btn-secondary" onclick="fecharModalPendencias()">❌ Cancelar</button>
+        </div>
+    </div>
+</div>
+
+
 
 <script>
 const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
@@ -641,7 +657,6 @@ function getCorPorStatus(status) {
     if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
     if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
     if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' };
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f55f62', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
@@ -653,7 +668,6 @@ function getEmojiStatus(status) {
     if (s.includes('aguardando')) return '⏳';
     if (s.includes('faltam')) return '🗂️';
     if (s.includes('reprovado')) return '❕​❕';
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return '❌';
     return '📌';
 }
 
@@ -814,7 +828,6 @@ function getTextoStatusSemFundo(status) {
     if (s.includes('reprovado')) return `❕ ${status}`;
     if (s.includes('equatorial')) return `⏳ ${status}`;
     if (s.includes('faltam')) return `🗂️ ${status}`;
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return `❌ ${status}`;
     return status;
 }
 
@@ -1079,14 +1092,14 @@ function obterDataHojeLocal() {
 }
 
 function getStatusBadge(status) {
-    if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
+    if (!status) return '<span class="status-badge status-faltam-dados">Não definido</span>';
     const s = status.toLowerCase();
     if (s === 'concluído' || s === 'concluido') return `<span class="status-badge status-concluido">✅ ${status}</span>`;
     if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
     if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
     if (s === 'reprovado') return `<span class="status-badge status-reprovado">❕ ${status}</span>`;
     if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️ ${status}</span>`;
-    return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
+    return `<span class="status-badge status-faltam-dados">🗂️ ${status}</span>`;
 }
 
 function mostrarDetalhesTarefa() {
@@ -1175,7 +1188,6 @@ function abrirEdicaoTarefa(index) {
                 <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
                 <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️ Faltam dados necessários</option>
                 <option value="reprovado pela equatorial" ${tarefa.status === 'reprovado pela equatorial' ? 'selected' : ''}>❕ Reprovado pela Equatorial</option>
-                <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
             </select>
         </div>
         <div class="form-group"><label>Data Início da Obra:</label><input type="date" id="editDataInicioObraTarefa" value="${dataInicioISO}"></div>
@@ -1190,8 +1202,20 @@ function abrirEdicaoTarefa(index) {
             </select>
         </div>
         <div class="form-group"><label>Materiais Faltando (um por linha):</label><textarea id="editMateriaisFaltandoTarefa">${matTexto}</textarea></div>
-        <div class="form-group"><label>Pendências a Resolver:</label><textarea id="editPendenciasTarefa">${tarefa.pendencias || ''}</textarea></div>
-        <div class="form-group"><label>Relatório de Atividades:</label><textarea id="editRelatorioAtividadesTarefa">${tarefa.relatorio_atividades || ''}</textarea></div>
+        <div class="form-group">
+            <label>Pendências a Resolver:</label>
+            <button type="button" class="btn btn-secondary" style="width: 100%; display: block; margin-top: 5px;" onclick="abrirModalPendencias()">
+                📝 Editar Pendências a Resolver
+            </button>
+            <input type="hidden" id="editPendenciasTarefa" value="${tarefa.pendencias || ''}">
+            <small id="previewPendencias" style="display: block; margin-top: 6px; color: #555; font-style: italic;">
+                ${tarefa.pendencias ? 'Pendência atual: ' + tarefa.pendencias : 'Nenhuma pendência informada.'}
+            </small>
+        </div>
+        <div class="form-group">
+            <label>Relatório de Atividades:</label>
+            <textarea id="editRelatorioAtividadesTarefa">${tarefa.relatorio_atividades || ''}</textarea>
+        </div>
         <div class="form-group"><label>Descrição Geral:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
         <div class="action-buttons">
             <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
@@ -1210,7 +1234,7 @@ function fecharModalEditTarefa() {
 async function salvarEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
     const nome = document.getElementById('editNomeTarefa').value.trim();
-    if (!nome) return;
+    if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
     let statusVal = document.getElementById('editStatusTarefa').value || null;
     let dataVal = document.getElementById('editDataEsperadaTarefa').value || null;
@@ -1222,10 +1246,18 @@ async function salvarEdicaoTarefa(index) {
     const matTexto = document.getElementById('editMateriaisFaltandoTarefa').value.trim();
     const materiaisArray = matTexto ? matTexto.split('\n').map(i => i.trim()).filter(Boolean) : [];
 
+    const relatorioEl = document.getElementById('editRelatorioAtividadesTarefa');
+    const relatorioVal = relatorioEl ? relatorioEl.value.trim() : null;
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
-            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                'Content-Type': 'application/json', 
+                'Prefer': 'return=representation' 
+            },
             body: JSON.stringify({
                 nome: nome,
                 tipo: document.getElementById('editTipoTarefa').value.trim() || null,
@@ -1237,19 +1269,22 @@ async function salvarEdicaoTarefa(index) {
                 status_material: document.getElementById('editStatusMaterialTarefa').value || null,
                 materiais_faltando: materiaisArray.length > 0 ? materiaisArray : null,
                 pendencias: document.getElementById('editPendenciasTarefa').value.trim() || null,
-                relatorio_atividades: document.getElementById('editRelatorioAtividadesTarefa').value.trim() || null,
+                relatorio_atividades: relatorioVal || null,
                 descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
             })
         });
 
-        if (!response.ok) throw new Error('Erro ao atualizar');
+        if (!response.ok) throw new Error('Erro ao atualizar no banco de dados');
         const atualizada = await response.json();
         dadosTarefas[index] = atualizada[0];
         mostrarDetalhesTarefa();
         fecharModalEditTarefa();
         await carregarTarefas();
         await carregarPagina1();
-    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+        alert('✅ Tarefa atualizada com sucesso!');
+    } catch (err) { 
+        alert(`❌ Erro: ${err.message}`); 
+    }
 }
 
 // --- ADICIONAR TAREFAS / INTEGRADORES ---
@@ -1441,6 +1476,30 @@ function notificarSincronizacao() {
         paineis.forEach(p => p.classList.remove('pulse-update'));
     }, 1000);
 }
+
+// --- LÓGICA DO MODAL SOBREPOSTO DE PENDÊNCIAS ---
+function abrirModalPendencias() {
+    const valorAtual = document.getElementById('editPendenciasTarefa').value;
+    document.getElementById('textoPendenciasModal').value = valorAtual;
+    document.getElementById('modalPendencias').classList.add('active');
+}
+
+function fecharModalPendencias() {
+    document.getElementById('modalPendencias').classList.remove('active');
+}
+
+function salvarPendenciasModal() {
+    const novoValor = document.getElementById('textoPendenciasModal').value.trim();
+    document.getElementById('editPendenciasTarefa').value = novoValor;
+    
+    const preview = document.getElementById('previewPendencias');
+    if (preview) {
+        preview.textContent = novoValor ? 'Pendência atual: ' + novoValor : 'Nenhuma pendência informada.';
+    }
+    
+    fecharModalPendencias();
+}
+
 </script>
 </body>
 </html>
