@@ -1499,12 +1499,27 @@ function abrirModalPendencias(index) {
     const container = document.getElementById('listaPendenciasContainer');
     container.innerHTML = ''; // Limpa itens anteriores
 
-    // Se houver pendências salvas, divide pelas quebras de linha (\n)
-    const itens = tarefa.pendencias ? tarefa.pendencias.split('\n') : [''];
-
-    itens.forEach(item => {
-        adicionarItemPendencia(item);
-    });
+    // Se houver pendências salvas, separa cada linha e extrai Texto e Data
+    if (tarefa.pendencias) {
+        const itens = tarefa.pendencias.split('\n').map(p => p.trim()).filter(Boolean);
+        
+        itens.forEach(line => {
+            let texto = line;
+            let data = '';
+            
+            // Localiza o último divisor ' - ' para separar o texto da data
+            const posHifen = line.lastIndexOf(' - ');
+            if (posHifen !== -1) {
+                texto = line.substring(0, posHifen).trim();
+                data = line.substring(posHifen + 3).trim();
+                if (data === 'S/D') data = ''; // Mantém o campo limpo se for o placeholder padrão
+            }
+            adicionarItemPendencia(texto, data);
+        });
+    } else {
+        // Se não houver nada, adiciona uma linha vazia por padrão
+        adicionarItemPendencia('', '');
+    }
 
     document.getElementById('modalPendencias').classList.add('active');
 }
@@ -1515,18 +1530,20 @@ function fecharModalPendencias() {
 }
 
 // Adiciona uma nova linha com campo de texto e botão de remover
-function adicionarItemPendencia(valor = '') {
+function adicionarItemPendencia(texto = '', data = '') {
     const container = document.getElementById('listaPendenciasContainer');
     
     const row = document.createElement('div');
     row.className = 'item-pendencia-row';
-    row.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+    row.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 5px;';
 
-    // Trata aspas para não quebrar a sintaxe do HTML
-    const valorEscapado = valor.replace(/"/g, '&quot;');
+    // Trata aspas para evitar quebras no HTML
+    const textoEscapado = texto.replace(/"/g, '&quot;');
+    const dataEscapada = data.replace(/"/g, '&quot;');
 
     row.innerHTML = `
-        <input type="text" class="input-pendencia-item" value="${valorEscapado}" placeholder="Digite o item pendente..." style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="text" class="input-pendencia-texto" value="${textoEscapado}" placeholder="Digite a pendência..." style="flex: 2; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="text" class="input-pendencia-data" value="${dataEscapada}" placeholder="Data (em dd/mm)..." style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
         <button type="button" class="btn btn-danger btn-sm" onclick="removerItemPendencia(this)" title="Remover item" style="padding: 4px 10px;">➖</button>
     `;
 
@@ -1544,13 +1561,24 @@ async function salvarPendenciasModal() {
 
     const tarefa = dadosTarefas[tarefaPendenciaEditando];
     
-    // Coleta todos os inputs da lista e remove entradas vazias
-    const inputs = document.querySelectorAll('.input-pendencia-item');
-    const listaValores = Array.from(inputs)
-        .map(input => input.value.trim())
-        .filter(texto => texto !== '');
+    const rows = document.querySelectorAll('#listaPendenciasContainer .item-pendencia-row');
+    const listaValores = [];
 
-    // Junta cada item em uma nova linha com \n
+    rows.forEach(row => {
+        const inputTexto = row.querySelector('.input-pendencia-texto');
+        const inputData = row.querySelector('.input-pendencia-data');
+        
+        const texto = inputTexto ? inputTexto.value.trim() : '';
+        const data = inputData ? inputData.value.trim() : '';
+
+        if (texto !== '') {
+            // Caso a data não seja preenchida, utiliza "S/D"
+            const dataFinal = data !== '' ? data : 'S/D';
+            listaValores.push(`${texto} - ${dataFinal}`);
+        }
+    });
+
+    // Unifica todos os itens em uma string com quebra de linha (\n)
     const textoFinal = listaValores.join('\n');
 
     try {
