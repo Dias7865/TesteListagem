@@ -445,7 +445,6 @@ h2 { color: #333; font-size: 1.8rem; }
 						</select>
 					</div>
 					<div class="form-group"><label for="materiaisFaltandoTarefa">Materiais Faltando (digite um por linha):</label><textarea id="materiaisFaltandoTarefa" placeholder="Ex: Cabo 10mm&#10;Inversor 5kW&#10;Disjuntor 32A"></textarea></div>
-					<div class="form-group"><label for="pendenciasTarefa">Pendências a Resolver:</label><textarea id="pendenciasTarefa" placeholder="Descreva em detalhes as pendências do caso..."></textarea></div>
 					<div class="form-group"><label for="relatorioAtividadesTarefa">Relatório de Atividades Desenvolvidas:</label><textarea id="relatorioAtividadesTarefa" placeholder="Relatório de atividades diárias..."></textarea></div>
 					<div class="form-group"><label for="descricaoTarefa">Descrição Geral:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
 					<button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
@@ -510,11 +509,20 @@ h2 { color: #333; font-size: 1.8rem; }
     <div class="modal-card">
         <button class="modal-close" onclick="fecharModalPendencias()">✕</button>
         <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">⚠️ Pendências a Resolver</h3>
+        
         <div class="form-group">
-            <label for="textoPendenciasModal">Descreva ou atualize as pendências do elemento:</label>
-            <textarea id="textoPendenciasModal" rows="6" placeholder="Descreva em detalhes as pendências a resolver..."></textarea>
+            <label style="font-weight: bold; margin-bottom: 10px; display: block;">Itens pendentes:</label>
+            
+            <!-- Container onde as linhas serão criadas dinamicamente -->
+            <div id="listaPendenciasContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px;"></div>
+            
+            <!-- Botão para adicionar nova linha -->
+            <button type="button" class="btn btn-secondary" onclick="adicionarItemPendencia()" style="margin-top: 10px; width: 100%;">
+                ➕ Adicionar Item
+            </button>
         </div>
-        <div class="action-buttons">
+
+        <div class="action-buttons" style="margin-top: 20px;">
             <button class="btn btn-success" onclick="salvarPendenciasModal()">💾 Salvar Pendências</button>
             <button class="btn btn-secondary" onclick="fecharModalPendencias()">❌ Cancelar</button>
         </div>
@@ -1127,6 +1135,18 @@ function mostrarDetalhesTarefa() {
         }
     }
 
+    // 3. Formatação das Pendências a Resolver (NOVO)
+    let listaPendencias = 'Sem pendências';
+    if (t.pendencias) {
+        const linhasPendencias = Array.isArray(t.pendencias)
+            ? t.pendencias
+            : t.pendencias.split('\n').map(p => p.trim()).filter(Boolean);
+
+        if (linhasPendencias.length > 0) {
+            listaPendencias = `<ul style="padding-left: 30px; margin-top: 5px;">${linhasPendencias.map(p => `<li>${p}</li>`).join('')}</ul>`;
+        }
+    }
+
     div.innerHTML = `
         <h3>${t.nome}</h3>
         <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
@@ -1138,12 +1158,13 @@ function mostrarDetalhesTarefa() {
         <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
         <p><span class="label">Status do Material:</span> ${t.status_material ? `<strong>${t.status_material}</strong>` : 'Não definido'}</p>
         <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
-        <p><span class="label">Pendências a Resolver:</span> ${t.pendencias || 'Sem pendências'}</p>
+        <p><span class="label">Pendências a Resolver:</span> ${listaPendencias}</p>
         <p><span class="label">Relatório de Atividades:</span> ${listaRelatorio}</p>
         <p><span class="label2" style="margin-left: 30px;">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
+            <button class="btn btn-secondary" onclick="abrirModalPendencias(${idx})">📝 Editar Pendências a Resolver</button>
             <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
         </div>
     `;
@@ -1202,15 +1223,7 @@ function abrirEdicaoTarefa(index) {
             </select>
         </div>
         <div class="form-group"><label>Materiais Faltando (um por linha):</label><textarea id="editMateriaisFaltandoTarefa">${matTexto}</textarea></div>
-        <div class="form-group">
-            <label>Pendências a Resolver:</label>
-            <button type="button" class="btn btn-secondary" style="width: 100%; display: block; margin-top: 5px;" onclick="abrirModalPendencias()">
-                📝 Editar Pendências a Resolver
-            </button>
-            <input type="hidden" id="editPendenciasTarefa" value="${tarefa.pendencias || ''}">
-            <small id="previewPendencias" style="display: block; margin-top: 6px; color: #555; font-style: italic;">
-                ${tarefa.pendencias ? 'Pendência atual: ' + tarefa.pendencias : 'Nenhuma pendência informada.'}
-            </small>
+
         </div>
         <div class="form-group">
             <label>Relatório de Atividades:</label>
@@ -1477,27 +1490,95 @@ function notificarSincronizacao() {
     }, 1000);
 }
 
-// --- LÓGICA DO MODAL SOBREPOSTO DE PENDÊNCIAS ---
-function abrirModalPendencias() {
-    const valorAtual = document.getElementById('editPendenciasTarefa').value;
-    document.getElementById('textoPendenciasModal').value = valorAtual;
+// --- LÓGICA DA LISTA DINÂMICA DE PENDÊNCIAS ---
+let tarefaPendenciaEditando = null;
+
+function abrirModalPendencias(index) {
+    tarefaPendenciaEditando = index;
+    const tarefa = dadosTarefas[index];
+    const container = document.getElementById('listaPendenciasContainer');
+    container.innerHTML = ''; // Limpa itens anteriores
+
+    // Se houver pendências salvas, divide pelas quebras de linha (\n)
+    const itens = tarefa.pendencias ? tarefa.pendencias.split('\n') : [''];
+
+    itens.forEach(item => {
+        adicionarItemPendencia(item);
+    });
+
     document.getElementById('modalPendencias').classList.add('active');
 }
 
 function fecharModalPendencias() {
     document.getElementById('modalPendencias').classList.remove('active');
+    tarefaPendenciaEditando = null;
 }
 
-function salvarPendenciasModal() {
-    const novoValor = document.getElementById('textoPendenciasModal').value.trim();
-    document.getElementById('editPendenciasTarefa').value = novoValor;
+// Adiciona uma nova linha com campo de texto e botão de remover
+function adicionarItemPendencia(valor = '') {
+    const container = document.getElementById('listaPendenciasContainer');
     
-    const preview = document.getElementById('previewPendencias');
-    if (preview) {
-        preview.textContent = novoValor ? 'Pendência atual: ' + novoValor : 'Nenhuma pendência informada.';
+    const row = document.createElement('div');
+    row.className = 'item-pendencia-row';
+    row.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+
+    // Trata aspas para não quebrar a sintaxe do HTML
+    const valorEscapado = valor.replace(/"/g, '&quot;');
+
+    row.innerHTML = `
+        <input type="text" class="input-pendencia-item" value="${valorEscapado}" placeholder="Digite o item pendente..." style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <button type="button" class="btn btn-danger btn-sm" onclick="removerItemPendencia(this)" title="Remover item" style="padding: 4px 10px;">➖</button>
+    `;
+
+    container.appendChild(row);
+}
+
+// Remove a linha específica
+function removerItemPendencia(botao) {
+    botao.parentElement.remove();
+}
+
+// Junta todas as linhas e salva no Supabase
+async function salvarPendenciasModal() {
+    if (tarefaPendenciaEditando === null) return;
+
+    const tarefa = dadosTarefas[tarefaPendenciaEditando];
+    
+    // Coleta todos os inputs da lista e remove entradas vazias
+    const inputs = document.querySelectorAll('.input-pendencia-item');
+    const listaValores = Array.from(inputs)
+        .map(input => input.value.trim())
+        .filter(texto => texto !== '');
+
+    // Junta cada item em uma nova linha com \n
+    const textoFinal = listaValores.join('\n');
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'PATCH',
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                'Content-Type': 'application/json', 
+                'Prefer': 'return=representation' 
+            },
+            body: JSON.stringify({
+                pendencias: textoFinal || null
+            })
+        });
+
+        if (!response.ok) throw new Error('Erro ao salvar no banco de dados.');
+
+        const atualizada = await response.json();
+        dadosTarefas[tarefaPendenciaEditando] = atualizada[0];
+
+        fecharModalPendencias();
+        mostrarDetalhesTarefa();
+        await carregarPagina1();
+        alert('✅ Pendências atualizadas com sucesso!');
+    } catch (err) {
+        alert(`❌ Erro ao salvar pendências: ${err.message}`);
     }
-    
-    fecharModalPendencias();
 }
 
 </script>
