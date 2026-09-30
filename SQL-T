@@ -17,9 +17,6 @@ DROP FUNCTION IF EXISTS verificar_senha(text) CASCADE;
 
 
 
-
-
-
 -- =====================================================
 -- 2. CRIAÇÃO DAS TABELAS
 -- =====================================================
@@ -45,7 +42,6 @@ CREATE TABLE intensidades (
     valor_intensidade INT DEFAULT 0,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 
 CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -81,8 +77,6 @@ CREATE TABLE pendenciastbl (
     texto_lista text NOT NULL,
     data_lista date
 );
-
-
 
 
 
@@ -126,7 +120,6 @@ CREATE POLICY "Permitir leitura pública de pendenciastbl" ON pendenciastbl FOR 
 CREATE POLICY "Permitir inserção pública de pendenciastbl" ON pendenciastbl FOR INSERT WITH CHECK (true);
 CREATE POLICY "Permitir atualização pública de pendenciastbl" ON pendenciastbl FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir remoção pública de pendenciastbl" ON pendenciastbl FOR DELETE USING (true);
-
 
 
 
@@ -183,10 +176,6 @@ $$ LANGUAGE plpgsql;
 
 
 
-
-
-
-
 -- =====================================================
 -- 5. TRIGGERS (GATILHOS AUTOMÁTICOS)
 -- =====================================================
@@ -213,9 +202,6 @@ GRANT EXECUTE ON FUNCTION calcular_intensidades() TO anon;
 
 
 
-
-
-
 -- =====================================================
 -- 7. CARGA DE DADOS INICIAIS (SEED DATA)
 -- =====================================================
@@ -229,7 +215,6 @@ INSERT INTO integradores (nome, integrador_cpf, integrador_num) VALUES
 ('Amarante', '98798979', '(86)98822-9998'),
 ('Borges', '6546464465', '(86)98999-3388'),
 ('Cláudio', '417711771', '(86)9944-8998');
-
 
 
 -- Tarefas
