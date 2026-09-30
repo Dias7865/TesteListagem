@@ -46,17 +46,17 @@ h1 {
 h2 { color: #333; font-size: 1.8rem; }
 .btn {
     padding: 12px 24px;
-    background: #4f46e5; /* Azul/Roxo fosco */
+    background: #4f46e5;
     color: white; border: none; border-radius: 8px; cursor: pointer;
     font-size: 16px; font-weight: bold;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-success { background: #2e7d32; } /* Verde fosco */
-.btn-warning { background: #e65100; } /* Laranja fosco */
-.btn-danger  { background: #c62828; } /* Vermelho fosco */
-.btn-secondary { background: #616161; } /* Cinza fosco */
+.btn-success { background: #2e7d32; }
+.btn-warning { background: #e65100; }
+.btn-danger  { background: #c62828; }
+.btn-secondary { background: #616161; }
 
 .loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
@@ -217,7 +217,7 @@ h2 { color: #333; font-size: 1.8rem; }
     100% { transform: translateY(-50%); }
 }
 .vis-card {
-    background: #0e136b; /* Cor fosco */
+    background: #0e136b;
     color: white; border-radius: 10px; padding: 12px; border: 2px solid #1a1a1a;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
 }
@@ -360,7 +360,6 @@ h2 { color: #333; font-size: 1.8rem; }
 
             <!-- VISUALIZAÇÃO DINÂMICA DIVIDIDA EM 2 COLUNAS -->
             <div class="grid-vis-dinamica">
-                <!-- Coluna 1: No Prazo / Prazo Próximo -->
                 <div class="container-vis-dinamica">
                     <div class="vis-dinamica-titulo" style="color: #2e7d32;">
                         🟢 Dentro do Prazo & Próximo
@@ -370,7 +369,6 @@ h2 { color: #333; font-size: 1.8rem; }
                     </div>
                 </div>
 
-                <!-- Coluna 2: Dia Limite / Atrasado -->
                 <div class="container-vis-dinamica">
                     <div class="vis-dinamica-titulo" style="color: #c62828;">
                         🔴 Prazo Limite & Atrasado
@@ -482,7 +480,6 @@ h2 { color: #333; font-size: 1.8rem; }
             <button class="btn btn-secondary" onclick="irParaPagina1()">⬅️ Voltar à 1ª Página</button>
         </div>
 
-        <!-- Tarefas Concluídas (Tabela trfsconcluidas) -->
         <div id="secaoConcluidas" class="section area-concluidas">
             <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
             <div class="seletor-container">
@@ -504,7 +501,7 @@ h2 { color: #333; font-size: 1.8rem; }
     </div>
 </div>
 
-<!-- Modal Secundário de Pendências -->
+<!-- Modal Secundário de Pendências (AGORA COM DATA E TEXTO SEPARADOS) -->
 <div id="modalPendencias" class="modal-overlay" style="z-index: 10002;">
     <div class="modal-card">
         <button class="modal-close" onclick="fecharModalPendencias()">✕</button>
@@ -512,11 +509,7 @@ h2 { color: #333; font-size: 1.8rem; }
         
         <div class="form-group">
             <label style="font-weight: bold; margin-bottom: 10px; display: block;">Itens pendentes:</label>
-            
-            <!-- Container onde as linhas serão criadas dinamicamente -->
             <div id="listaPendenciasContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px;"></div>
-            
-            <!-- Botão para adicionar nova linha -->
             <button type="button" class="btn btn-secondary" onclick="adicionarItemPendencia()" style="margin-top: 10px; width: 100%;">
                 ➕ Adicionar Item
             </button>
@@ -528,8 +521,6 @@ h2 { color: #333; font-size: 1.8rem; }
         </div>
     </div>
 </div>
-
-
 
 <script>
 const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
@@ -764,10 +755,8 @@ function renderizarCaixasPrazos() {
 function obterPesoOrdem(t) {
     const status = (t.status || '').toLowerCase();
     
-    // REGRA 1: Tarefas concluídas vão FORÇADAMENTE para o final da lista (peso máximo)
     if (status.includes('conclu')) return 10;
-
-    if (!t.data_para_termino) return 9; // Sem data fica logo acima das concluídas
+    if (!t.data_para_termino) return 9; 
 
     const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
     const dataTermino = new Date(ano, mes - 1, dia);
@@ -776,11 +765,10 @@ function obterPesoOrdem(t) {
 
     const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
 
-    // REGRA 2: Ordem de urgência para as tarefas NÃO concluídas
-    if (diffDias < 0) return 1;   // 🔴 Atrasado
-    if (diffDias < 2) return 2;   // 🚨 No Limite
-    if (diffDias <= 8) return 3;  // ⚠️ Próximo
-    return 4;                     // 🟢 No Prazo
+    if (diffDias < 0) return 1;   
+    if (diffDias < 2) return 2;   
+    if (diffDias <= 8) return 3;  
+    return 4;                     
 }
 
 function renderizarListaPendentes() {
@@ -795,12 +783,8 @@ function renderizarListaPendentes() {
         const pesoA = obterPesoOrdem(a);
         const pesoB = obterPesoOrdem(b);
 
-        // Separa por grupo (Atrasado -> No Limite -> Próximo -> No Prazo -> Concluído)
-        if (pesoA !== pesoB) {
-            return pesoA - pesoB;
-        }
+        if (pesoA !== pesoB) return pesoA - pesoB;
 
-        // Desempate dentro do mesmo grupo: data mais antiga/próxima primeiro
         if (a.data_para_termino && b.data_para_termino) {
             return new Date(a.data_para_termino) - new Date(b.data_para_termino);
         }
@@ -918,7 +902,7 @@ function renderizarVisualizacaoDinamicaVertical() {
     }
 }
 
-// --- BUSCAR DADOS GENÉRICOS ---
+// --- BUSCAR DADOS ---
 async function buscarDados(tabela) {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
@@ -930,7 +914,14 @@ async function buscarDados(tabela) {
 async function carregarTarefas() {
     const select = document.getElementById('selectTarefas');
     try {
-        dadosTarefas = await buscarDados('tarefas');
+        // Alterado aqui: O supabase agora busca as pendências relativas à tarefa usando a Foreign Key
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*)`, {
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
+        
+        dadosTarefas = await response.json();
+        
         select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
         dadosTarefas.forEach((t, i) => {
             const opt = document.createElement('option');
@@ -977,7 +968,6 @@ function mostrarDetalhesTrfConcluida() {
 
     const tc = dadosTrfsConcluidas[idx];
 
-    // Formatação do Relatório de Atividades para Tarefas Concluídas
     let listaRelatorio = 'Sem relatório';
     if (tc.relatorio_atividades) {
         const linhasRelatorio = Array.isArray(tc.relatorio_atividades)
@@ -1118,12 +1108,10 @@ function mostrarDetalhesTarefa() {
 
     const t = dadosTarefas[idx];
     
-    // 1. Formatação da lista de Materiais Faltando
     const listaMateriais = Array.isArray(t.materiais_faltando) && t.materiais_faltando.length > 0
         ? `<ul style="padding-left: 30px; margin-top: 5px;">${t.materiais_faltando.map(m => `<li>${m}</li>`).join('')}</ul>`
         : 'Nenhum material pendente';
 
-    // 2. Formatação do Relatório de Atividades
     let listaRelatorio = 'Nenhum relatório registrado';
     if (t.relatorio_atividades) {
         const linhasRelatorio = Array.isArray(t.relatorio_atividades)
@@ -1135,16 +1123,13 @@ function mostrarDetalhesTarefa() {
         }
     }
 
-    // 3. Formatação das Pendências a Resolver (NOVO)
+    // Leitura das pendências separadas pela nova tabela
     let listaPendencias = 'Sem pendências';
-    if (t.pendencias) {
-        const linhasPendencias = Array.isArray(t.pendencias)
-            ? t.pendencias
-            : t.pendencias.split('\n').map(p => p.trim()).filter(Boolean);
-
-        if (linhasPendencias.length > 0) {
-            listaPendencias = `<ul style="padding-left: 30px; margin-top: 5px;">${linhasPendencias.map(p => `<li>${p}</li>`).join('')}</ul>`;
-        }
+    if (t.pendenciastbl && t.pendenciastbl.length > 0) {
+        listaPendencias = `<ul style="padding-left: 30px; margin-top: 5px;">${t.pendenciastbl.map(p => {
+            let dataApresentada = p.data_lista ? formatarData(p.data_lista) : 'S/D';
+            return `<li>${p.texto_lista} - <strong>${dataApresentada}</strong></li>`;
+        }).join('')}</ul>`;
     }
 
     div.innerHTML = `
@@ -1281,18 +1266,17 @@ async function salvarEdicaoTarefa(index) {
                 intg_id: document.getElementById('editIntegradorTarefa').value || null, 
                 status_material: document.getElementById('editStatusMaterialTarefa').value || null,
                 materiais_faltando: materiaisArray.length > 0 ? materiaisArray : null,
-                pendencias: document.getElementById('editPendenciasTarefa').value.trim() || null,
                 relatorio_atividades: relatorioVal || null,
                 descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
             })
         });
 
         if (!response.ok) throw new Error('Erro ao atualizar no banco de dados');
-        const atualizada = await response.json();
-        dadosTarefas[index] = atualizada[0];
+        
+        // Recarregar os dados para atualizar a tela
+        await carregarTarefas();
         mostrarDetalhesTarefa();
         fecharModalEditTarefa();
-        await carregarTarefas();
         await carregarPagina1();
         alert('✅ Tarefa atualizada com sucesso!');
     } catch (err) { 
@@ -1313,7 +1297,6 @@ async function adicionarTarefa() {
     const nome = document.getElementById('nomeTarefa').value.trim();
     if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
-    // Transforma a lista de materiais (separados por quebra de linha) em um Array
     const matTexto = document.getElementById('materiaisFaltandoTarefa').value.trim();
     const materiaisArray = matTexto ? matTexto.split('\n').map(i => i.trim()).filter(Boolean) : [];
 
@@ -1331,7 +1314,6 @@ async function adicionarTarefa() {
                 intg_id: document.getElementById('integradorTarefa').value || null,
                 status_material: document.getElementById('statusMaterialTarefa').value || null,
                 materiais_faltando: materiaisArray.length > 0 ? materiaisArray : null,
-                pendencias: document.getElementById('pendenciasTarefa').value.trim() || null,
                 relatorio_atividades: document.getElementById('relatorioAtividadesTarefa').value.trim() || null,
                 descricao: document.getElementById('descricaoTarefa').value.trim() || null
             })
@@ -1413,7 +1395,6 @@ function resetarFormularioAdicao() {
     document.getElementById('integradorTarefa').value = '';
     document.getElementById('statusMaterialTarefa').value = '';
     document.getElementById('materiaisFaltandoTarefa').value = '';
-    document.getElementById('pendenciasTarefa').value = '';
     document.getElementById('relatorioAtividadesTarefa').value = '';
     document.getElementById('descricaoTarefa').value = '';
     document.getElementById('nomeIntegrador').value = '';
@@ -1490,34 +1471,21 @@ function notificarSincronizacao() {
     }, 1000);
 }
 
-// --- LÓGICA DA LISTA DINÂMICA DE PENDÊNCIAS ---
+// --- LÓGICA DA LISTA DINÂMICA DE PENDÊNCIAS COM TABELA RELACIONAL ---
 let tarefaPendenciaEditando = null;
 
 function abrirModalPendencias(index) {
     tarefaPendenciaEditando = index;
     const tarefa = dadosTarefas[index];
     const container = document.getElementById('listaPendenciasContainer');
-    container.innerHTML = ''; // Limpa itens anteriores
+    container.innerHTML = ''; 
 
-    // Se houver pendências salvas, separa cada linha e extrai Texto e Data
-    if (tarefa.pendencias) {
-        const itens = tarefa.pendencias.split('\n').map(p => p.trim()).filter(Boolean);
-        
-        itens.forEach(line => {
-            let texto = line;
-            let data = '';
-            
-            // Localiza o último divisor ' - ' para separar o texto da data
-            const posHifen = line.lastIndexOf(' - ');
-            if (posHifen !== -1) {
-                texto = line.substring(0, posHifen).trim();
-                data = line.substring(posHifen + 3).trim();
-                if (data === 'S/D') data = ''; // Mantém o campo limpo se for o placeholder padrão
-            }
-            adicionarItemPendencia(texto, data);
+    // Lê diretamente da array relacional vinda do Supabase
+    if (tarefa.pendenciastbl && tarefa.pendenciastbl.length > 0) {
+        tarefa.pendenciastbl.forEach(p => {
+            adicionarItemPendencia(p.texto_lista, p.data_lista || '');
         });
     } else {
-        // Se não houver nada, adiciona uma linha vazia por padrão
         adicionarItemPendencia('', '');
     }
 
@@ -1529,7 +1497,7 @@ function fecharModalPendencias() {
     tarefaPendenciaEditando = null;
 }
 
-// Adiciona uma nova linha com campo de texto e botão de remover
+// Adiciona linha com input de Date
 function adicionarItemPendencia(texto = '', data = '') {
     const container = document.getElementById('listaPendenciasContainer');
     
@@ -1537,70 +1505,72 @@ function adicionarItemPendencia(texto = '', data = '') {
     row.className = 'item-pendencia-row';
     row.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-bottom: 5px;';
 
-    // Trata aspas para evitar quebras no HTML
     const textoEscapado = texto.replace(/"/g, '&quot;');
-    const dataEscapada = data.replace(/"/g, '&quot;');
 
     row.innerHTML = `
         <input type="text" class="input-pendencia-texto" value="${textoEscapado}" placeholder="Digite a pendência..." style="flex: 2; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
-        <input type="text" class="input-pendencia-data" value="${dataEscapada}" placeholder="Data (em dd/mm)..." style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <input type="date" class="input-pendencia-data" value="${data}" style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
         <button type="button" class="btn btn-danger btn-sm" onclick="removerItemPendencia(this)" title="Remover item" style="padding: 4px 10px;">➖</button>
     `;
 
     container.appendChild(row);
 }
 
-// Remove a linha específica
 function removerItemPendencia(botao) {
     botao.parentElement.remove();
 }
 
-// Junta todas as linhas e salva no Supabase
 async function salvarPendenciasModal() {
     if (tarefaPendenciaEditando === null) return;
 
     const tarefa = dadosTarefas[tarefaPendenciaEditando];
-    
     const rows = document.querySelectorAll('#listaPendenciasContainer .item-pendencia-row');
-    const listaValores = [];
+    
+    const novasPendencias = [];
 
     rows.forEach(row => {
         const inputTexto = row.querySelector('.input-pendencia-texto');
         const inputData = row.querySelector('.input-pendencia-data');
         
         const texto = inputTexto ? inputTexto.value.trim() : '';
-        const data = inputData ? inputData.value.trim() : '';
+        const data = inputData && inputData.value ? inputData.value : null;
 
         if (texto !== '') {
-            // Caso a data não seja preenchida, utiliza "S/D"
-            const dataFinal = data !== '' ? data : 'S/D';
-            listaValores.push(`${texto} - ${dataFinal}`);
+            novasPendencias.push({
+                tarefa_id: tarefa.id,
+                texto_lista: texto,
+                data_lista: data
+            });
         }
     });
 
-    // Unifica todos os itens em uma string com quebra de linha (\n)
-    const textoFinal = listaValores.join('\n');
-
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
-            method: 'PATCH',
+        // 1. Apagar pendências velhas vinculadas àquela Tarefa
+        await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?tarefa_id=eq.${tarefa.id}`, {
+            method: 'DELETE',
             headers: { 
                 'apikey': SUPABASE_ANON_KEY, 
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
-                'Content-Type': 'application/json', 
-                'Prefer': 'return=representation' 
-            },
-            body: JSON.stringify({
-                pendencias: textoFinal || null
-            })
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}` 
+            }
         });
 
-        if (!response.ok) throw new Error('Erro ao salvar no banco de dados.');
+        // 2. Inserir a nova lista de pendências (se houver alguma)
+        if (novasPendencias.length > 0) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': SUPABASE_ANON_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(novasPendencias)
+            });
+            if (!res.ok) throw new Error('Erro ao salvar as novas pendências.');
+        }
 
-        const atualizada = await response.json();
-        dadosTarefas[tarefaPendenciaEditando] = atualizada[0];
-
+        // Recarrega tudo e atualiza o detalhe
         fecharModalPendencias();
+        await carregarTarefas();
         mostrarDetalhesTarefa();
         await carregarPagina1();
         alert('✅ Pendências atualizadas com sucesso!');
@@ -1608,7 +1578,6 @@ async function salvarPendenciasModal() {
         alert(`❌ Erro ao salvar pendências: ${err.message}`);
     }
 }
-
 </script>
 </body>
 </html>
