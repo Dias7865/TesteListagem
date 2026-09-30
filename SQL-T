@@ -1,9 +1,4 @@
 -- =====================================================
--- CÓDIGO SQL COMPLETO E ORGANIZADO - SUPABASE
--- Sistema de Tarefas, Integradores e Intensidades
--- =====================================================
-
--- =====================================================
 -- 1. LIMPEZA DE ESTRUTURAS EXISTENTES
 -- =====================================================
 
@@ -13,11 +8,17 @@ DROP TABLE IF EXISTS integradores CASCADE;
 DROP TABLE IF EXISTS intensidades CASCADE;
 DROP TABLE IF EXISTS tarefas CASCADE;
 DROP TABLE IF EXISTS trfsconcluidas CASCADE;
+DROP TABLE IF EXISTS pendenciastbl CASCADE;
 
 -- Apagar funções
 DROP FUNCTION IF EXISTS trg_atualizar_intensidades() CASCADE;
 DROP FUNCTION IF EXISTS calcular_intensidades() CASCADE;
 DROP FUNCTION IF EXISTS verificar_senha(text) CASCADE;
+
+
+
+
+
 
 -- =====================================================
 -- 2. CRIAÇÃO DAS TABELAS
@@ -45,6 +46,7 @@ CREATE TABLE intensidades (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+
 CREATE TABLE tarefas (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     nome varchar(50) NOT NULL,
@@ -55,7 +57,6 @@ CREATE TABLE tarefas (
     status varchar(30) CHECK (status IN ('concluído', 'em progresso', 'aguardando equatorial', 'faltam dados', 'reprovado pela equatorial')),
     data_para_termino date,
     endereco text,
-    pendencias text,
     data_inicio_obra date,
     status_material varchar(20) CHECK (status_material IN ('Falta', 'Arranjado')),
     materiais_faltando text[],
@@ -74,6 +75,17 @@ CREATE TABLE trfsconcluidas (
     relatorio_atividades text
 );
 
+CREATE TABLE pendenciastbl (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    tarefa_id uuid REFERENCES tarefas(id) ON DELETE CASCADE,
+    texto_lista text NOT NULL,
+    data_lista date
+);
+
+
+
+
+
 -- =====================================================
 -- 3. SEGURANÇA (RLS - ROW LEVEL SECURITY) E POLÍTICAS
 -- =====================================================
@@ -83,6 +95,7 @@ ALTER TABLE integradores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trfsconcluidas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pendenciastbl ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: configuracoes
 CREATE POLICY "Bloquear leitura direta de configuracoes" ON configuracoes FOR SELECT USING (false);
@@ -107,6 +120,15 @@ CREATE POLICY "Permitir leitura pública de trfsconcluidas" ON trfsconcluidas FO
 CREATE POLICY "Permitir inserção pública de trfsconcluidas" ON trfsconcluidas FOR INSERT WITH CHECK (true);
 CREATE POLICY "Permitir atualização pública de trfsconcluidas" ON trfsconcluidas FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir remoção pública de trfsconcluidas" ON trfsconcluidas FOR DELETE USING (true);
+
+-- Políticas: pendenciastbl
+CREATE POLICY "Permitir leitura pública de pendenciastbl" ON pendenciastbl FOR SELECT USING (true);
+CREATE POLICY "Permitir inserção pública de pendenciastbl" ON pendenciastbl FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública de pendenciastbl" ON pendenciastbl FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir remoção pública de pendenciastbl" ON pendenciastbl FOR DELETE USING (true);
+
+
+
 
 -- =====================================================
 -- 4. FUNÇÕES E PROCEDURES (RPCs)
@@ -159,6 +181,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+
+
+
+
+
 -- =====================================================
 -- 5. TRIGGERS (GATILHOS AUTOMÁTICOS)
 -- =====================================================
@@ -177,10 +205,14 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON tarefas TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON integradores TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON trfsconcluidas TO anon;
 GRANT SELECT ON intensidades TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON pendenciastbl TO anon;
 
 -- Funções RPC
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
 GRANT EXECUTE ON FUNCTION calcular_intensidades() TO anon;
+
+
+
 
 
 
@@ -198,22 +230,22 @@ INSERT INTO integradores (nome, integrador_cpf, integrador_num) VALUES
 ('Borges', '6546464465', '(86)98999-3388'),
 ('Cláudio', '417711771', '(86)9944-8998');
 
+
+
 -- Tarefas
-INSERT INTO tarefas (nome, tipo, status, endereco, data_inicio_obra, data_para_termino, intg_id, status_material, materiais_faltando, pendencias, relatorio_atividades, descricao)
+INSERT INTO tarefas (nome, tipo, status, endereco, data_inicio_obra, data_para_termino, intg_id, status_material, materiais_faltando, relatorio_atividades, descricao)
 VALUES 
-  ('Posto do A214', 'Subestação', 'reprovado pela equatorial', 'Av. Principal, 214 - Setor Industrial', '2026-09-01', '2026-10-15', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Arranjado', NULL, 'Adequar diagrama unifilar conforme solicitação do parecer de acesso', '01/09/2026 - Entrada na documentação. 10/09/2026 - Reprovado por inconsistência no padrão', 'Adequação e homologação de subestação para posto de combustível'),
-  ('Barbearia do B193', 'Rateio', 'aguardando equatorial', 'Rua Brasil, 193 - Bairro Novo', '2026-08-20', '2026-09-17', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', NULL, 'Aguardando vistoria técnica da concessionária para homologação', '20/08/2026 - Solicitação de troca de titularidade e cadastro do rateio enviada', 'Projeto de rateio de créditos de energia para barbearia'),
-  ('Petshop do C045', 'Instalação solar', 'concluído', 'Rua São José, 45 - Centro', '2026-09-05', '2026-10-28', (SELECT id FROM integradores WHERE nome = 'Borges' LIMIT 1), 'Arranjado', NULL, 'Nenhuma pendência', '05/09/2026 - Estruturas fixadas. 12/09/2026 - Módulos montados e comissionamento efetuado', 'Instalação de sistema fotovoltaico sobre o telhado do petshop'),
-  ('Gráfica do D382', 'Instalação solar', 'em progresso', 'Av. do Comércio, 382 - Vila Maria', '2026-09-10', '2026-12-19', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Falta', ARRAY['Disjuntor 63A', 'DPS Classe II', 'Cabo Verde 6mm²'], 'Aguardando entrega dos itens de proteção CA para finalizar o quadro', '10/09/2026 - Passagem dos cabos CC no telhado finalizada', 'Montagem de gerador solar fotovoltaico para gráfica'),
-  ('Marcenaria do E721', 'Subestação', 'concluído', 'Rua dos Pinhais, 721 - Distrito Industrial', NULL, '2026-09-02', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Falta', ARRAY['Transformador 112.5kVA', 'Chave Fusível 15kV'], 'Aprovação do orçamento pelo cliente e compra do transformador', NULL, 'Implantação e montagem de subestação dedicada para marcenaria'),
-  ('Tornearia do F130', 'Instalação solar', 'em progresso', 'Rua das Indústrias, 130 - Zona Norte', '2026-09-15', '2026-10-07', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Falta', ARRAY['Inversor 10kW'], 'Acompanhar rastreio da entrega do inversor pelo fornecedor', '15/09/2026 - Montagem de trilhos e fixação dos ganchos concluída', 'Instalação de usina solar fotovoltaica para tornearia'),
-  ('Lava Jato do G842', 'Instalação solar', 'faltam dados', 'Av. Rio Branco, 842 - Jardim Europa', NULL, '2026-09-25', (SELECT id FROM integradores WHERE nome = 'Borges' LIMIT 1), 'Arranjado', NULL, 'Solicitar conta de energia atualizada e procuração assinada pelo cliente', '18/09/2026 - Visita técnica realizada. Aguardando documentação do cliente', 'Projeto solar fotovoltaico para atendimento de demanda em lava jato'),
-  ('Vidraçaria do H901', 'Instalação solar', 'em progresso', 'Rua Amazonas, 901 - Bairro Amapá', '2026-09-01', '2026-09-19', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Falta', ARRAY['Conectores MC4 par'], 'Finalizar aterramento das estruturas e crimpagem dos conectores', '01/09/2026 - Fixação dos 24 módulos fotovoltaicos concluída', 'Instalação de painéis fotovoltaicos e conexões na vidraçaria'),
-  ('Restaurante do I618', 'Instalação solar', 'concluído', 'Rua Gastronômica, 618 - Centro', '2026-08-15', '2026-09-06', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', NULL, 'Nenhuma pendência', '15/08/2026 - Início das obras. 01/09/2026 - Troca do medidor efetuada pela concessionária', 'Sistema solar fotovoltaico concluído para o restaurante'),
-  ('Auto Peças do J375', 'Rateio', 'em progresso', 'Av. Automotiva, 375 - Bairro das Graças', '2026-08-01', '2026-08-16', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Arranjado', NULL, 'Ajustar porcentagem de redistribuição de créditos das UC beneficiárias', '01/08/2026 - Formuários de rateio protocolados no portal da concessionária', 'Redistribuição e gestão de rateio para loja de auto peças'),
-  ('Frutaria do K196', 'Rateio', 'faltam dados', 'Rua do Comércio, 196 - Centro', NULL, '2026-09-15', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', NULL, 'Coletar número da conta contrato das unidades consumidoras filiais', '10/09/2026 - Minuta do contrato de rateio enviada via e-mail para aprovação', 'Configuração e envio de documentação para rateio de frutaria');
-
-
+  ('Posto do A214', 'Subestação', 'reprovado pela equatorial', 'Av. Principal, 214 - Setor Industrial', '2026-09-01', '2026-10-15', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Arranjado', NULL, '01/09/2026 - Entrada na documentação. 10/09/2026 - Reprovado por inconsistência no padrão', 'Adequação e homologação de subestação para posto de combustível'),
+  ('Barbearia do B193', 'Rateio', 'aguardando equatorial', 'Rua Brasil, 193 - Bairro Novo', '2026-08-20', '2026-09-17', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', NULL, '20/08/2026 - Solicitação de troca de titularidade e cadastro do rateio enviada', 'Projeto de rateio de créditos de energia para barbearia'),
+  ('Petshop do C045', 'Instalação solar', 'concluído', 'Rua São José, 45 - Centro', '2026-09-05', '2026-10-28', (SELECT id FROM integradores WHERE nome = 'Borges' LIMIT 1), 'Arranjado', NULL, '05/09/2026 - Estruturas fixadas. 12/09/2026 - Módulos montados e comissionamento efetuado', 'Instalação de sistema fotovoltaico sobre o telhado do petshop'),
+  ('Gráfica do D382', 'Instalação solar', 'em progresso', 'Av. do Comércio, 382 - Vila Maria', '2026-09-10', '2026-12-19', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Falta', ARRAY['Disjuntor 63A', 'DPS Classe II', 'Cabo Verde 6mm²'], '10/09/2026 - Passagem dos cabos CC no telhado finalizada', 'Montagem de gerador solar fotovoltaico para gráfica'),
+  ('Marcenaria do E721', 'Subestação', 'concluído', 'Rua dos Pinhais, 721 - Distrito Industrial', NULL, '2026-09-02', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Falta', ARRAY['Transformador 112.5kVA', 'Chave Fusível 15kV'], NULL, 'Implantação e montagem de subestação dedicada para marcenaria'),
+  ('Tornearia do F130', 'Instalação solar', 'em progresso', 'Rua das Indústrias, 130 - Zona Norte', '2026-09-15', '2026-10-07', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Falta', ARRAY['Inversor 10kW'], '15/09/2026 - Montagem de trilhos e fixação dos ganchos concluída', 'Instalação de usina solar fotovoltaica para tornearia'),
+  ('Lava Jato do G842', 'Instalação solar', 'faltam dados', 'Av. Rio Branco, 842 - Jardim Europa', NULL, '2026-09-25', (SELECT id FROM integradores WHERE nome = 'Borges' LIMIT 1), 'Arranjado', NULL, '18/09/2026 - Visita técnica realizada. Aguardando documentação do cliente', 'Projeto solar fotovoltaico para atendimento de demanda em lava jato'),
+  ('Vidraçaria do H901', 'Instalação solar', 'em progresso', 'Rua Amazonas, 901 - Bairro Amapá', '2026-09-01', '2026-09-19', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Falta', ARRAY['Conectores MC4 par'], '01/09/2026 - Fixação dos 24 módulos fotovoltaicos concluída', 'Instalação de painéis fotovoltaicos e conexões na vidraçaria'),
+  ('Restaurante do I618', 'Instalação solar', 'concluído', 'Rua Gastronômica, 618 - Centro', '2026-08-15', '2026-09-06', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', NULL, '15/08/2026 - Início das obras. 01/09/2026 - Troca do medidor efetuada pela concessionária', 'Sistema solar fotovoltaico concluído para o restaurante'),
+  ('Auto Peças do J375', 'Rateio', 'em progresso', 'Av. Automotiva, 375 - Bairro das Graças', '2026-08-01', '2026-08-16', (SELECT id FROM integradores WHERE nome = 'Alisson' LIMIT 1), 'Arranjado', NULL, '01/08/2026 - Formuários de rateio protocolados no portal da concessionária', 'Redistribuição e gestão de rateio para loja de auto peças'),
+  ('Frutaria do K196', 'Rateio', 'faltam dados', 'Rua do Comércio, 196 - Centro', NULL, '2026-09-15', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', NULL, '10/09/2026 - Minuta do contrato de rateio enviada via e-mail para aprovação', 'Configuração e envio de documentação para rateio de frutaria');
 
 
 -- Tarefas Concluídas (Histórico)
@@ -238,5 +270,6 @@ VALUES
   ('Lavanderia do J623', 'Rateio', '2026-04-30', 'Amarante', 'Realizado na Rua Chi Psi Zeta'),
   ('Sorveteria do I489', 'Instalação solar', '2025-03-31', 'Amarante', 'Realizado na Rua Chi Psi Alfa');
 
--- Cálculo inicial dos contadores
+
+-- Cálculo inicial dos contadores [necessário]
 SELECT calcular_intensidades();
