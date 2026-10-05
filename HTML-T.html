@@ -52,12 +52,29 @@ h2 { color: #333; font-size: 1.8rem; }
 .btn-danger  { background: #c62828; }
 .btn-secondary { background: #616161; }
 
-
+/* Botão repartido ao meio (Split Button) */
+.btn-split-container {
+    display: flex;
+    flex: 1;
+    min-width: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.btn-split-left {
+    flex: 1;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+.btn-split-right {
+    flex: 1;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
 
 .loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
-
-
 
 .imagem-login {
     width: 100%;
@@ -91,12 +108,6 @@ h2 { color: #333; font-size: 1.8rem; }
 .mensagem-sucesso { background: #e8f5e9; border: 2px solid #4caf50; color: #2e7d32; }
 .mensagem-erro { background: #fce4ec; border: 2px solid #f44336; color: #c62828; }
 
-
-
-
-
-
-
 /* --- ESTRUTURA LAYOUT DA 1ª PÁGINA --- */
 .p1-topo {    display: grid; grid-template-columns: 1fr 200px; gap: 15px; margin-bottom: 15px; align-items: stretch;	}
 
@@ -112,10 +123,6 @@ h2 { color: #333; font-size: 1.8rem; }
     border-left: 3px solid #1a1a1a; padding-left: 8px; white-space: nowrap;
     text-transform: uppercase; letter-spacing: 1px;
 }
-
-
-
-
 
 /* QUADRADOS DOS STATUS E CÍRCULOS DOS PRAZOS */
 .grid-caixas-status, .grid-caixas-prazos {
@@ -145,10 +152,6 @@ h2 { color: #333; font-size: 1.8rem; }
     font-size: 1.0rem; text-transform: capitalize; line-height: 1.2;
 }
 
-
-
-
-
 /* BOTÕES PARA NAVEGAÇÃO */
 .p1-botoes-laterais {
     display: flex;
@@ -168,13 +171,6 @@ h2 { color: #333; font-size: 1.8rem; }
     box-shadow: 0 8px 20px rgba(0,0,0,0.15); width: 100%; height: 100%;
 }
 .btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
-
-
-
-
-
-
-
 
 /* GRID DE 2 COLUNAS ROLANTES NA PÁGINA 1 */
 .p1-corpo {
@@ -196,13 +192,6 @@ h2 { color: #333; font-size: 1.8rem; }
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 .item-pendente-esquerda { display: flex; align-items: center; gap: 10px; }
-
-
-
-
-
-
-
 
 /* VISUALIZAÇÃO DINÂMICA EM 2 COLUNAS IGUAIS */
 .grid-vis-dinamica {
@@ -401,7 +390,42 @@ h2 { color: #333; font-size: 1.8rem; }
                     </div>
                 </div>
             </div>
+				
         </div>
+		
+				<!-- PAINEL DE ANÁLISE DE PENDÊNCIAS DA TABELA PENDENCIASTBL -->
+		<div class="container-analise-pendencias" style="margin-top: 25px; background: white; border: 4px solid #1a1a1a; border-radius: 12px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+			<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+				<h3 style="font-size: 1.4rem; color: #1a1a1a;">📋 Análise de Prazos das Pendências</h3>
+				<button class="btn btn-warning" onclick="analisarPendencias()">🔍 Processar Pendências</button>
+			</div>
+
+			<div id="resultadoAnalisePendencias" style="display: none;">
+				<!-- Cards de Resumo dos Totais -->
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+				
+					<div style="background: #c62828; color: white; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+						<div style="font-size: 0.9rem; font-weight: bold; text-transform: uppercase;"> Fora do Limite (Atrasadas)</div>
+						<div id="qtdForaLimite" style="font-size: 2.2rem; font-weight: bold; margin-top: 5px;">0</div>
+					</div>
+				
+					<div style="background: #e65100; color: white; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+						<div style="font-size: 0.9rem; font-weight: bold; text-transform: uppercase;"> Dentro do Limite (Até 4 dias)</div>
+						<div id="qtdDentroLimite" style="font-size: 2.2rem; font-weight: bold; margin-top: 5px;">0</div>
+					</div>
+				
+					<div style="background: #2e7d32; color: white; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+						<div style="font-size: 0.9rem; font-weight: bold; text-transform: uppercase;"> Dentro do Esperado (> 4 dias)</div>
+						<div id="qtdDentroEsperado" style="font-size: 2.2rem; font-weight: bold; margin-top: 5px;">0</div>
+					</div>
+					
+				</div>
+
+				<!-- Lista Detalhada das Pendências Categorizadas -->
+				<div id="detalhesPendenciasCategorizadas" style="display: flex; flex-direction: column; gap: 15px;"></div>
+			</div>
+		</div>
+		
     </div>
 
     <!-- ==================== PÁGINA 2 ==================== -->
@@ -524,7 +548,7 @@ h2 { color: #333; font-size: 1.8rem; }
     </div>
 </div>
 
-<!-- Modal Secundário de Pendências (AGORA COM DATA E TEXTO SEPARADOS) -->
+<!-- Modal Secundário de Pendências -->
 <div id="modalPendencias" class="modal-overlay" style="z-index: 10002;">
     <div class="modal-card">
         <button class="modal-close" onclick="fecharModalPendencias()">✕</button>
@@ -541,6 +565,20 @@ h2 { color: #333; font-size: 1.8rem; }
         <div class="action-buttons" style="margin-top: 20px;">
             <button class="btn btn-success" onclick="salvarPendenciasModal()">💾 Salvar Pendências</button>
             <button class="btn btn-secondary" onclick="fecharModalPendencias()">❌ Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Materiais da Tarefa -->
+<div id="modalMateriais" class="modal-overlay" style="z-index: 10003;">
+    <div class="modal-card">
+        <button class="modal-close" onclick="fecharModalMateriais()">✕</button>
+        <h3 id="tituloModalMateriais" style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">📦 Materiais da Tarefa</h3>
+        
+        <div id="listaMateriaisModalContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 4px;"></div>
+
+        <div class="action-buttons" style="margin-top: 20px;">
+            <button class="btn btn-secondary" onclick="fecharModalMateriais()" style="width: 100%;">Fechar</button>
         </div>
     </div>
 </div>
@@ -937,7 +975,6 @@ async function buscarDados(tabela) {
 async function carregarTarefas() {
     const select = document.getElementById('selectTarefas');
     try {
-        // Alterado aqui: O supabase agora busca as pendências relativas à tarefa usando a Foreign Key
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*)`, {
             headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
@@ -1158,10 +1195,8 @@ function mostrarDetalhesTarefa() {
             
             let subTexto = '';
             if (p.subpendencia_lista) {
-                // Divide o texto por quebras de linha e remove linhas vazias
                 const linhasSub = p.subpendencia_lista.split('\n').map(s => s.trim()).filter(Boolean);
                 if (linhasSub.length > 0) {
-                    // Cria uma sub-lista sem o "ponto" padrão, usando espaços (nbsp) e a seta
                     subTexto = `<ul style="list-style-type: none; padding-left: 0; margin-top: 2px;">` + 
                         linhasSub.map(s => `<li style="color: #555;">&nbsp;&nbsp;&nbsp;&nbsp;➝ ${s}</li>`).join('') + 
                     `</ul>`;
@@ -1190,10 +1225,60 @@ function mostrarDetalhesTarefa() {
             <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
             <button class="btn btn-secondary" onclick="abrirModalPendencias(${idx})">📝 Editar Pendências a Resolver</button>
-            <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
+            <div class="btn-split-container">
+                <button class="btn btn-danger btn-split-left" onclick="removerTarefa(${idx})">🗑️ Remover</button>
+                <button class="btn btn-secondary btn-split-right" onclick="abrirModalMateriais(${idx})">📦 Todos os Materiais</button>
+            </div>
         </div>
     `;
     div.style.display = 'block';
+}
+
+function abrirModalMateriais(index) {
+    const tarefa = dadosTarefas[index];
+    if (!tarefa) return;
+
+    document.getElementById('tituloModalMateriais').textContent = `📦 Materiais: ${tarefa.nome}`;
+    const container = document.getElementById('listaMateriaisModalContainer');
+    container.innerHTML = '';
+
+    const materiais = Array.isArray(tarefa.materiais) ? tarefa.materiais : [];
+
+    if (materiais.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 15px;">Nenhum material cadastrado para esta tarefa.</p>';
+    } else {
+        materiais.forEach(m => {
+            let nome = '';
+            let status = 'F';
+
+            if (typeof m === 'object' && m !== null) {
+                nome = m.nome || '';
+                status = m.status || 'F';
+            } else if (typeof m === 'string') {
+                nome = m;
+                status = 'F';
+            }
+
+            if (!nome) return;
+
+            const emojiStatus = (status === 'D' || status === 'Disponível') ? '🔵' : '⭕';
+            const statusTexto = (status === 'D' || status === 'Disponível') ? 'Disponível' : 'Faltando';
+
+            const row = document.createElement('div');
+            row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 1rem; color: #333; font-weight: 600;';
+            row.innerHTML = `
+                <span>${nome}</span>
+                <span title="${statusTexto}" style="font-size: 1.2rem;">${emojiStatus}</span>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    document.getElementById('modalMateriais').classList.add('active');
+}
+
+function fecharModalMateriais() {
+    document.getElementById('modalMateriais').classList.remove('active');
 }
 
 function mostrarDetalhesIntegrador() {
@@ -1219,7 +1304,7 @@ function abrirEdicaoTarefa(index) {
     const modalContent = document.getElementById('conteudoModalEditTarefa');
     const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
     const dataInicioISO = tarefa.data_inicio_obra ? new Date(tarefa.data_inicio_obra).toISOString().split('T')[0] : '';
-    const matTexto = converterArrayMateriaisParaTexto(tarefa.materiais); 	// Converte a lista de objetos para o formato "F: Item" ou "D: Item"
+    const matTexto = converterArrayMateriaisParaTexto(tarefa.materiais);
 
     modalContent.innerHTML = `
         <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">✏️ Editando: ${tarefa.nome}</h3>
@@ -1304,7 +1389,7 @@ async function salvarEdicaoTarefa(index) {
                 data_para_termino: dataVal,
                 intg_id: document.getElementById('editIntegradorTarefa').value || null, 
                 status_material: document.getElementById('editStatusMaterialTarefa').value || null,
-                materiais: materiaisJSON, // Atualiza a coluna JSON de materiais
+                materiais: materiaisJSON,
                 relatorio_atividades: relatorioVal || null,
                 descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
             })
@@ -1351,7 +1436,7 @@ async function adicionarTarefa() {
                 data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
                 intg_id: document.getElementById('integradorTarefa').value || null,
                 status_material: document.getElementById('statusMaterialTarefa').value || null,
-                materiais: materiaisJSON.length > 0 ? materiaisJSON : [], // Envia a lista JSON com os estados F/D
+                materiais: materiaisJSON.length > 0 ? materiaisJSON : [],
                 relatorio_atividades: document.getElementById('relatorioAtividadesTarefa').value.trim() || null,
                 descricao: document.getElementById('descricaoTarefa').value.trim() || null
             })
@@ -1518,7 +1603,6 @@ function abrirModalPendencias(index) {
     const container = document.getElementById('listaPendenciasContainer');
     container.innerHTML = ''; 
 
-    // Lê diretamente da array relacional vinda do Supabase
     if (tarefa.pendenciastbl && tarefa.pendenciastbl.length > 0) {
         tarefa.pendenciastbl.forEach(p => {
             adicionarItemPendencia(p.texto_lista, p.data_lista || '', p.subpendencia_lista || '');
@@ -1535,13 +1619,11 @@ function fecharModalPendencias() {
     tarefaPendenciaEditando = null;
 }
 
-// Adiciona linha com input de Date e Subpendência
 function adicionarItemPendencia(texto = '', data = '', sub = '') {
     const container = document.getElementById('listaPendenciasContainer');
     
     const row = document.createElement('div');
     row.className = 'item-pendencia-row';
-    // Layout em coluna, com espaço extra embaixo para separar os itens
     row.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;';
 
     const textoEscapado = texto.replace(/"/g, '&quot;');
@@ -1560,7 +1642,6 @@ function adicionarItemPendencia(texto = '', data = '', sub = '') {
 }
 
 function removerItemPendencia(botao) {
-    // Usamos closest para remover todo o bloco pai (.item-pendencia-row)
     botao.closest('.item-pendencia-row').remove();
 }
 
@@ -1592,7 +1673,6 @@ async function salvarPendenciasModal() {
     });
 
     try {
-        // 1. Apagar pendências velhas vinculadas àquela Tarefa
         await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?tarefa_id=eq.${tarefa.id}`, {
             method: 'DELETE',
             headers: { 
@@ -1601,7 +1681,6 @@ async function salvarPendenciasModal() {
             }
         });
 
-        // 2. Inserir a nova lista de pendências (se houver alguma)
         if (novasPendencias.length > 0) {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl`, {
                 method: 'POST',
@@ -1615,7 +1694,6 @@ async function salvarPendenciasModal() {
             if (!res.ok) throw new Error('Erro ao salvar as novas pendências.');
         }
 
-        // Recarrega tudo e atualiza o detalhe
         fecharModalPendencias();
         await carregarTarefas();
         mostrarDetalhesTarefa();
@@ -1632,7 +1710,7 @@ function converterTextoParaArrayMateriais(texto) {
         let l = linha.trim();
         if (!l) return null;
         
-        let status = 'F'; // Padrão é falta
+        let status = 'F';
         let nome = l;
         
         if (l.toUpperCase().startsWith('F:')) {
@@ -1651,6 +1729,142 @@ function converterArrayMateriaisParaTexto(materiais) {
     if (!Array.isArray(materiais) || materiais.length === 0) return '';
     return materiais.map(m => `${m.status}: ${m.nome}`).join('\n');
 }
+
+async function analisarPendencias() {
+    const containerResultado = document.getElementById('resultadoAnalisePendencias');
+    const divDetalhes = document.getElementById('detalhesPendenciasCategorizadas');
+    
+	
+	// 🔽 VERIFICAÇÃO PARA FECHAR SE JÁ ESTIVER ABERTO 🔽
+    if (containerResultado && containerResultado.style.display === 'block') {
+        containerResultado.style.display = 'none';
+        return; // Interrompe a função para não buscar no Supabase novamente
+    }
+	
+	
+    try {
+        // Busca todas as pendências da pendenciastbl junto com o nome da tarefa associada
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome)`, {
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}` 
+            }
+        });
+
+        if (!response.ok) throw new Error('Falha ao obter pendências do Supabase.');
+
+        const pendencias = await response.json();
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        const dentroEsperado = [];
+        const dentroLimite = [];
+        const foraLimite = [];
+
+        pendencias.forEach(p => {
+            const nomeTarefa = p.tarefas ? p.tarefas.nome : 'Tarefa Não Identificada';
+            const item = { ...p, nomeTarefa };
+
+            if (!p.data_lista) {
+                dentroEsperado.push({ ...item, diffDias: null });
+                return;
+            }
+
+            const [ano, mes, dia] = p.data_lista.split('T')[0].split('-');
+            const dataLista = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataLista.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias < 0) {
+                foraLimite.push({ ...item, diffDias });
+            } else if (diffDias <= 4) {
+                dentroLimite.push({ ...item, diffDias });
+            } else {
+                dentroEsperado.push({ ...item, diffDias });
+            }
+        });
+
+        // Atualiza os contadores no topo
+		document.getElementById('qtdForaLimite').textContent = foraLimite.length;
+		document.getElementById('qtdDentroLimite').textContent = dentroLimite.length;
+        document.getElementById('qtdDentroEsperado').textContent = dentroEsperado.length;
+    
+
+        // Função responsável por montar a grade em 2 colunas
+        const renderizarGrupo = (itens, cor, emoji) => {
+            if (itens.length === 0) {
+                return '<p style="color: #777; font-size: 0.9rem; margin-top: 10px;">Nenhuma pendência nesta categoria.</p>';
+            }
+
+            const cards = itens.map(item => {
+                let txtPrazo = 'Sem data definida';
+                if (item.diffDias !== null) {
+                    if (item.diffDias < 0) txtPrazo = `${Math.abs(item.diffDias)} dia(s) de atraso`;
+                    else if (item.diffDias === 0) txtPrazo = 'Vence hoje!';
+                    else txtPrazo = `Faltam ${item.diffDias} dia(s)`;
+                }
+
+                return `
+                    <div style="background: #ffffff; border-left: 5px solid ${cor}; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                        <div>
+                            <div style="font-weight: bold; color: #1a1a1a; font-size: 0.95rem;">
+                                ${emoji} ${item.texto_lista} 
+                                <span style="font-weight: normal; color: #666; font-size: 0.82rem;">( ${item.nomeTarefa})</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #555; margin-top: 6px;">
+                                <b>Data marcada:</b> ${item.data_lista ? formatarData(item.data_lista) : 'N/A'} — <strong>${txtPrazo}</strong>
+                            </div>
+                        </div>
+                        ${item.subpendencia_lista ? `
+                            <div style="font-size: 0.8rem; color: #555; margin-top: 10px; background: #f8f9fa; padding: 8px 10px; border-radius: 4px; border: 1px solid #f0f0f0; white-space: pre-wrap;">
+                                <b>Subpendências:</b><br>${item.subpendencia_lista}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Container em GRID com 2 colunas iguais e espaço de 12px entre elas
+            return `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">
+                    ${cards}
+                </div>
+            `;
+        };
+
+        divDetalhes.innerHTML = `
+		
+			<div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+                <h4 style="color: #c62828; font-size: 1.1rem; border-bottom: 2px solid #c62828; padding-bottom: 6px; margin: 0;">
+                     Atrasadas (${foraLimite.length})
+                </h4>
+                ${renderizarGrupo(foraLimite, '#c62828', '♦️​')}
+            </div>
+		
+			<div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+                <h4 style="color: #e65100; font-size: 1.1rem; border-bottom: 2px solid #e65100; padding-bottom: 6px; margin: 0;">
+                     Dentro do Limite — Até 4 dias (${dentroLimite.length})
+                </h4>
+                ${renderizarGrupo(dentroLimite, '#e65100', '🔅')}
+            </div>
+		
+            <div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+                <h4 style="color: #2e7d32; font-size: 1.1rem; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin: 0;">
+                     No Aguardo (${dentroEsperado.length})
+                </h4>
+                ${renderizarGrupo(dentroEsperado, '#2e7d32', '〰️')}
+            </div>		
+			
+        `;
+
+        containerResultado.style.display = 'block';
+
+    } catch (err) {
+        alert(`❌ Erro ao analisar pendências: ${err.message}`);
+        console.error(err);
+    }
+}
+
 
 
 </script>
