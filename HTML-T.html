@@ -314,6 +314,47 @@ h2 { color: #333; font-size: 1.8rem; }
     50% { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
     100% { border-color: #1a1a1a; }
 }
+
+/* Estilo Minimalista para a Análise de Pendências */
+.grid-caixas-prazos-mini {
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    justify-content: center;
+    margin-top: 5px; 
+    padding-top: 15px; 
+    border-top: 2px dashed #e0e0e0; 
+    width: 100%;
+}
+
+.item-caixa-prazo-mini {
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+    padding: 6px 12px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(0,0,0,0.2);
+    color: white; 
+    font-weight: bold; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.qtd-mini {
+    background: rgba(0,0,0,0.3); 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+    font-size: 0.95rem;
+}
+
+.label-mini {
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+
+
+
+
 </style>
 </head>
 <body>
@@ -356,12 +397,22 @@ h2 { color: #333; font-size: 1.8rem; }
 
         <div class="p1-corpo">
             <div class="p1-corpo-esquerda">
-                <div class="painel-com-rotulo">
-                    <div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
-                    <div id="gridPrazosCaixas" class="grid-caixas-prazos">
-                        <div class="loading">Carregando prazos...</div>
-                    </div>
-                </div>
+				<div class="painel-com-rotulo">
+					<div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
+					
+					<div style="display: flex; flex-direction: column; width: 100%; gap: 10px;">
+						<!-- Suas 4 opções originais continuam aqui -->
+						<div id="gridPrazosCaixas" class="grid-caixas-status">
+							<!-- O JS original injeta as 4 caixas aqui -->
+							<div class="loading">Carregando prazos...</div>
+						</div>
+						
+						<!-- NOVO: Contêiner para os 3 indicadores da Análise de Pendências -->
+						<div id="gridAnalisePendenciasMini" class="grid-caixas-prazos-mini" style="display: none;">
+							<!-- Será preenchido pelo JavaScript após clicar em Processar Pendências -->
+						</div>
+					</div>
+				</div>
 
                 <div class="container-lista-pendentes">
                     <div id="listaPendentesVertical" class="lista-vertical-pendentes">
@@ -1733,13 +1784,9 @@ function converterArrayMateriaisParaTexto(materiais) {
 async function analisarPendencias() {
     const containerResultado = document.getElementById('resultadoAnalisePendencias');
     const divDetalhes = document.getElementById('detalhesPendenciasCategorizadas');
-    
+    const containerAnalise = document.getElementById('gridAnalisePendenciasMini');
 	
-	// 🔽 VERIFICAÇÃO PARA FECHAR SE JÁ ESTIVER ABERTO 🔽
-    if (containerResultado && containerResultado.style.display === 'block') {
-        containerResultado.style.display = 'none';
-        return; // Interrompe a função para não buscar no Supabase novamente
-    }
+
 	
 	
     try {
@@ -1856,6 +1903,22 @@ async function analisarPendencias() {
             </div>		
 			
         `;
+
+		containerAnalise.innerHTML = `
+			<div class="item-caixa-prazo-mini" style="background-color: #d9534f;">
+				<span class="qtd-mini">(${foraLimite.length})</span>
+				<span class="label-mini">Fora do Limite (Atrasadas)</span>
+			</div>
+			<div class="item-caixa-prazo-mini" style="background-color: #f0ad4e;">
+				<span class="qtd-mini">(${dentroLimite.length})</span>
+				<span class="label-mini">Dentro do Limite (Até 4 dias)</span>
+			</div>
+			<div class="item-caixa-prazo-mini" style="background-color: #5cb85c;">
+				<span class="qtd-mini">(${dentroEsperado.length})</span>
+				<span class="label-mini">Dentro do Esperado (> 4 dias)</span>
+			</div>
+		`;
+		containerAnalise.style.display = 'flex';
 
         containerResultado.style.display = 'block';
 
