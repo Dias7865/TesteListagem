@@ -440,8 +440,8 @@ h2 { color: #333; font-size: 1.8rem; }
                         <div id="trackPrazoCritico" class="vis-dinamica-track"></div>
                     </div>
                 </div>
-            </div>
-				
+            </div>	
+			
         </div>
 		
 				<!-- PAINEL DE ANÁLISE DE PENDÊNCIAS DA TABELA PENDENCIASTBL -->
@@ -552,6 +552,8 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
             </div>
         </div>
+		
+		
     </div>
 
     <!-- ==================== PÁGINA 3 (HISTÓRICO) ==================== -->
@@ -624,6 +626,7 @@ let dadosTarefas = [];
 let dadosIntegradores = [];
 let dadosIntensidades = [];
 let dadosTrfsConcluidas = [];
+let pendenciastbl = [];
 
 function irParaPagina2() {
     document.getElementById('pagina1').classList.add('hidden');
@@ -1017,12 +1020,16 @@ async function carregarTarefas() {
         
         dadosTarefas = await response.json();
         
+        // Extrai todas as pendências das tarefas para a variável global
+        pendenciastbl = dadosTarefas.flatMap(t => t.pendenciastbl || []);
+
         select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
         dadosTarefas.forEach((t, i) => {
             const opt = document.createElement('option');
             opt.value = i; opt.textContent = t.nome;
             select.appendChild(opt);
         });
+
     } catch (err) { console.error(err); }
 }
 
@@ -1222,10 +1229,10 @@ function mostrarDetalhesTarefa() {
         }
     }
 
-	// Leitura das pendências separadas pela nova tabela
+	// Leitura das pendências separadas pela nova tabela com botão "fim ❎"
     let listaPendencias = 'Sem pendências';
     if (t.pendenciastbl && t.pendenciastbl.length > 0) {
-        listaPendencias = `<ul style="padding-left: 30px; margin-top: 5px;">${t.pendenciastbl.map(p => {
+        listaPendencias = `<ul style="padding-left: 20px; margin-top: 5px; list-style: none;">${t.pendenciastbl.map(p => {
             let dataApresentada = p.data_lista ? formatarData(p.data_lista) : 'S/D';
             
             let subTexto = '';
@@ -1233,12 +1240,19 @@ function mostrarDetalhesTarefa() {
                 const linhasSub = p.subpendencia_lista.split('\n').map(s => s.trim()).filter(Boolean);
                 if (linhasSub.length > 0) {
                     subTexto = `<ul style="list-style-type: none; padding-left: 0; margin-top: 2px;">` + 
-                        linhasSub.map(s => `<li style="color: #555;">&nbsp;&nbsp;&nbsp;&nbsp;➝ ${s}</li>`).join('') + 
+                        linhasSub.map(s => `<li style="color: #555;">&nbsp;&nbsp;➝ ${s}</li>`).join('') + 
                     `</ul>`;
                 }
             }
             
-            return `<li style="margin-bottom: 10px;">${p.texto_lista} - <strong>${dataApresentada}</strong>${subTexto}</li>`;
+            return `
+                <li style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #e0e0e0;">
+                    <div>
+                        • <strong>${p.texto_lista}</strong> - <span style="color:#666;">(${dataApresentada})</span>${subTexto}
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="finalizarPendenciaParaRelatorio('${p.id}',${idx})" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; white-space: nowrap; margin-left: 10px; cursor: pointer;" title="Anexar pendência ao relatório de atividades">fim ❎</button>
+                </li>
+            `;
         }).join('')}</ul>`;
     }
 
@@ -1961,6 +1975,57 @@ async function analisarPendencias2() {
     }
 }
 
+
+async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
+    const tarefa = dadosTarefas[indexTarefa];
+    if (!tarefa) return alert("⚠️ Tarefa não encontrada!");
+
+    // Localiza a pendência selecionada
+    const pendencia = (tarefa.pendenciastbl || []).find(p => p.id == pendenciaId) || pendenciastbl.find(p => p.id == pendenciaId);
+    if (!pendencia || !pendencia.texto_lista) {
+        return alert("⚠️ Pendência não encontrada!");
+    }
+
+    if (!confirm(`Deseja enviar a pendência "${pendencia.texto_lista}" para o Relatório de Atividades?`)) {
+        return;
+    }
+
+    // Monta o relatório com a nova linha do texto da pendência
+    const relatorioAtual = tarefa.relatorio_atividades || '';
+    const novoRelatorio = relatorioAtual 
+        ? `${relatorioAtual}\n ${pendencia.texto_lista}` 
+        : `${pendencia.texto_lista}`;
+
+    try {
+        // Envia o UPDATE (PATCH) diretamente para a tabela 'tarefas' no Supabase
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ relatorio_atividades: novoRelatorio })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        // Atualiza os dados na memória local
+        tarefa.relatorio_atividades = novoRelatorio;
+
+        // Atualiza a exibição dos detalhes da tarefa na tela imediatamente
+        mostrarDetalhesTarefa();
+
+        alert("✅ Pendência adicionada ao Relatório de Atividades com sucesso!");
+
+    } catch (err) {
+        console.error("Erro ao atualizar o relatório:", err);
+        alert("❌ Falha ao enviar a pendência para o relatório no banco de dados.");
+    }
+}
 
 
 
