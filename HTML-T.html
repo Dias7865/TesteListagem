@@ -401,9 +401,7 @@ h2 { color: #333; font-size: 1.8rem; }
 					<div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
 					
 					<div style="display: flex; flex-direction: column; width: 100%; gap: 10px;">
-						<!-- Suas 4 opções originais continuam aqui -->
 						<div id="gridPrazosCaixas" class="grid-caixas-status">
-							<!-- O JS original injeta as 4 caixas aqui -->
 							<div class="loading">Carregando prazos...</div>
 						</div>
 						
@@ -452,8 +450,6 @@ h2 { color: #333; font-size: 1.8rem; }
 			</div>
 
 			<div id="resultadoAnalisePendencias" style="display: none;">
-
-
 				<!-- Lista Detalhada das Pendências Categorizadas -->
 				<div id="detalhesPendenciasCategorizadas" style="display: flex; flex-direction: column; gap: 15px;"></div>
 			</div>
@@ -534,7 +530,6 @@ h2 { color: #333; font-size: 1.8rem; }
                     <div class="form-group"><label for="ncpfIntegrador">nº do CPF:</label><input type="text" id="ncpfIntegrador" placeholder="Ex: 123456789" maxlength="15"></div>
                     <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
                 </div>
-
                 <div id="mensagemAdicionar" style="margin-top:15px;"></div>
             </div>
 
@@ -552,8 +547,6 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
             </div>
         </div>
-		
-		
     </div>
 
     <!-- ==================== PÁGINA 3 (HISTÓRICO) ==================== -->
@@ -585,15 +578,15 @@ h2 { color: #333; font-size: 1.8rem; }
 
 <!-- Modal Secundário de Pendências -->
 <div id="modalPendencias" class="modal-overlay" style="z-index: 10002;">
-    <div class="modal-card">
+    <div class="modal-card" style="max-width: 650px;">
         <button class="modal-close" onclick="fecharModalPendencias()">✕</button>
         <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">⚠️ Pendências a Resolver</h3>
         
         <div class="form-group">
             <label style="font-weight: bold; margin-bottom: 10px; display: block;">Itens pendentes:</label>
-            <div id="listaPendenciasContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 4px;"></div>
+            <div id="listaPendenciasContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 4px;"></div>
             <button type="button" class="btn btn-secondary" onclick="adicionarItemPendencia()" style="margin-top: 10px; width: 100%;">
-                ➕ Adicionar Item
+                ➕ Adicionar Pendência
             </button>
         </div>
 
@@ -853,7 +846,6 @@ function renderizarCaixasPrazos() {
 
 function obterPesoOrdem(t) {
     const status = (t.status || '').toLowerCase();
-    
     if (status.includes('conclu')) return 10;
     if (!t.data_para_termino) return 9; 
 
@@ -1013,14 +1005,14 @@ async function buscarDados(tabela) {
 async function carregarTarefas() {
     const select = document.getElementById('selectTarefas');
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*)`, {
+        // Agora busca tarefas -> pendenciastbl -> subpendtbl aninhados
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*,subpendtbl(*))`, {
             headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
         if (!response.ok) throw new Error(`Erro ${response.status}`);
         
         dadosTarefas = await response.json();
         
-        // Extrai todas as pendências das tarefas para a variável global
         pendenciastbl = dadosTarefas.flatMap(t => t.pendenciastbl || []);
 
         select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
@@ -1178,9 +1170,16 @@ function formatarData(dataISO) {
     if (!dataISO) return 'Não definida';
     const partes = dataISO.split('T')[0].split('-');
     if (partes.length < 3) return dataISO;
-    
     const [ano, mes, dia] = partes;
     return `${dia}/${mes}/${ano}`;
+}
+
+function formatarDataCurta(dataISO) {
+    if (!dataISO) return 'Não definida';
+    const partes = dataISO.split('T')[0].split('-');
+    if (partes.length < 3) return dataISO;
+    const [ano, mes, dia] = partes;
+    return `${dia}/${mes}`;
 }
 
 function obterDataHojeLocal() {
@@ -1210,7 +1209,6 @@ function mostrarDetalhesTarefa() {
 
     const t = dadosTarefas[idx];
     
-    // Extrai apenas os materiais marcados com 'F' (Falta)
     const materiaisFaltando = (Array.isArray(t.materiais) ? t.materiais : [])
         .filter(m => m && m.status === 'F');
 
@@ -1229,20 +1227,20 @@ function mostrarDetalhesTarefa() {
         }
     }
 
-	// Leitura das pendências separadas pela nova tabela com botão "fim ❎"
+	// Lendo a nova estrutura aninhada de subpendências (subpendtbl)
     let listaPendencias = 'Sem pendências';
     if (t.pendenciastbl && t.pendenciastbl.length > 0) {
         listaPendencias = `<ul style="padding-left: 20px; margin-top: 5px; list-style: none;">${t.pendenciastbl.map(p => {
-            let dataApresentada = p.data_lista ? formatarData(p.data_lista) : 'S/D';
+            let dataApresentada = p.data_lista ? formatarDataCurta(p.data_lista) : 'S/D';
             
             let subTexto = '';
-            if (p.subpendencia_lista) {
-                const linhasSub = p.subpendencia_lista.split('\n').map(s => s.trim()).filter(Boolean);
-                if (linhasSub.length > 0) {
-                    subTexto = `<ul style="list-style-type: none; padding-left: 0; margin-top: 2px;">` + 
-                        linhasSub.map(s => `<li style="color: #555;">&nbsp;&nbsp;➝ ${s}</li>`).join('') + 
-                    `</ul>`;
-                }
+            if (p.subpendtbl && p.subpendtbl.length > 0) {
+                subTexto = `<ul style="list-style-type: none; padding-left: 0; margin-top: 4px;">` + 
+                    p.subpendtbl.map(s => {
+                        let dataSub = s.data_sub ? ` <span style="color:#999; font-size: 0.85rem;">(${formatarDataCurta(s.data_sub)})</span>` : '';
+                        return `<li style="color: #555;">&nbsp;&nbsp;➝ ${s.texto_sub}${dataSub}</li>`;
+                    }).join('') + 
+                `</ul>`;
             }
             
             return `
@@ -1642,7 +1640,7 @@ function notificarSincronizacao() {
     }, 1000);
 }
 
-// --- LÓGICA DA LISTA DINÂMICA DE PENDÊNCIAS COM TABELA RELACIONAL ---
+// --- LÓGICA DA LISTA DINÂMICA DE PENDÊNCIAS COM TABELA RELACIONAL DE SUBPENDÊNCIAS ---
 let tarefaPendenciaEditando = null;
 
 function abrirModalPendencias(index) {
@@ -1653,10 +1651,10 @@ function abrirModalPendencias(index) {
 
     if (tarefa.pendenciastbl && tarefa.pendenciastbl.length > 0) {
         tarefa.pendenciastbl.forEach(p => {
-            adicionarItemPendencia(p.texto_lista, p.data_lista || '', p.subpendencia_lista || '');
+            adicionarItemPendencia(p.texto_lista, p.data_lista || '', p.subpendtbl || []);
         });
     } else {
-        adicionarItemPendencia('', '', '');
+        adicionarItemPendencia('', '', []);
     }
 
     document.getElementById('modalPendencias').classList.add('active');
@@ -1667,88 +1665,162 @@ function fecharModalPendencias() {
     tarefaPendenciaEditando = null;
 }
 
-function adicionarItemPendencia(texto = '', data = '', sub = '') {
+// Renderiza o item principal da pendência
+function adicionarItemPendencia(texto = '', data = '', subsArray = []) {
     const container = document.getElementById('listaPendenciasContainer');
     
     const row = document.createElement('div');
     row.className = 'item-pendencia-row';
     row.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;';
 
-    const textoEscapado = texto.replace(/"/g, '&quot;');
-    const subEscapado = sub.replace(/"/g, '&quot;');
+    const textoEscapado = texto ? texto.replace(/"/g, '&quot;') : '';
 
     row.innerHTML = `
         <div style="display: flex; gap: 8px; align-items: center;">
             <input type="text" class="input-pendencia-texto" value="${textoEscapado}" placeholder="Digite a pendência principal..." style="flex: 2; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
             <input type="date" class="input-pendencia-data" value="${data}" style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
-            <button type="button" class="btn btn-danger btn-sm" onclick="removerItemPendencia(this)" title="Remover item" style="padding: 4px 10px;">➖</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.item-pendencia-row').remove()" title="Remover Pendência" style="padding: 4px 10px;">➖</button>
         </div>
-        <textarea class="input-pendencia-sub" placeholder="Digite as subpendências (dê Enter para cada novo item)..." style="width: 100%; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; min-height: 65px; resize: vertical; font-family: inherit;">${subEscapado}</textarea>
+        
+        <div class="subs-container" style="padding-left: 20px; display: flex; flex-direction: column; gap: 6px;"></div>
+        
+        <button type="button" onclick="adicionarSubItem(this)" style="align-self: flex-start; padding: 4px 8px; font-size: 0.85rem; border-radius: 4px; border: 1px solid #ccc; background-color: #f1f1f1; cursor: pointer; margin-left: 20px;">
+            ✖️ Adicionar Subpendência
+        </button>
     `;
 
     container.appendChild(row);
+
+    const subsContainer = row.querySelector('.subs-container');
+    if (Array.isArray(subsArray)) {
+        subsArray.forEach(s => {
+            adicionarSubItemRender(subsContainer, s.texto_sub, s.data_sub || '');
+        });
+    }
 }
 
-function removerItemPendencia(botao) {
-    botao.closest('.item-pendencia-row').remove();
+// Disparada pelo botão ✖️ (Adicionar nova subpendência vazia)
+function adicionarSubItem(btn) {
+    const container = btn.previousElementSibling;
+    adicionarSubItemRender(container, '', '');
 }
 
+// Função utilitária para renderizar uma linha de subpendência
+function adicionarSubItemRender(container, texto = '', data = '') {
+    const subRow = document.createElement('div');
+    subRow.className = 'item-subpendencia-row';
+    subRow.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-top: 4px;';
+    
+    const textoEscapado = texto ? texto.replace(/"/g, '&quot;') : '';
+
+    subRow.innerHTML = `
+        <span style="color: #888; font-weight:bold;">↳</span>
+        <input type="text" class="input-sub-texto" value="${textoEscapado}" placeholder="Texto da subpendência..." style="flex: 2; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+        <input type="date" class="input-sub-data" value="${data}" style="flex: 1; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.item-subpendencia-row').remove()" title="Remover subpendência" style="padding: 2px 8px; font-size: 0.8rem;">➖</button>
+    `;
+    container.appendChild(subRow);
+}
+
+// Função de salvar (modificada para salvar dependências da nova tabela)
 async function salvarPendenciasModal() {
     if (tarefaPendenciaEditando === null) return;
-
     const tarefa = dadosTarefas[tarefaPendenciaEditando];
-    const rows = document.querySelectorAll('#listaPendenciasContainer .item-pendencia-row');
     
+    const btnSalvar = document.querySelector('#modalPendencias .btn-success');
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = '💾 Salvando...';
+
+    const rows = document.querySelectorAll('#listaPendenciasContainer .item-pendencia-row');
     const novasPendencias = [];
 
     rows.forEach(row => {
         const inputTexto = row.querySelector('.input-pendencia-texto');
         const inputData = row.querySelector('.input-pendencia-data');
-        const inputSub = row.querySelector('.input-pendencia-sub');
-        
         const texto = inputTexto ? inputTexto.value.trim() : '';
         const data = inputData && inputData.value ? inputData.value : null;
-        const sub = inputSub && inputSub.value.trim() !== '' ? inputSub.value.trim() : null;
 
         if (texto !== '') {
+            const subsArray = [];
+            const subRows = row.querySelectorAll('.item-subpendencia-row');
+            subRows.forEach(sRow => {
+                const sTexto = sRow.querySelector('.input-sub-texto').value.trim();
+                const sData = sRow.querySelector('.input-sub-data').value;
+                if (sTexto) {
+                    subsArray.push({ texto_sub: sTexto, data_sub: sData || null });
+                }
+            });
+
             novasPendencias.push({
                 tarefa_id: tarefa.id,
                 texto_lista: texto,
                 data_lista: data,
-                subpendencia_lista: sub
+                subs: subsArray
             });
         }
     });
 
     try {
+        // 1. Limpa todas as pendências antigas dessa tarefa
+        // (Devido ao ON DELETE CASCADE no SQL, todas as subpendências vinculadas serão excluídas automaticamente)
         await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?tarefa_id=eq.${tarefa.id}`, {
             method: 'DELETE',
-            headers: { 
-                'apikey': SUPABASE_ANON_KEY, 
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}` 
-            }
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
 
-        if (novasPendencias.length > 0) {
-            const res = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl`, {
+        // 2. Insere as novas pendências e, logo em seguida, suas respectivas subpendências
+        for (const pend of novasPendencias) {
+            const resPend = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl`, {
                 method: 'POST',
                 headers: { 
                     'apikey': SUPABASE_ANON_KEY, 
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
-                    'Content-Type': 'application/json' 
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
                 },
-                body: JSON.stringify(novasPendencias)
+                body: JSON.stringify({
+                    tarefa_id: pend.tarefa_id,
+                    texto_lista: pend.texto_lista,
+                    data_lista: pend.data_lista
+                })
             });
-            if (!res.ok) throw new Error('Erro ao salvar as novas pendências.');
+
+            if (!resPend.ok) throw new Error('Erro ao salvar as novas pendências.');
+            
+            const insertedPend = await resPend.json();
+            const pendId = insertedPend[0].id;
+
+            // Insere as subpendências (se existirem) vinculando-as ao pendId gerado
+            if (pend.subs.length > 0) {
+                const subsDataToInsert = pend.subs.map(sub => ({
+                    pend_id: pendId,
+                    texto_sub: sub.texto_sub,
+                    data_sub: sub.data_sub
+                }));
+
+                await fetch(`${SUPABASE_URL}/rest/v1/subpendtbl`, {
+                    method: 'POST',
+                    headers: { 
+                        'apikey': SUPABASE_ANON_KEY, 
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(subsDataToInsert)
+                });
+            }
         }
 
         fecharModalPendencias();
-        await carregarTarefas();
-        mostrarDetalhesTarefa();
+        await carregarTarefas(); // Recarrega do zero puxando pendências e subpendências atualizadas
+        mostrarDetalhesTarefa(); // Atualiza a tela de detalhes
         await carregarPagina1();
-        alert('✅ Pendências atualizadas com sucesso!');
+        
+        alert('✅ Pendências e Subpendências atualizadas com sucesso!');
     } catch (err) {
         alert(`❌ Erro ao salvar pendências: ${err.message}`);
+    } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = '💾 Salvar Pendências';
     }
 }
 
@@ -1757,10 +1829,8 @@ function converterTextoParaArrayMateriais(texto) {
     return texto.split('\n').map(linha => {
         let l = linha.trim();
         if (!l) return null;
-        
         let status = 'F';
         let nome = l;
-        
         if (l.toUpperCase().startsWith('F:')) {
             status = 'F';
             nome = l.substring(2).trim();
@@ -1768,7 +1838,6 @@ function converterTextoParaArrayMateriais(texto) {
             status = 'D';
             nome = l.substring(2).trim();
         }
-        
         return { nome, status };
     }).filter(Boolean);
 }
@@ -1782,17 +1851,14 @@ async function analisarPendencias() {
     const containerResultado = document.getElementById('resultadoAnalisePendencias');
     const divDetalhes = document.getElementById('detalhesPendenciasCategorizadas');
     
-	
-	// 🔽 VERIFICAÇÃO PARA FECHAR SE JÁ ESTIVER ABERTO 🔽
     if (containerResultado && containerResultado.style.display === 'block') {
         containerResultado.style.display = 'none';
-        return; // Interrompe a função para não buscar no Supabase novamente
+        return;
     }
 	
-	
     try {
-        // Busca todas as pendências da pendenciastbl junto com o nome da tarefa associada
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome)`, {
+        // Busca com relacionamentos para tabela de subpendencias
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome),subpendtbl(*)`, {
             headers: { 
                 'apikey': SUPABASE_ANON_KEY, 
                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` 
@@ -1802,7 +1868,6 @@ async function analisarPendencias() {
         if (!response.ok) throw new Error('Falha ao obter pendências do Supabase.');
 
         const pendencias = await response.json();
-
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
 
@@ -1832,13 +1897,8 @@ async function analisarPendencias() {
             }
         });
 
-    
-
-        // Função responsável por montar a grade em 2 colunas
         const renderizarGrupo = (itens, cor, emoji) => {
-            if (itens.length === 0) {
-                return '<p style="color: #777; font-size: 0.9rem; margin-top: 10px;">Nenhuma pendência nesta categoria.</p>';
-            }
+            if (itens.length === 0) return '<p style="color: #777; font-size: 0.9rem; margin-top: 10px;">Nenhuma pendência nesta categoria.</p>';
 
             const cards = itens.map(item => {
                 let txtPrazo = 'Sem data definida';
@@ -1846,6 +1906,22 @@ async function analisarPendencias() {
                     if (item.diffDias < 0) txtPrazo = `${Math.abs(item.diffDias)} dia(s) de atraso`;
                     else if (item.diffDias === 0) txtPrazo = 'Vence hoje!';
                     else txtPrazo = `Faltam ${item.diffDias} dia(s)`;
+                }
+
+                // Renderiza as subpendências da nova tabela no card
+                let subTextoHtml = '';
+                if (item.subpendtbl && item.subpendtbl.length > 0) {
+                    const linhasSub = item.subpendtbl.map(s => {
+                        const sDataStr = s.data_sub ? ` (${formatarData(s.data_sub)})` : '';
+                        return `<li>➝ ${s.texto_sub}${sDataStr}</li>`;
+                    }).join('');
+
+                    subTextoHtml = `
+                        <div style="font-size: 0.8rem; color: #555; margin-top: 10px; background: #f8f9fa; padding: 8px 10px; border-radius: 4px; border: 1px solid #f0f0f0;">
+                            <b>Subpendências:</b><br>
+                            <ul style="list-style:none; padding-left:0; margin-top:4px;">${linhasSub}</ul>
+                        </div>
+                    `;
                 }
 
                 return `
@@ -1859,50 +1935,30 @@ async function analisarPendencias() {
                                 <b>Data marcada:</b> ${item.data_lista ? formatarData(item.data_lista) : 'N/A'} — <strong>${txtPrazo}</strong>
                             </div>
                         </div>
-                        ${item.subpendencia_lista ? `
-                            <div style="font-size: 0.8rem; color: #555; margin-top: 10px; background: #f8f9fa; padding: 8px 10px; border-radius: 4px; border: 1px solid #f0f0f0; white-space: pre-wrap;">
-                                <b>Subpendências:</b><br>${item.subpendencia_lista}
-                            </div>
-                        ` : ''}
+                        ${subTextoHtml}
                     </div>
                 `;
             }).join('');
 
-            // Container em GRID com 2 colunas iguais e espaço de 12px entre elas
-            return `
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">
-                    ${cards}
-                </div>
-            `;
+            return `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">${cards}</div>`;
         };
 
         divDetalhes.innerHTML = `
-		
 			<div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
-                <h4 style="color: #c62828; font-size: 1.1rem; border-bottom: 2px solid #c62828; padding-bottom: 6px; margin: 0;">
-                     Atrasadas (${foraLimite.length})
-                </h4>
+                <h4 style="color: #c62828; font-size: 1.1rem; border-bottom: 2px solid #c62828; padding-bottom: 6px; margin: 0;">Atrasadas (${foraLimite.length})</h4>
                 ${renderizarGrupo(foraLimite, '#c62828', '♦️​')}
             </div>
-		
 			<div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
-                <h4 style="color: #e65100; font-size: 1.1rem; border-bottom: 2px solid #e65100; padding-bottom: 6px; margin: 0;">
-                     Dentro do Limite — Até 4 dias (${dentroLimite.length})
-                </h4>
+                <h4 style="color: #e65100; font-size: 1.1rem; border-bottom: 2px solid #e65100; padding-bottom: 6px; margin: 0;">Dentro do Limite — Até 4 dias (${dentroLimite.length})</h4>
                 ${renderizarGrupo(dentroLimite, '#e65100', '🔅')}
             </div>
-		
             <div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
-                <h4 style="color: #2e7d32; font-size: 1.1rem; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin: 0;">
-                     No Aguardo (${dentroEsperado.length})
-                </h4>
+                <h4 style="color: #2e7d32; font-size: 1.1rem; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin: 0;">No Aguardo (${dentroEsperado.length})</h4>
                 ${renderizarGrupo(dentroEsperado, '#2e7d32', '〰️')}
             </div>		
-			
         `;
 
         containerResultado.style.display = 'block';
-
     } catch (err) {
         alert(`❌ Erro ao analisar pendências: ${err.message}`);
         console.error(err);
@@ -1912,9 +1968,7 @@ async function analisarPendencias() {
 async function analisarPendencias2() {
     const containerAnalise = document.getElementById('gridAnalisePendenciasMini');
 	
-	
     try {
-        // Busca os dados das pendências no Supabase
         const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome)`, {
             headers: { 
                 'apikey': SUPABASE_ANON_KEY, 
@@ -1925,35 +1979,27 @@ async function analisarPendencias2() {
         if (!response.ok) throw new Error('Falha ao obter pendências do Supabase.');
 
         const pendencias = await response.json();
-
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
 
-        // Contadores simples (em vez de arrays)
         let qtdDentroEsperado = 0;
         let qtdDentroLimite = 0;
         let qtdForaLimite = 0;
 
         pendencias.forEach(p => {
             if (!p.data_lista) {
-                qtdDentroEsperado++; // Se não tem data, vai para os aguardados
+                qtdDentroEsperado++; 
                 return;
             }
-
             const [ano, mes, dia] = p.data_lista.split('T')[0].split('-');
             const dataLista = new Date(ano, mes - 1, dia);
             const diffDias = Math.round((dataLista.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
 
-            if (diffDias < 0) {
-                qtdForaLimite++;
-            } else if (diffDias <= 4) {
-                qtdDentroLimite++;
-            } else {
-                qtdDentroEsperado++;
-            }
+            if (diffDias < 0) qtdForaLimite++;
+            else if (diffDias <= 4) qtdDentroLimite++;
+            else qtdDentroEsperado++;
         });
 
-        // Injeta o HTML das caixinhas pequenas e injeta as quantidades calculadas
         containerAnalise.innerHTML = `
             <div class="item-caixa-prazo-mini" style="background-color: #f0ad4e;">
                 <span class="qtd-mini">${qtdDentroLimite}</span>
@@ -1965,21 +2011,17 @@ async function analisarPendencias2() {
             </div>
         `;
         
-        // Exibe o painel com as novas caixas
         containerAnalise.style.display = 'flex';
-
     } catch (err) {
         alert(`❌ Erro ao analisar pendências: ${err.message}`);
         console.error(err);
     }
 }
 
-
 async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
     const tarefa = dadosTarefas[indexTarefa];
     if (!tarefa) return alert("⚠️ Tarefa não encontrada!");
 
-    // Localiza a pendência selecionada
     const pendencia = (tarefa.pendenciastbl || []).find(p => p.id == pendenciaId) || pendenciastbl.find(p => p.id == pendenciaId);
     if (!pendencia || !pendencia.texto_lista) {
         return alert("⚠️ Pendência não encontrada!");
@@ -1989,29 +2031,20 @@ async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
         return;
     }
 
-    // 1. Extrai a data e formata EXCLUSIVAMENTE para dd/mm
     let dataFormatada = '';
-    if (pendencia.data_lista) {
-        const partes = pendencia.data_lista.split('T')[0].split('-');
-        if (partes.length >= 3) {
-            const [ano, mes, dia] = partes;
-            dataFormatada = `${dia}/${mes}`; // Formato dd/mm
-        }
-    }
+	
+	dataFormatada = formatarDataCurta(pendencia.data_lista)
 
-    // 2. Monta o texto no formato: "dd/mm - NomeDaPendencia"
     const textoPendencia = dataFormatada 
         ? `${dataFormatada} - ${pendencia.texto_lista}` 
         : pendencia.texto_lista;
 
-    // 3. Concatena no relatório de atividades mantendo o histórico de linhas
     const relatorioAtual = tarefa.relatorio_atividades || '';
     const novoRelatorio = relatorioAtual 
         ? `${relatorioAtual}\n${textoPendencia}` 
         : `${textoPendencia}`;
 
     try {
-        // Envia a atualização (PATCH) para a tabela 'tarefas' no Supabase
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
             headers: {
@@ -2023,25 +2056,16 @@ async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
             body: JSON.stringify({ relatorio_atividades: novoRelatorio })
         });
 
-        if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
 
-        // Atualiza a memória local (JavaScript)
         tarefa.relatorio_atividades = novoRelatorio;
-
-        // Recarrega os detalhes da tarefa na tela para refletir o novo relatório
         mostrarDetalhesTarefa();
-
         alert("✅ Pendência adicionada ao Relatório de Atividades!");
-
     } catch (err) {
         console.error("Erro ao atualizar o relatório:", err);
         alert("❌ Falha ao enviar a pendência para o relatório no banco de dados.");
     }
 }
-
-
 
 </script>
 </body>
