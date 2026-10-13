@@ -519,10 +519,10 @@ h2 { color: #333; font-size: 1.8rem; }
 						<select id="statusMaterialTarefa">
 							<option value="">-- Selecione o status do material --</option>
 							<option value="Falta">❌ Falta</option>
-							<option value="Arranjado">✅ Arranjado</option>
+							<option value="Arranjado">✅ Arranjado</option> 
 						</select>
 					</div>
-					<div class="form-group"><label for="materiaisFaltandoTarefa">Materiais Faltando (digite um por linha):</label><textarea id="materiaisFaltandoTarefa" placeholder="Ex: Cabo 10mm&#10;Inversor 5kW&#10;Disjuntor 32A"></textarea></div>
+					<div class="form-group"><label for="materiaisFaltandoTarefa">Materiais Faltando (D: para Disponível):</label><textarea id="materiaisFaltandoTarefa" placeholder="Ex: Cabo 10mm&#10;Inversor 5kW&#10;Disjuntor 32A"></textarea></div>
 					<div class="form-group"><label for="relatorioAtividadesTarefa">Relatório de Atividades Desenvolvidas:</label><textarea id="relatorioAtividadesTarefa" placeholder="Relatório de atividades diárias..."></textarea></div>
 					<div class="form-group"><label for="descricaoTarefa">Descrição Geral:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
 					<button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
@@ -1360,6 +1360,8 @@ function abrirEdicaoTarefa(index) {
         <div class="form-group"><label>Nome:</label><input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}"></div>
         <div class="form-group"><label>Tipo:</label><input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}"></div>
         <div class="form-group"><label>Endereço:</label><input type="text" id="editEnderecoTarefa" value="${tarefa.endereco || ''}"></div>
+        <div class="form-group"><label>Descrição Geral:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
+		<div class="form-group"><label>Integrador:</label><select id="editIntegradorTarefa"></select></div>
         <div class="form-group">
             <label>Status:</label>
             <select id="editStatusTarefa">
@@ -1371,9 +1373,8 @@ function abrirEdicaoTarefa(index) {
             </select>
         </div>
         <div class="form-group"><label>Data Início da Obra:</label><input type="date" id="editDataInicioObraTarefa" value="${dataInicioISO}"></div>
-        <div class="form-group"><label>Data Esperada:</label><input type="date" id="editDataEsperadaTarefa" value="${dataISO}"></div>
-        <div class="form-group"><label>Integrador:</label><select id="editIntegradorTarefa"></select></div>
-        <div class="form-group">
+		<div class="form-group"><label>Data Esperada:</label><input type="date" id="editDataEsperadaTarefa" value="${dataISO}"></div>
+		<div class="form-group">
             <label>Status do Material:</label>
             <select id="editStatusMaterialTarefa">
                 <option value="" ${!tarefa.status_material ? 'selected' : ''}>-- Selecione --</option>
@@ -1382,13 +1383,11 @@ function abrirEdicaoTarefa(index) {
             </select>
         </div>
         <div class="form-group"><label>Materiais Faltando (um por linha):</label><textarea id="editMateriaisFaltandoTarefa">${matTexto}</textarea></div>
-		
         <div class="form-group">
             <label>Relatório de Atividades:</label>
             <textarea id="editRelatorioAtividadesTarefa">${tarefa.relatorio_atividades || ''}</textarea>
         </div>
-        <div class="form-group"><label>Descrição Geral:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
-        <div class="action-buttons">
+		<div class="action-buttons">
             <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
             <button class="btn btn-secondary" onclick="fecharModalEditTarefa()">❌ Cancelar</button>
         </div>
@@ -1956,13 +1955,13 @@ async function analisarPendencias2() {
 
         // Injeta o HTML das caixinhas pequenas e injeta as quantidades calculadas
         containerAnalise.innerHTML = `
-            <div class="item-caixa-prazo-mini" style="background-color: #d9534f;">
-                <span class="qtd-mini">${qtdForaLimite}</span>
-                <span class="label-mini">Pendências Atrasadas</span>
-            </div>
             <div class="item-caixa-prazo-mini" style="background-color: #f0ad4e;">
                 <span class="qtd-mini">${qtdDentroLimite}</span>
-                <span class="label-mini">Pendências no Limite</span>
+                <span class="label-mini">Pendências Urgentes</span>
+            </div>
+            <div class="item-caixa-prazo-mini" style="background-color: #d9534f;">
+                <span class="qtd-mini">${qtdForaLimite}</span>
+                <span class="label-mini">Pendências Perdidas</span>
             </div>
         `;
         
@@ -1990,14 +1989,29 @@ async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
         return;
     }
 
-    // Monta o relatório com a nova linha do texto da pendência
+    // 1. Extrai a data e formata EXCLUSIVAMENTE para dd/mm
+    let dataFormatada = '';
+    if (pendencia.data_lista) {
+        const partes = pendencia.data_lista.split('T')[0].split('-');
+        if (partes.length >= 3) {
+            const [ano, mes, dia] = partes;
+            dataFormatada = `${dia}/${mes}`; // Formato dd/mm
+        }
+    }
+
+    // 2. Monta o texto no formato: "dd/mm - NomeDaPendencia"
+    const textoPendencia = dataFormatada 
+        ? `${dataFormatada} - ${pendencia.texto_lista}` 
+        : pendencia.texto_lista;
+
+    // 3. Concatena no relatório de atividades mantendo o histórico de linhas
     const relatorioAtual = tarefa.relatorio_atividades || '';
     const novoRelatorio = relatorioAtual 
-        ? `${relatorioAtual}\n ${pendencia.texto_lista}` 
-        : `${pendencia.texto_lista}`;
+        ? `${relatorioAtual}\n${textoPendencia}` 
+        : `${textoPendencia}`;
 
     try {
-        // Envia o UPDATE (PATCH) diretamente para a tabela 'tarefas' no Supabase
+        // Envia a atualização (PATCH) para a tabela 'tarefas' no Supabase
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
             headers: {
@@ -2013,13 +2027,13 @@ async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
             throw new Error(`Erro HTTP: ${response.status}`);
         }
 
-        // Atualiza os dados na memória local
+        // Atualiza a memória local (JavaScript)
         tarefa.relatorio_atividades = novoRelatorio;
 
-        // Atualiza a exibição dos detalhes da tarefa na tela imediatamente
+        // Recarrega os detalhes da tarefa na tela para refletir o novo relatório
         mostrarDetalhesTarefa();
 
-        alert("✅ Pendência adicionada ao Relatório de Atividades com sucesso!");
+        alert("✅ Pendência adicionada ao Relatório de Atividades!");
 
     } catch (err) {
         console.error("Erro ao atualizar o relatório:", err);
