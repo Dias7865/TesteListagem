@@ -75,8 +75,22 @@ CREATE TABLE pendenciastbl (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     tarefa_id uuid REFERENCES tarefas(id) ON DELETE CASCADE,
     texto_lista text NOT NULL,
-    data_lista date,
-    subpendencia_lista text
+    data_lista date
+);
+
+CREATE TABLE subpendtbl (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    pend_id uuid REFERENCES pendenciastbl(id) ON DELETE CASCADE,
+    texto_sub text NOT NULL,
+    data_sub date
+);
+
+CREATE TABLE maeriaistbl (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    tarefa_id uuid REFERENCES tarefas(id) ON DELETE CASCADE,
+    nome_material text NOT NULL,
+    quant_material int,
+    status_material boolean
 );
 
 
@@ -91,6 +105,7 @@ ALTER TABLE intensidades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trfsconcluidas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pendenciastbl ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subpendtbl ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: configuracoes
 CREATE POLICY "Bloquear leitura direta de configuracoes" ON configuracoes FOR SELECT USING (false);
@@ -121,6 +136,12 @@ CREATE POLICY "Permitir leitura pública de pendenciastbl" ON pendenciastbl FOR 
 CREATE POLICY "Permitir inserção pública de pendenciastbl" ON pendenciastbl FOR INSERT WITH CHECK (true);
 CREATE POLICY "Permitir atualização pública de pendenciastbl" ON pendenciastbl FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir remoção pública de pendenciastbl" ON pendenciastbl FOR DELETE USING (true);
+
+-- Políticas: subpendtbl
+CREATE POLICY "Permitir leitura pública de subpendtbl" ON subpendtbl FOR SELECT USING (true);
+CREATE POLICY "Permitir inserção pública de subpendtbl" ON subpendtbl FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública de subpendtbl" ON subpendtbl FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir remoção pública de subpendtbl" ON subpendtbl FOR DELETE USING (true);
 
 
 
@@ -196,6 +217,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON integradores TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON trfsconcluidas TO anon;
 GRANT SELECT ON intensidades TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON pendenciastbl TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON subpendtbl TO anon;
 
 -- Funções RPC
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
@@ -250,16 +272,16 @@ WHERE t.nome = v.nome_tarefa;
 
 
 -- Pendências de cada tarefa (Apenas para tarefas que NÃO estão concluídas)
-INSERT INTO pendenciastbl (tarefa_id, texto_lista, data_lista, subpendencia_lista)
+INSERT INTO pendenciastbl (tarefa_id, texto_lista, data_lista)
 VALUES 
-  ( (SELECT id FROM tarefas WHERE nome = 'Posto do A214' LIMIT 1), 'Ajustar projeto elétrico na Equatorial', '2026-10-15', E'Emitir ART corrigida \nAguardar liberação do novo protocolo' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Barbearia do B193' LIMIT 1), 'Aprovar troca de titularidade', '2026-10-20', E'Verificar débitos anteriores \nEnviar RG do novo titular' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Gráfica do D382' LIMIT 1), 'Instalar barras de Suporte', '2026-10-25', E'Contratar metalúrgico \nEncomendar o suporte de ferro' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Tornearia do F130' LIMIT 1), 'Aguardar chegada do Inversor', '2026-11-02', E'Rastrear transportadora \nConferir nota fiscal de entrega' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Lava Jato do G842' LIMIT 1), 'Coletar documentos faltantes', '2026-10-18', E'Ligar para o cliente \nObter comprovante de endereço atualizado' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Vidraçaria do H901' LIMIT 1), 'Comprar conectores MC4', '2026-10-10', 'Ir à loja de materiais elétricos' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Auto Peças do J375' LIMIT 1), 'Validar dados de rateio', '2026-11-05', E'Conferir número da UC \nValidar percentual de divisão' ),
-  ( (SELECT id FROM tarefas WHERE nome = 'Frutaria do K196' LIMIT 1), 'Assinar contrato de rateio', '2026-10-22', E'Imprimir via física \nColher assinatura do proprietário' );
+  ( (SELECT id FROM tarefas WHERE nome = 'Posto do A214' LIMIT 1), 'Ajustar projeto elétrico na Equatorial', '2026-10-15'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Barbearia do B193' LIMIT 1), 'Aprovar troca de titularidade', '2026-10-20'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Gráfica do D382' LIMIT 1), 'Instalar barras de Suporte', '2026-10-25'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Tornearia do F130' LIMIT 1), 'Aguardar chegada do Inversor', '2026-11-02'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Lava Jato do G842' LIMIT 1), 'Coletar documentos faltantes', '2026-10-18'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Vidraçaria do H901' LIMIT 1), 'Comprar conectores MC4', '2026-10-10'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Auto Peças do J375' LIMIT 1), 'Validar dados de rateio', '2026-11-05'),
+  ( (SELECT id FROM tarefas WHERE nome = 'Frutaria do K196' LIMIT 1), 'Assinar contrato de rateio', '2026-10-22');
 
 
 
