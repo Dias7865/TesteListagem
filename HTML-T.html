@@ -4,14 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leitor de Dados - Matssa</title>
+<link rel="icon" type="image/webp" href="https://iajsciazkrtyqhlurvsi.supabase.co/storage/v1/object/public/D78Imagens/fvfvsf.webp">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
+    background-image: url('https://iajsciazkrtyqhlurvsi.supabase.co/storage/v1/object/public/D78Imagens/planofspl.webp');
+    background-repeat: repeat-x;
+    background-size: 100vw 150vh;
+    background-attachment: fixed;
+    animation: moverFundo 40s steps(1200) infinite;
+
     min-height: 100vh;
     padding: 20px;
-	zoom: 75%;
+    zoom: 75%;
+}
+
+@keyframes moverFundo {
+    0% {
+        background-position-x: 0;
+    }
+    100% {
+        background-position-x: -100vw;
+    }
 }
 
 .container { max-width: 1250px; margin: 0 auto; }
@@ -20,28 +35,43 @@ h1 {
     text-align: center; color: white; margin-bottom: 25px;
     font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
-.section {
-    background: white; border-radius: 12px; padding: 30px;
-    margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-.section-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;
-}
+.section {    background: white; border-radius: 12px; padding: 30px;    margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);	}
+.section-header {    display: flex; justify-content: space-between; align-items: center;    margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px;	}
 h2 { color: #333; font-size: 1.8rem; }
 .btn {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #00730d 0%, #764ba2 100%);
+    background: #4f46e5;
     color: white; border: none; border-radius: 8px; cursor: pointer;
     font-size: 16px; font-weight: bold;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-success { background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); }
-.btn-warning { background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); }
-.btn-danger { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
-.btn-secondary { background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%); }
+.btn-success { background: #2e7d32; }
+.btn-warning { background: #e65100; }
+.btn-danger  { background: #c62828; }
+.btn-secondary { background: #616161; }
+
+/* Botão repartido ao meio (Split Button) */
+.btn-split-container {
+    display: flex;
+    flex: 1;
+    min-width: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.btn-split-left {
+    flex: 1;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+.btn-split-right {
+    flex: 1;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
 
 .loading { text-align: center; padding: 20px; color: #00730d; font-size: 1.1rem; }
 .error { background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px; margin-top: 15px; }
@@ -74,17 +104,12 @@ h2 { color: #333; font-size: 1.8rem; }
     flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0;
     border-radius: 8px; font-size: 16px;
 }
-.mensagem-resultado {
-    margin-top: 15px; padding: 15px 20px; border-radius: 8px;
-    font-size: 1.2rem; font-weight: bold; text-align: center; display: none;
-}
+.mensagem-resultado {    margin-top: 15px; padding: 15px 20px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; text-align: center; display: none;	}
 .mensagem-sucesso { background: #e8f5e9; border: 2px solid #4caf50; color: #2e7d32; }
 .mensagem-erro { background: #fce4ec; border: 2px solid #f44336; color: #c62828; }
 
 /* --- ESTRUTURA LAYOUT DA 1ª PÁGINA --- */
-.p1-topo {
-    display: grid; grid-template-columns: 1fr 200px; gap: 15px; margin-bottom: 15px; align-items: stretch;
-}
+.p1-topo {    display: grid; grid-template-columns: 1fr 200px; gap: 15px; margin-bottom: 15px; align-items: stretch;	}
 
 .painel-com-rotulo {
     background: white; border: 4px solid #1a1a1a; border-radius: 12px;
@@ -99,6 +124,7 @@ h2 { color: #333; font-size: 1.8rem; }
     text-transform: uppercase; letter-spacing: 1px;
 }
 
+/* QUADRADOS DOS STATUS E CÍRCULOS DOS PRAZOS */
 .grid-caixas-status, .grid-caixas-prazos {
     display: flex; gap: 15px; flex-wrap: wrap; justify-content: space-around; align-items: flex-start; flex: 1;
 }
@@ -123,7 +149,18 @@ h2 { color: #333; font-size: 1.8rem; }
 
 .nome-status-caixa, .nome-prazo-caixa {
     margin-top: 8px; font-weight: bold; color: #333; text-align: center;
-    font-size: 0.9rem; text-transform: capitalize; line-height: 1.2;
+    font-size: 1.0rem; text-transform: capitalize; line-height: 1.2;
+}
+
+/* BOTÕES PARA NAVEGAÇÃO */
+.p1-botoes-laterais {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+.p1-botoes-laterais .btn-p1-lateral {
+    flex: 1;
 }
 
 .btn-p1-lateral {
@@ -135,7 +172,7 @@ h2 { color: #333; font-size: 1.8rem; }
 }
 .btn-p1-lateral:hover { background: #1a1a1a; color: #fff; transform: translateY(-3px); }
 
-/* GRID DE 2 COLUNAS NA PÁGINA 1 */
+/* GRID DE 2 COLUNAS ROLANTES NA PÁGINA 1 */
 .p1-corpo {
     display: grid; grid-template-columns: 1.8fr 1.4fr; gap: 15px; align-items: stretch;
 }
@@ -181,8 +218,8 @@ h2 { color: #333; font-size: 1.8rem; }
 .p1-titulo-periodo {
     text-align: center;
     color: white;
-    font-size: 1.6rem;
-    margin-bottom: 20px;
+    font-size: 2.0rem;
+    margin-bottom: 5px;
     font-weight: bold;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
 }
@@ -192,7 +229,7 @@ h2 { color: #333; font-size: 1.8rem; }
     100% { transform: translateY(-50%); }
 }
 .vis-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #0e136b;
     color: white; border-radius: 10px; padding: 12px; border: 2px solid #1a1a1a;
     box-shadow: 0 4px 10px rgba(0,0,0,0.15); font-size: 0.9rem;
 }
@@ -204,8 +241,7 @@ h2 { color: #333; font-size: 1.8rem; }
     display: grid; grid-template-columns: 1.4fr 1fr;
     grid-template-areas:
         "tarefas adicionar"
-        "tarefas integradores"
-        "concluidas concluidas";
+        "tarefas integradores";
     gap: 20px; align-items: start;
 }
 .area-tarefas { grid-area: tarefas; }
@@ -217,7 +253,7 @@ h2 { color: #333; font-size: 1.8rem; }
     .p1-topo { grid-template-columns: 1fr; }
     .p1-corpo { grid-template-columns: 1fr; }
     .grid-vis-dinamica { grid-template-columns: 1fr; }
-    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores" "concluidas"; }
+    .app-layout { grid-template-columns: 1fr; grid-template-areas: "tarefas" "adicionar" "integradores"; }
 }
 
 .seletor-container { margin-bottom: 20px; }
@@ -235,12 +271,12 @@ h2 { color: #333; font-size: 1.8rem; }
 .detalhes-card h3 { color: #333; margin-bottom: 15px; font-size: 1.6rem; }
 .detalhes-card p { color: #666; margin: 10px 0; line-height: 1.6; }
 .detalhes-card .label { font-weight: bold; color: #764ba2; }
+.detalhes-card .label2 { font-weight: bold; color: #9b8cab; }
 .detalhes-card .badge { display: inline-block; background: #00730d; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: 8px; }
 .status-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
 .status-concluido { background: #2196f3; color: white; }
 .status-em-progresso { background: #4caf50; color: white; }
 .status-aguardando { background: #ffc229; color: white; }
-.status-nao-iniciado { background: #4f0b06; color: white; }
 .status-faltam-dados { background: #00802D; color: white; }
 .status-reprovado { background: #757575; color: white; }
 .action-buttons { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
@@ -254,7 +290,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .prazo-atrasado { background: #d32f2f; color: white; }
 
 /* Modal */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay {position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); z-index: 10000; display: none; align-items: center;justify-content: center;padding: 20px; }
 .modal-overlay.active { display: flex; }
 .modal-card { background: white; border-radius: 12px; padding: 30px; max-width: 550px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #ffbd17; }
 .modal-close { position: absolute; top: 15px; right: 15px; width: 36px; height: 36px; background: #f0f0f0; border: none; border-radius: 50%; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -278,6 +314,88 @@ h2 { color: #333; font-size: 1.8rem; }
     50% { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
     100% { border-color: #1a1a1a; }
 }
+
+/* Estilo Minimalista para a Análise de Pendências */
+.grid-caixas-prazos-mini {
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    justify-content: center;
+    margin-top: 5px; 
+    padding-top: 15px; 
+    border-top: 2px dashed #e0e0e0; 
+    width: 100%;
+}
+
+.item-caixa-prazo-mini {
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+    padding: 6px 12px; 
+    border-radius: 15px; 
+    border: 1px solid rgba(0,0,0,0.2);
+    color: white; 
+    font-weight: bold; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.qtd-mini {
+    background: rgba(0,0,0,0.3); 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+    font-size: 0.95rem;
+}
+
+.label-mini {
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+}
+
+
+
+
+/* Estilos para o alerta de material + prazo crítico */
+.alerta-banner-critico {
+    background: #000000;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 3px solid #ffeb3b;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.05rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(183, 28, 28, 0.5);
+    animation: piscarBanner 1.5s infinite alternate;
+}
+
+.badge-alerta-mat {
+    display: block;
+    background: #d50000;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-top: 8px;
+    border: 1px solid #ffeb3b;
+    text-align: center;
+}
+
+@keyframes piscarBanner {
+    0% { border-color: #ffeb3b; box-shadow: 0 0 10px rgba(255, 235, 59, 0.5); }
+    100% { border-color: #ffffff; box-shadow: 0 0 20px rgba(255, 235, 59, 0.9); }
+}
+
+
+
+
+
+
+
+
+
 </style>
 </head>
 <body>
@@ -297,7 +415,7 @@ h2 { color: #333; font-size: 1.8rem; }
 
     <!-- ==================== PÁGINA 1 ==================== -->
     <div id="pagina1" class="hidden">
-        <h2 class="p1-titulo-periodo">Dados dos últimos 2 meses</h2>
+        <h2 class="p1-titulo-periodo">DADOS DOS ÚLTIMOS 2 MESES</h2>
         <div id="syncIndicator" class="sync-indicator">🟢 Sincronizado agora</div>
         
         <div class="p1-topo">
@@ -307,19 +425,40 @@ h2 { color: #333; font-size: 1.8rem; }
                     <div class="loading">Carregando contadores...</div>
                 </div>
             </div>
-            <button class="btn-p1-lateral" onclick="irParaPagina2()">
-                vai à 2ªpag ➔
-            </button>
+            
+            <div class="p1-botoes-laterais">
+                <button class="btn-p1-lateral" onclick="irParaPagina2()">
+                    Itens Listados ➔
+                </button>
+                <button class="btn-p1-lateral" onclick="irParaPagina3()">
+                    Histórico ➔
+                </button>
+            </div>
         </div>
 
         <div class="p1-corpo">
             <div class="p1-corpo-esquerda">
-                <div class="painel-com-rotulo">
-                    <div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
-                    <div id="gridPrazosCaixas" class="grid-caixas-prazos">
-                        <div class="loading">Carregando prazos...</div>
-                    </div>
-                </div>
+				<div class="painel-com-rotulo">
+					<div class="rotulo-vertical">ESTADO DE CADA PRAZO</div>
+					
+					<div style="display: flex; flex-direction: column; width: 100%; gap: 10px;">
+						<div id="gridPrazosCaixas" class="grid-caixas-status">
+							<div class="loading">Carregando prazos...</div>
+						</div>
+						
+						<!-- BANNER DE ALERTA DE MATERIAIS FALTANDO EM PRAZO CRÍTICO -->
+						<div id="bannerAlertaMateriais" class="alerta-banner-critico hidden">
+							⚠️ <span id="qtdAlertasMateriais">0</span> tarefa(s) com <u>MATERIAL FALTANDO</u> em <u>PRAZO CRÍTICO</u>!
+						</div>
+						
+						<!-- Contêiner para os indicadores da Análise de Pendências -->
+						<div id="gridAnalisePendenciasMini" class="grid-caixas-prazos-mini" style="display: none;">
+						
+						
+						
+						</div>
+					</div>
+				</div>
 
                 <div class="container-lista-pendentes">
                     <div id="listaPendentesVertical" class="lista-vertical-pendentes">
@@ -330,7 +469,6 @@ h2 { color: #333; font-size: 1.8rem; }
 
             <!-- VISUALIZAÇÃO DINÂMICA DIVIDIDA EM 2 COLUNAS -->
             <div class="grid-vis-dinamica">
-                <!-- Coluna 1: No Prazo / Prazo Próximo -->
                 <div class="container-vis-dinamica">
                     <div class="vis-dinamica-titulo" style="color: #2e7d32;">
                         🟢 Dentro do Prazo & Próximo
@@ -340,7 +478,6 @@ h2 { color: #333; font-size: 1.8rem; }
                     </div>
                 </div>
 
-                <!-- Coluna 2: Dia Limite / Atrasado -->
                 <div class="container-vis-dinamica">
                     <div class="vis-dinamica-titulo" style="color: #c62828;">
                         🔴 Prazo Limite & Atrasado
@@ -349,8 +486,22 @@ h2 { color: #333; font-size: 1.8rem; }
                         <div id="trackPrazoCritico" class="vis-dinamica-track"></div>
                     </div>
                 </div>
-            </div>
+            </div>	
+			
         </div>
+		
+		<!-- PAINEL DE ANÁLISE DE PENDÊNCIAS -->
+		<div class="container-analise-pendencias" style="margin-top: 25px; background: white; border: 4px solid #1a1a1a; border-radius: 12px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+			<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+				<h3 style="font-size: 1.4rem; color: #1a1a1a;">📋 Análise de Prazos das Pendências</h3>
+				<button class="btn btn-warning" onclick="analisarPendencias()">🔍 Processar Pendências</button>
+			</div>
+
+			<div id="resultadoAnalisePendencias" style="display: none;">
+				<div id="detalhesPendenciasCategorizadas" style="display: flex; flex-direction: column; gap: 15px;"></div>
+			</div>
+		</div>
+		
     </div>
 
     <!-- ==================== PÁGINA 2 ==================== -->
@@ -387,27 +538,38 @@ h2 { color: #333; font-size: 1.8rem; }
                     </select>
                 </div>
 
-                <!-- Form Tarefa -->
-                <div id="formTarefa" class="hidden">
-                    <div class="form-group"><label for="nomeTarefa">Nome da Tarefa:</label><input type="text" id="nomeTarefa" placeholder="Ex: CASA 10"></div>
-                    <div class="form-group"><label for="tipoTarefa">Tipo:</label><input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar"></div>
-                    <div class="form-group">
-                        <label for="statusTarefa">Status:</label>
-                        <select id="statusTarefa">
-                            <option value="">-- Selecione o status --</option>
-                            <option value="concluído">✅ Concluído</option>
-                            <option value="em progresso">⏩ Em progresso</option>
-                            <option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
-                            <option value="faltam dados">🗂️ Faltam dados necessários</option>
-                            <option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
-                            <option value="não iniciado">❌ Não iniciado</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
-                    <div class="form-group"><label for="integradorTarefa">Integrador Associado:</label><select id="integradorTarefa"><option value="">-- Selecione o integrador --</option></select></div>
-                    <div class="form-group"><label for="descricaoTarefa">Descrição:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
-                    <button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
-                </div>
+				<!-- Form Tarefa -->
+				<div id="formTarefa" class="hidden">
+					<div class="form-group"><label for="nomeTarefa">Nome da Tarefa:</label><input type="text" id="nomeTarefa" placeholder="Ex: CASA 10"></div>
+					<div class="form-group"><label for="tipoTarefa">Tipo:</label><input type="text" id="tipoTarefa" placeholder="Ex: Instalação solar"></div>
+					<div class="form-group">
+						<label for="statusTarefa">Status:</label>
+						<select id="statusTarefa">
+							<option value="">-- Selecione o status --</option>
+							<option value="concluído">✅ Concluído</option>
+							<option value="em progresso">⏩ Em progresso</option>
+							<option value="aguardando equatorial">⏳ Aguardando Equatorial</option>
+							<option value="faltam dados">🗂️ Faltam dados necessários</option>
+							<option value="reprovado pela equatorial">❕ Reprovado pela Equatorial</option>
+						</select>
+					</div>
+					<div class="form-group"><label for="enderecoTarefa">Endereço:</label><input type="text" id="enderecoTarefa" placeholder="Ex: Av. Central, 123 - Centro"></div>
+					<div class="form-group"><label for="dataInicioObraTarefa">Data de Início da Obra:</label><input type="date" id="dataInicioObraTarefa"></div>
+					<div class="form-group"><label for="dataEsperadaTarefa">Data Esperada para Entrega:</label><input type="date" id="dataEsperadaTarefa"></div>
+					<div class="form-group"><label for="integradorTarefa">Integrador Associado:</label><select id="integradorTarefa"><option value="">-- Selecione o integrador --</option></select></div>
+					<div class="form-group">
+						<label for="statusMaterialTarefa">Status do Material:</label>
+						<select id="statusMaterialTarefa">
+							<option value="">-- Selecione o status do material --</option>
+							<option value="Falta">❌ Falta</option>
+							<option value="Arranjado">✅ Arranjado</option> 
+						</select>
+					</div>
+					<div class="form-group"><label for="materiaisFaltandoTarefa">Materiais (D: para Disponível, digite quantidade no início ex: 2 Disjuntor):</label><textarea id="materiaisFaltandoTarefa" placeholder="Ex: 2 Disjuntor 63A&#10;D: Cabo 10mm&#10;F: 3 DPS Classe II"></textarea></div>
+					<div class="form-group"><label for="relatorioAtividadesTarefa">Relatório de Atividades Desenvolvidas:</label><textarea id="relatorioAtividadesTarefa" placeholder="Relatório de atividades diárias..."></textarea></div>
+					<div class="form-group"><label for="descricaoTarefa">Descrição Geral:</label><textarea id="descricaoTarefa" placeholder="Descreva a tarefa..."></textarea></div>
+					<button class="btn btn-success" onclick="adicionarTarefa()" id="btnAdicionarTarefa">Adicionar Tarefa</button>
+				</div>
 
                 <!-- Form Integrador -->
                 <div id="formIntegrador" class="hidden">
@@ -415,7 +577,6 @@ h2 { color: #333; font-size: 1.8rem; }
                     <div class="form-group"><label for="ncpfIntegrador">nº do CPF:</label><input type="text" id="ncpfIntegrador" placeholder="Ex: 123456789" maxlength="15"></div>
                     <button class="btn btn-success" onclick="adicionarIntegrador()" id="btnAdicionarIntegrador">Adicionar Integrador</button>
                 </div>
-
                 <div id="mensagemAdicionar" style="margin-top:15px;"></div>
             </div>
 
@@ -432,18 +593,24 @@ h2 { color: #333; font-size: 1.8rem; }
                 <div id="integradoresError" class="error" style="display:none;"></div>
                 <div id="detalhesIntegrador" class="detalhes-card" style="display:none;"></div>
             </div>
+        </div>
+    </div>
 
-            <!-- Tarefas Concluídas (Tabela trfsconcluidas) -->
-            <div id="secaoConcluidas" class="section area-concluidas">
-                <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
-                <div class="seletor-container">
-                    <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
-                    <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
-                        <option value="">-- Escolha uma tarefa concluída --</option>
-                    </select>
-                </div>
-                <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
+    <!-- ==================== PÁGINA 3 (HISTÓRICO) ==================== -->
+    <div id="pagina3" class="hidden">
+        <div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="irParaPagina1()">⬅️ Voltar à 1ª Página</button>
+        </div>
+
+        <div id="secaoConcluidas" class="section area-concluidas">
+            <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
+            <div class="seletor-container">
+                <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
+                <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
+                    <option value="">-- Escolha uma tarefa concluída --</option>
+                </select>
             </div>
+            <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
         </div>
     </div>
 </div>
@@ -456,6 +623,81 @@ h2 { color: #333; font-size: 1.8rem; }
     </div>
 </div>
 
+<!-- Modal Secundário de Pendências -->
+<div id="modalPendencias" class="modal-overlay" style="z-index: 10002;">
+    <div class="modal-card" style="max-width: 650px;">
+        <button class="modal-close" onclick="fecharModalPendencias()">✕</button>
+        <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">⚠️ Pendências a Resolver</h3>
+        
+        <div class="form-group">
+            <label style="font-weight: bold; margin-bottom: 10px; display: block;">Itens pendentes:</label>
+            <div id="listaPendenciasContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding-right: 4px;"></div>
+            <button type="button" class="btn btn-secondary" onclick="adicionarItemPendencia()" style="margin-top: 10px; width: 100%;">
+                ➕ Adicionar Pendência
+            </button>
+        </div>
+
+        <div class="action-buttons" style="margin-top: 20px;">
+            <button class="btn btn-success" onclick="salvarPendenciasModal()">💾 Salvar Pendências</button>
+            <button class="btn btn-secondary" onclick="fecharModalPendencias()">❌ Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Materiais da Tarefa (Atualizado com gestão dinâmica) -->
+<div id="modalMateriais" class="modal-overlay" style="z-index: 10003;">
+    <div class="modal-card">
+        <button class="modal-close" onclick="fecharModalMateriais()">✕</button>
+        <h3 id="tituloModalMateriais" style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">📦 Materiais da Tarefa</h3>
+        
+        <div id="listaMateriaisModalContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; padding-right: 4px; margin-bottom: 15px;"></div>
+
+        <!-- Botões de Ação Dinâmica -->
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-secondary" style="flex: 1; padding: 10px; font-size: 0.95rem;" onclick="togglePainelNovoMaterial()">🛠️ Novo</button>
+            <button class="btn btn-secondary" style="flex: 1; padding: 10px; font-size: 0.95rem;" onclick="togglePainelTodosMateriais()">📚 Todos</button>
+        </div>
+
+        <!-- Painel para Adicionar 1 Novo Material -->
+        <div id="painelNovoMaterial" class="hidden" style="background: #f8f9fa; border: 2px solid #e0e0e0; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <h4 style="margin-bottom: 10px; color: #333; font-size: 1rem;">🛠️ Inserir Novo Material</h4>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="font-size: 0.85rem; margin-bottom: 4px; font-weight: bold; color: #555;">Nome do Material:</label>
+                <input type="text" id="novoMatNome" placeholder="Ex: Disjuntor 63A" style="padding: 8px 12px; font-size: 0.9rem;">
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label style="font-size: 0.85rem; margin-bottom: 4px; font-weight: bold; color: #555;">Quantidade:</label>
+                    <input type="number" id="novoMatQuant" value="1" min="1" style="padding: 8px 12px; font-size: 0.9rem;">
+                </div>
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label style="font-size: 0.85rem; margin-bottom: 4px; font-weight: bold; color: #555;">Status:</label>
+                    <select id="novoMatStatus" style="padding: 8px 12px; font-size: 0.9rem; background: white;">
+                        <option value="false">⭕ Faltando</option>
+                        <option value="true">🔵 Disponível</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-success" id="btnConfirmarNovoMaterial" style="width: 100%; padding: 10px; font-size: 0.95rem;" onclick="confirmarAdicaoMaterialUnico()">✅ Confirmar Adição</button>
+        </div>
+
+        <!-- Painel para Edição Completa em Texto (Todos) -->
+        <div id="painelTodosMateriais" class="hidden" style="margin-bottom: 15px;">
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label for="inputMateriaisModal" style="font-weight: bold; margin-bottom: 8px; display: block; color: #555; font-size: 0.9rem;">
+                    Editar Lista Completa (um por linha. Ex: 2 Disjuntor 63A ou D: Cabo 10mm):
+                </label>
+                <textarea id="inputMateriaisModal" style="width: 100%; min-height: 90px; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; font-family: inherit; font-size: 0.9rem;" placeholder="Ex: 2 Disjuntor 63A&#10;D: Cabo 10mm&#10;F: 3 DPS Classe II"></textarea>
+            </div>
+            <button class="btn btn-success" id="btnSalvarMateriaisModal" style="width: 100%; padding: 10px; font-size: 0.95rem;" onclick="salvarMateriaisModal()">💾 Salvar Lista Completa</button>
+        </div>
+
+        <div class="action-buttons" style="margin-top: 15px;">
+            <button class="btn btn-secondary" style="width: 100%;" onclick="fecharModalMateriais()">❌ Fechar</button>
+        </div>
+    </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://iajsciazkrtyqhlurvsi.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_vJZfKGSKgljFrTJ4X4exUg_Z1xMQ0tN';
@@ -464,14 +706,24 @@ let dadosTarefas = [];
 let dadosIntegradores = [];
 let dadosIntensidades = [];
 let dadosTrfsConcluidas = [];
+let pendenciastbl = [];
+let tarefaMateriaisEditando = null;
 
 function irParaPagina2() {
     document.getElementById('pagina1').classList.add('hidden');
+    document.getElementById('pagina3').classList.add('hidden');
     document.getElementById('pagina2').classList.remove('hidden');
+}
+
+function irParaPagina3() {
+    document.getElementById('pagina1').classList.add('hidden');
+    document.getElementById('pagina2').classList.add('hidden');
+    document.getElementById('pagina3').classList.remove('hidden');
 }
 
 function irParaPagina1() {
     document.getElementById('pagina2').classList.add('hidden');
+    document.getElementById('pagina3').classList.add('hidden');
     document.getElementById('pagina1').classList.remove('hidden');
     carregarPagina1();
 }
@@ -542,12 +794,14 @@ async function carregarDadosIniciais() {
     await carregarTrfsConcluidas();
     await carregarPagina1();
     await verificarEArquivarAutomatico();
+	await analisarPendencias2();
     
     setInterval(async () => {
         await carregarTarefas();
         await verificarEArquivarAutomatico();
         await carregarTrfsConcluidas();
         await carregarPagina1();
+		await analisarPendencias2();
     }, 15000);
 }
 
@@ -567,6 +821,7 @@ async function carregarPagina1() {
         renderizarCaixasPrazos();
         renderizarListaPendentes();
         renderizarVisualizacaoDinamicaVertical();
+		atualizarBannerAlertaMateriais();
         
         notificarSincronizacao();
     } catch (e) {
@@ -582,7 +837,6 @@ function getCorPorStatus(status) {
     if (s.includes('aguardando')) return { bg: '#1800a1', text: '#ffffff' };
     if (s.includes('faltam')) return { bg: '#00a889', text: '#ffffff' };
     if (s.includes('reprovado')) return { bg: '#757575', text: '#ffffff' };
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return { bg: '#f44336', text: '#ffffff' };
     return { bg: '#e0e0e0', text: '#333333' };
 }
 
@@ -593,8 +847,7 @@ function getEmojiStatus(status) {
     if (s.includes('progresso')) return '⏩';
     if (s.includes('aguardando')) return '⏳';
     if (s.includes('faltam')) return '🗂️';
-    if (s.includes('reprovado')) return '❕';
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return '❌';
+    if (s.includes('reprovado')) return '❕​❕';
     return '📌';
 }
 
@@ -680,7 +933,24 @@ function renderizarCaixasPrazos() {
     `).join('');
 }
 
-/* ATUALIZAÇÃO 2: MOSTRA TAREFAS PENDENTES E CONCLUÍDAS COM RÓTULOS PERSONALIZADOS */
+function obterPesoOrdem(t) {
+    const status = (t.status || '').toLowerCase();
+    if (status.includes('conclu')) return 10;
+    if (!t.data_para_termino) return 9; 
+
+    const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); 
+    hoje.setHours(0, 0, 0, 0);
+
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDias < 0) return 1;   
+    if (diffDias < 2) return 2;   
+    if (diffDias <= 8) return 3;  
+    return 4;                     
+}
+
 function renderizarListaPendentes() {
     const container = document.getElementById('listaPendentesVertical');
 
@@ -689,7 +959,19 @@ function renderizarListaPendentes() {
         return;
     }
 
-    container.innerHTML = dadosTarefas.map(t => {
+    const tarefasOrdenadas = [...dadosTarefas].sort((a, b) => {
+        const pesoA = obterPesoOrdem(a);
+        const pesoB = obterPesoOrdem(b);
+
+        if (pesoA !== pesoB) return pesoA - pesoB;
+
+        if (a.data_para_termino && b.data_para_termino) {
+            return new Date(a.data_para_termino) - new Date(b.data_para_termino);
+        }
+        return 0;
+    });
+
+    container.innerHTML = tarefasOrdenadas.map(t => {
         const s = (t.status || '').toLowerCase();
         const isConcluido = s.includes('conclu');
         const emoji = getEmojiStatus(t.status);
@@ -697,16 +979,18 @@ function renderizarListaPendentes() {
         const bgCor = isConcluido ? '#2196f3' : getCorPrazo(t.data_para_termino);
         const dataFormatada = formatarData(t.data_para_termino);
         const rotuloData = isConcluido ? 'Terminado' : 'Até';
+		const temAlerta = verificarAlertaMaterialEPrazo(t);
+		const iconeAlerta = temAlerta ? ' <span title="Material Faltando em Prazo Crítico!" style="animation: piscarBanner 1s infinite;">⚠️📦</span>' : '';
 
-        return `
-            <div class="item-pendente" style="background-color: ${bgCor};">
-                <div class="item-pendente-esquerda">
-                    <span>${emoji}</span>
-                    <span>${t.nome}</span>
-                </div>
-                <span>${rotuloData}: ${dataFormatada}</span>
-            </div>
-        `;
+		return `
+			<div class="item-pendente" style="background-color: ${bgCor};">
+				<div class="item-pendente-esquerda">
+					<span>${emoji}</span>
+					<span>${t.nome}${iconeAlerta}</span>
+				</div>
+				<span>${rotuloData}: ${dataFormatada}</span>
+			</div>
+		`;
     }).join('');
 }
 
@@ -718,7 +1002,6 @@ function getTextoStatusSemFundo(status) {
     if (s.includes('reprovado')) return `❕ ${status}`;
     if (s.includes('equatorial')) return `⏳ ${status}`;
     if (s.includes('faltam')) return `🗂️ ${status}`;
-    if (s.includes('não iniciado') || s.includes('nao iniciado')) return `❌ ${status}`;
     return status;
 }
 
@@ -759,13 +1042,18 @@ function renderizarVisualizacaoDinamicaVertical() {
     const cardsCritico = [];
 
     pendentes.forEach(t => {
-        const cardHtml = `
-            <div class="vis-card">
-                <h4>${t.nome}</h4>
-                <p><b>Status:</b> ${getTextoStatusSemFundo(t.status)}</p>
-                <p><b>Data:</b> ${formatarData(t.data_para_termino)} - ${getTextoPrazoSemFundo(t.data_para_termino)}</p>
-            </div>
-        `;
+    const temAlerta = verificarAlertaMaterialEPrazo(t);
+    const badgeAlerta = temAlerta ? '<div class="badge-alerta-mat">⚠️ MATERIAL FALTANDO!</div>' : '';
+    const bordaDestaque = temAlerta ? 'style="border: 3px solid #ff1744; background: #1a0008;"' : '';
+
+    const cardHtml = `
+        <div class="vis-card" ${bordaDestaque}>
+            <h4>${t.nome}</h4>
+            <p><b>Status:</b> ${getTextoStatusSemFundo(t.status)}</p>
+            <p><b>Data:</b> ${formatarData(t.data_para_termino)} - ${getTextoPrazoSemFundo(t.data_para_termino)}</p>
+            ${badgeAlerta}
+        </div>
+    `;
 
         if (t.data_para_termino) {
             const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
@@ -801,7 +1089,7 @@ function renderizarVisualizacaoDinamicaVertical() {
     }
 }
 
-// --- BUSCAR DADOS GENÉRICOS ---
+// --- BUSCAR DADOS ---
 async function buscarDados(tabela) {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}?select=*`, {
         headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
@@ -813,13 +1101,23 @@ async function buscarDados(tabela) {
 async function carregarTarefas() {
     const select = document.getElementById('selectTarefas');
     try {
-        dadosTarefas = await buscarDados('tarefas');
+        // Busca tarefas -> pendenciastbl -> subpendtbl E materiaistbl
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*,subpendtbl(*)),materiaistbl(*)`, {
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
+        
+        dadosTarefas = await response.json();
+        
+        pendenciastbl = dadosTarefas.flatMap(t => t.pendenciastbl || []);
+
         select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
         dadosTarefas.forEach((t, i) => {
             const opt = document.createElement('option');
             opt.value = i; opt.textContent = t.nome;
             select.appendChild(opt);
         });
+
     } catch (err) { console.error(err); }
 }
 
@@ -859,12 +1157,27 @@ function mostrarDetalhesTrfConcluida() {
     if (idx === '') { div.style.display = 'none'; return; }
 
     const tc = dadosTrfsConcluidas[idx];
+
+    let listaRelatorio = 'Sem relatório';
+    if (tc.relatorio_atividades) {
+        const linhasRelatorio = Array.isArray(tc.relatorio_atividades)
+            ? tc.relatorio_atividades
+            : tc.relatorio_atividades.split('\n').map(r => r.trim()).filter(Boolean);
+
+        if (linhasRelatorio.length > 0) {
+            listaRelatorio = `<ul style="padding-left: 30px; list-style-type: '- '; margin-top: 5px;">${linhasRelatorio.map(r => `<li>${r}</li>`).join('')}</ul>`;
+        }
+    }
+
     div.innerHTML = `
         <h3>${tc.nome}</h3>
         <p><span class="label">Tipo:</span> ${tc.tipo || 'Não informado'}</p>
+        <p><span class="label">Endereço:</span> ${tc.endereco || 'Não informado'}</p>
+		<p><span class="label">Descrição Geral:</span> ${tc.descricao || 'Sem descrição'}</p>
         <p><span class="label">Integrador responsável:</span> <span class="badge" style="background:#00bcd4;">👤 ${tc.intg_fz || 'N/A'}</span></p>
-        <p><span class="label">Descrição:</span> ${tc.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data de Início da Obra:</span> ${formatarData(tc.data_inicio_obra)}</p>
         <p><span class="label">Data de Finalização:</span> ${formatarData(tc.data_finalizado)}</p>
+        <p><span class="label">Relatório de Atividades:</span> ${listaRelatorio}</p>
         <div class="action-buttons">
             <button class="btn btn-danger" onclick="removerTrfConcluida(${idx})">🗑️ Remover do Histórico</button>
         </div>
@@ -892,7 +1205,10 @@ async function concluirEArquivarTarefa(index) {
                 tipo: tarefa.tipo,
                 descricao: tarefa.descricao,
                 intg_fz: integradorNome,
-                data_finalizado: obterDataHojeLocal()
+                data_finalizado: obterDataHojeLocal(),
+                endereco: tarefa.endereco,
+                data_inicio_obra: tarefa.data_inicio_obra,
+                relatorio_atividades: tarefa.relatorio_atividades
             })
         });
 
@@ -948,12 +1264,18 @@ function getIntegradorBadge(integradorId) {
 
 function formatarData(dataISO) {
     if (!dataISO) return 'Não definida';
-    // Pega apenas a parte da data YYYY-MM-DD e divide os blocos
     const partes = dataISO.split('T')[0].split('-');
     if (partes.length < 3) return dataISO;
-    
     const [ano, mes, dia] = partes;
     return `${dia}/${mes}/${ano}`;
+}
+
+function formatarDataCurta(dataISO) {
+    if (!dataISO) return 'Não definida';
+    const partes = dataISO.split('T')[0].split('-');
+    if (partes.length < 3) return dataISO;
+    const [ano, mes, dia] = partes;
+    return `${dia}/${mes}`;
 }
 
 function obterDataHojeLocal() {
@@ -964,16 +1286,15 @@ function obterDataHojeLocal() {
     return `${ano}-${mes}-${dia}`;
 }
 
-
 function getStatusBadge(status) {
-    if (!status) return '<span class="status-badge status-nao-iniciado">Não definido</span>';
+    if (!status) return '<span class="status-badge status-faltam-dados">Não definido</span>';
     const s = status.toLowerCase();
     if (s === 'concluído' || s === 'concluido') return `<span class="status-badge status-concluido">✅ ${status}</span>`;
     if (s === 'em progresso') return `<span class="status-badge status-em-progresso">⏩ ${status}</span>`;
     if (s === 'aguardando equatorial') return `<span class="status-badge status-aguardando">⏳ ${status}</span>`;
     if (s === 'reprovado') return `<span class="status-badge status-reprovado">❕ ${status}</span>`;
     if (s === 'faltam dados') return `<span class="status-badge status-faltam-dados">🗂️ ${status}</span>`;
-    return `<span class="status-badge status-nao-iniciado">❌ ${status}</span>`;
+    return `<span class="status-badge status-faltam-dados">🗂️ ${status}</span>`;
 }
 
 function mostrarDetalhesTarefa() {
@@ -983,21 +1304,285 @@ function mostrarDetalhesTarefa() {
     if (idx === '') { div.style.display = 'none'; return; }
 
     const t = dadosTarefas[idx];
+    
+    // Filtra apenas os materiais marcados com status_material = false (Faltando)
+    const materiaisFaltando = (Array.isArray(t.materiaistbl) ? t.materiaistbl : [])
+        .filter(m => m && (m.status_material === false || m.status_material === 0));
+
+    const listaMateriais = materiaisFaltando.length > 0
+        ? `<ul style="padding-left: 30px; margin-top: 5px;">${materiaisFaltando.map(m => {
+            const qStr = (m.quant_material && m.quant_material > 1) ? `<strong>(${m.quant_material}x)</strong> ` : '';
+            return `<li>${qStr}${m.nome_material}</li>`;
+        }).join('')}</ul>`
+        : 'Nenhum material pendente';
+
+    let listaRelatorio = 'Nenhum relatório registrado';
+    if (t.relatorio_atividades) {
+        const linhasRelatorio = Array.isArray(t.relatorio_atividades)
+            ? t.relatorio_atividades
+            : t.relatorio_atividades.split('\n').map(r => r.trim()).filter(Boolean);
+
+        if (linhasRelatorio.length > 0) {
+            listaRelatorio = `<ul style="padding-left: 30px; margin-top: 5px;">${linhasRelatorio.map(r => `<li>${r}</li>`).join('')}</ul>`;
+        }
+    }
+
+    let listaPendencias = 'Sem pendências';
+    if (t.pendenciastbl && t.pendenciastbl.length > 0) {
+        listaPendencias = `<ul style="padding-left: 20px; margin-top: 5px; list-style: none;">${t.pendenciastbl.map(p => {
+            let dataApresentada = p.data_lista ? formatarDataCurta(p.data_lista) : 'S/D';
+            
+            let subTexto = '';
+            if (p.subpendtbl && p.subpendtbl.length > 0) {
+                subTexto = `<ul style="list-style-type: none; padding-left: 0; margin-top: 4px;">` + 
+                    p.subpendtbl.map(s => {
+                        let dataSub = s.data_sub ? ` <span style="color:#999; font-size: 0.85rem;">(${formatarDataCurta(s.data_sub)})</span>` : '';
+                        return `<li style="color: #555;">&nbsp;&nbsp;➝ ${s.texto_sub}${dataSub}</li>`;
+                    }).join('') + 
+                `</ul>`;
+            }
+            
+            return `
+                <li style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #e0e0e0;">
+                    <div>
+                        • <strong>${p.texto_lista}</strong> - <span style="color:#666;">(${dataApresentada})</span>${subTexto}
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="finalizarPendenciaParaRelatorio('${p.id}',${idx})" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; white-space: nowrap; margin-left: 10px; cursor: pointer;" title="Anexar pendência ao relatório de atividades">fim ❎</button>
+                </li>
+            `;
+        }).join('')}</ul>`;
+    }
+
     div.innerHTML = `
         <h3>${t.nome}</h3>
         <p><span class="label">Tipo:</span> ${t.tipo || 'Não informado'}</p>
+        <p><span class="label">Endereço:</span> ${t.endereco || 'Não informado'}</p>
+        <p><span class="label">Descrição Geral:</span> ${t.descricao || 'Sem descrição'}</p>
         <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
         <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
-        <p><span class="label">Descrição:</span> ${t.descricao || 'Sem descrição'}</p>
+        <p><span class="label">Data de Início da Obra:</span> ${formatarData(t.data_inicio_obra)}</p>
         <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
-        <p><span class="label">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
+        <p><span class="label">Status do Material:</span> ${t.status_material ? `<strong>${t.status_material}</strong>` : 'Não definido'}</p>
+        <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
+        <p><span class="label">Pendências a Resolver:</span> ${listaPendencias}</p>
+        <p><span class="label">Relatório de Atividades:</span> ${listaRelatorio}</p>
+        <p><span class="label2" style="margin-left: 30px;">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
-            <button class="btn btn-danger" onclick="removerTarefa(${idx})">🗑️ Remover Elemento</button>
+            <button class="btn btn-secondary" onclick="abrirModalPendencias(${idx})">📝 Editar Pendências a Resolver</button>
+            <div class="btn-split-container">
+                <button class="btn btn-danger btn-split-left" onclick="removerTarefa(${idx})">🗑️ Remover</button>
+                <button class="btn btn-secondary btn-split-right" onclick="abrirModalMateriais(${idx})">📦 Todos os Materiais</button>
+            </div>
         </div>
     `;
     div.style.display = 'block';
+}
+
+// --- FUNÇÕES DO MODAL DE MATERIAIS ---
+function togglePainelNovoMaterial() {
+    const painelNovo = document.getElementById('painelNovoMaterial');
+    const painelTodos = document.getElementById('painelTodosMateriais');
+    
+    if (painelNovo.classList.contains('hidden')) {
+        painelNovo.classList.remove('hidden');
+        painelTodos.classList.add('hidden');
+    } else {
+        painelNovo.classList.add('hidden');
+    }
+}
+
+function togglePainelTodosMateriais() {
+    const painelNovo = document.getElementById('painelNovoMaterial');
+    const painelTodos = document.getElementById('painelTodosMateriais');
+    
+    if (painelTodos.classList.contains('hidden')) {
+        painelTodos.classList.remove('hidden');
+        painelNovo.classList.add('hidden');
+    } else {
+        painelTodos.classList.add('hidden');
+    }
+}
+
+function abrirModalMateriais(index) {
+    tarefaMateriaisEditando = index;
+    const tarefa = dadosTarefas[index];
+    if (!tarefa) return;
+
+    document.getElementById('tituloModalMateriais').textContent = `📦 Materiais: ${tarefa.nome}`;
+    
+    // Oculta e reseta os painéis de adição/edição
+    document.getElementById('painelNovoMaterial').classList.add('hidden');
+    document.getElementById('painelTodosMateriais').classList.add('hidden');
+    document.getElementById('novoMatNome').value = '';
+    document.getElementById('novoMatQuant').value = '1';
+    document.getElementById('novoMatStatus').value = 'false';
+
+    const container = document.getElementById('listaMateriaisModalContainer');
+    container.innerHTML = '';
+
+    const materiais = Array.isArray(tarefa.materiaistbl) ? tarefa.materiaistbl : [];
+
+    if (materiais.length === 0) {
+        container.innerHTML = '<p style="color: #666; text-align: center; padding: 15px;">Nenhum material cadastrado para esta tarefa.</p>';
+    } else {
+        materiais.forEach(m => {
+            const isDisponivel = (m.status_material === true || m.status_material === 1 || m.status_material === 'true');
+            const emojiStatus = isDisponivel ? '🔵' : '⭕';
+            const statusTexto = isDisponivel ? 'Disponível (Clique para alterar para Faltando)' : 'Faltando (Clique para alterar para Disponível)';
+
+            const q = parseInt(m.quant_material, 10);
+            const quantExibida = (!isNaN(q) && q > 1) ? `<span style="color:#666; font-weight:normal; margin-right: 6px;">(${q}x)</span>` : '';
+
+            const row = document.createElement('div');
+            row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.95rem; color: #333; font-weight: 600;';
+            row.innerHTML = `
+                <div>${quantExibida}<span>${m.nome_material}</span></div>
+                <button type="button" onclick="alternarStatusMaterial('${m.id}', ${isDisponivel})" title="${statusTexto}" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                    ${emojiStatus}
+                </button>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // Carrega o texto atual dos materiais na textarea de edição do modal
+    const inputModal = document.getElementById('inputMateriaisModal');
+    if (inputModal) {
+        inputModal.value = converterArrayMateriaisParaTexto(tarefa.materiaistbl);
+    }
+
+    document.getElementById('modalMateriais').classList.add('active');
+}
+
+function fecharModalMateriais() {
+    document.getElementById('modalMateriais').classList.remove('active');
+    tarefaMateriaisEditando = null;
+}
+
+// Alterna o status do material diretamente ao clicar no emoji
+async function alternarStatusMaterial(matId, statusAtual) {
+    if (!matId) return;
+    const novoStatus = !statusAtual;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/materiaistbl?id=eq.${matId}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status_material: novoStatus })
+        });
+
+        if (!response.ok) throw new Error('Erro ao alterar status do material');
+
+        await carregarTarefas();
+        if (tarefaMateriaisEditando !== null) {
+            abrirModalMateriais(tarefaMateriaisEditando);
+        }
+        mostrarDetalhesTarefa();
+        await carregarPagina1();
+    } catch (err) {
+        alert(`❌ Erro ao alterar status: ${err.message}`);
+    }
+}
+
+// Adiciona um único material via formulário do painel 🛠️ Novo
+async function confirmarAdicaoMaterialUnico() {
+    if (tarefaMateriaisEditando === null) return;
+    const tarefa = dadosTarefas[tarefaMateriaisEditando];
+    if (!tarefa) return;
+
+    const nome = document.getElementById('novoMatNome').value.trim();
+    const quant = parseInt(document.getElementById('novoMatQuant').value, 10) || 1;
+    const status = (document.getElementById('novoMatStatus').value === 'true');
+
+    if (!nome) {
+        return alert('⚠️ Digite o nome do material!');
+    }
+
+    const btnConfirmar = document.getElementById('btnConfirmarNovoMaterial');
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'Adicionando...';
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/materiaistbl`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tarefa_id: tarefa.id,
+                nome_material: nome,
+                quant_material: quant,
+                status_material: status
+            })
+        });
+
+        if (!response.ok) throw new Error('Erro ao adicionar novo material');
+
+        await carregarTarefas();
+        abrirModalMateriais(tarefaMateriaisEditando);
+        mostrarDetalhesTarefa();
+        await carregarPagina1();
+    } catch (err) {
+        alert(`❌ Erro ao adicionar material: ${err.message}`);
+    } finally {
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = '✅ Confirmar Adição';
+    }
+}
+
+// Função para salvar as alterações em lote feitas no textarea do painel 📚 Todos
+async function salvarMateriaisModal() {
+    if (tarefaMateriaisEditando === null) return;
+    const tarefa = dadosTarefas[tarefaMateriaisEditando];
+    if (!tarefa) return;
+
+    const btnSalvar = document.getElementById('btnSalvarMateriaisModal');
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = '💾 Salvando...';
+
+    const matTexto = document.getElementById('inputMateriaisModal').value.trim();
+    const materiaisArray = converterTextoParaArrayMateriais(matTexto, tarefa.id);
+
+    try {
+        // Apaga os materiais antigos da tarefa
+        await fetch(`${SUPABASE_URL}/rest/v1/materiaistbl?tarefa_id=eq.${tarefa.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+
+        // Insere os novos materiais se houver algum
+        if (materiaisArray.length > 0) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/materiaistbl`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': SUPABASE_ANON_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(materiaisArray)
+            });
+            if (!res.ok) throw new Error('Erro ao salvar materiais no banco de dados');
+        }
+
+        await carregarTarefas();
+        abrirModalMateriais(tarefaMateriaisEditando);
+        mostrarDetalhesTarefa();
+        await carregarPagina1();
+        alert('✅ Materiais atualizados com sucesso!');
+    } catch (err) {
+        alert(`❌ Erro ao salvar materiais: ${err.message}`);
+    } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = '💾 Salvar Lista Completa';
+    }
 }
 
 function mostrarDetalhesIntegrador() {
@@ -1010,7 +1595,7 @@ function mostrarDetalhesIntegrador() {
     div.innerHTML = `
         <h3>${i.nome}</h3>
         <p><span class="label">nº do CPF:</span> <span class="badge">${i.integrador_cpf || 'N/A'}</span></p>
-        <p><span class="label">Criado em:</span> ${new Date(i.created_at).toLocaleString('pt-BR')}</p>
+        <p><span class="label2">Criado em:</span> ${new Date(i.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
             <button class="btn btn-danger" onclick="removerIntegrador(${idx})">🗑️ Remover Elemento</button>
         </div>
@@ -1018,16 +1603,19 @@ function mostrarDetalhesIntegrador() {
     div.style.display = 'block';
 }
 
-/* ATUALIZAÇÃO 1: MONITORANDO MUDANÇA DE STATUS PARA MUDAR DATA AUTOMATICAMENTE */
 function abrirEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
     const modalContent = document.getElementById('conteudoModalEditTarefa');
     const dataISO = tarefa.data_para_termino ? new Date(tarefa.data_para_termino).toISOString().split('T')[0] : '';
+    const dataInicioISO = tarefa.data_inicio_obra ? new Date(tarefa.data_inicio_obra).toISOString().split('T')[0] : '';
 
     modalContent.innerHTML = `
         <h3 style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">✏️ Editando: ${tarefa.nome}</h3>
         <div class="form-group"><label>Nome:</label><input type="text" id="editNomeTarefa" value="${tarefa.nome || ''}"></div>
         <div class="form-group"><label>Tipo:</label><input type="text" id="editTipoTarefa" value="${tarefa.tipo || ''}"></div>
+        <div class="form-group"><label>Endereço:</label><input type="text" id="editEnderecoTarefa" value="${tarefa.endereco || ''}"></div>
+        <div class="form-group"><label>Descrição Geral:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
+		<div class="form-group"><label>Integrador:</label><select id="editIntegradorTarefa"></select></div>
         <div class="form-group">
             <label>Status:</label>
             <select id="editStatusTarefa">
@@ -1036,26 +1624,28 @@ function abrirEdicaoTarefa(index) {
                 <option value="aguardando equatorial" ${tarefa.status === 'aguardando equatorial' ? 'selected' : ''}>⏳ Aguardando Equatorial</option>
                 <option value="faltam dados" ${tarefa.status === 'faltam dados' ? 'selected' : ''}>🗂️ Faltam dados necessários</option>
                 <option value="reprovado pela equatorial" ${tarefa.status === 'reprovado pela equatorial' ? 'selected' : ''}>❕ Reprovado pela Equatorial</option>
-                <option value="não iniciado" ${tarefa.status === 'não iniciado' ? 'selected' : ''}>❌ Não iniciado</option>
             </select>
         </div>
-        <div class="form-group"><label>Data Esperada:</label><input type="date" id="editDataEsperadaTarefa" value="${dataISO}"></div>
-        <div class="form-group"><label>Integrador:</label><select id="editIntegradorTarefa"></select></div>
-        <div class="form-group"><label>Descrição:</label><textarea id="editDescricaoTarefa">${tarefa.descricao || ''}</textarea></div>
-        <div class="action-buttons">
+        <div class="form-group"><label>Data Início da Obra:</label><input type="date" id="editDataInicioObraTarefa" value="${dataInicioISO}"></div>
+		<div class="form-group"><label>Data Esperada:</label><input type="date" id="editDataEsperadaTarefa" value="${dataISO}"></div>
+		<div class="form-group">
+            <label>Status do Material:</label>
+            <select id="editStatusMaterialTarefa">
+                <option value="" ${!tarefa.status_material ? 'selected' : ''}>-- Selecione --</option>
+                <option value="Falta" ${tarefa.status_material === 'Falta' ? 'selected' : ''}>❌ Falta</option>
+                <option value="Arranjado" ${tarefa.status_material === 'Arranjado' ? 'selected' : ''}>✅ Arranjado</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Relatório de Atividades:</label>
+            <textarea id="editRelatorioAtividadesTarefa">${tarefa.relatorio_atividades || ''}</textarea>
+        </div>
+		<div class="action-buttons">
             <button class="btn btn-success" onclick="salvarEdicaoTarefa(${index})">💾 Salvar</button>
             <button class="btn btn-secondary" onclick="fecharModalEditTarefa()">❌ Cancelar</button>
         </div>
     `;
     popularSelectIntegrador('editIntegradorTarefa', tarefa.intg_id);
-
-    // Evento em tempo real: ao alterar para "concluído", preenche a data de hoje no campo de data
-    document.getElementById('editStatusTarefa').addEventListener('change', function() {
-        if (this.value.toLowerCase().includes('conclu')) {
-            const hoje = obterDataHojeLocal();
-            document.getElementById('editDataEsperadaTarefa').value = hoje;
-        }
-    });
 
     document.getElementById('modalEditTarefa').classList.add('active');
 }
@@ -1067,38 +1657,51 @@ function fecharModalEditTarefa() {
 async function salvarEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
     const nome = document.getElementById('editNomeTarefa').value.trim();
-    if (!nome) return;
+    if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
     let statusVal = document.getElementById('editStatusTarefa').value || null;
     let dataVal = document.getElementById('editDataEsperadaTarefa').value || null;
 
-    // Garantia no salvamento: Se o status for concluído, define a data para hoje
     if (statusVal && statusVal.toLowerCase().includes('conclu')) {
         dataVal = obterDataHojeLocal();
     }
 
+    const relatorioEl = document.getElementById('editRelatorioAtividadesTarefa');
+    const relatorioVal = relatorioEl ? relatorioEl.value.trim() : null;
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
-            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                'Content-Type': 'application/json', 
+                'Prefer': 'return=representation' 
+            },
             body: JSON.stringify({
                 nome: nome,
                 tipo: document.getElementById('editTipoTarefa').value.trim() || null,
                 status: statusVal,
+                endereco: document.getElementById('editEnderecoTarefa').value.trim() || null,
+                data_inicio_obra: document.getElementById('editDataInicioObraTarefa').value || null,
                 data_para_termino: dataVal,
                 intg_id: document.getElementById('editIntegradorTarefa').value || null, 
+                status_material: document.getElementById('editStatusMaterialTarefa').value || null,
+                relatorio_atividades: relatorioVal || null,
                 descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
             })
         });
 
-        if (!response.ok) throw new Error('Erro ao atualizar');
-        const atualizada = await response.json();
-        dadosTarefas[index] = atualizada[0];
+        if (!response.ok) throw new Error('Erro ao atualizar tarefa no banco de dados');
+
+        await carregarTarefas();
         mostrarDetalhesTarefa();
         fecharModalEditTarefa();
-        await carregarTarefas();
         await carregarPagina1();
-    } catch (err) { alert(`❌ Erro: ${err.message}`); }
+        alert('✅ Tarefa atualizada com sucesso!');
+    } catch (err) { 
+        alert(`❌ Erro: ${err.message}`); 
+    }
 }
 
 // --- ADICIONAR TAREFAS / INTEGRADORES ---
@@ -1114,22 +1717,52 @@ async function adicionarTarefa() {
     const nome = document.getElementById('nomeTarefa').value.trim();
     if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
+    const matTexto = document.getElementById('materiaisFaltandoTarefa').value.trim();
+
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
             method: 'POST',
-            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                'Content-Type': 'application/json', 
+                'Prefer': 'return=representation' 
+            },
             body: JSON.stringify({
                 nome: nome,
                 tipo: document.getElementById('tipoTarefa').value.trim() || null,
                 status: document.getElementById('statusTarefa').value || null,
+                endereco: document.getElementById('enderecoTarefa').value.trim() || null,
+                data_inicio_obra: document.getElementById('dataInicioObraTarefa').value || null,
                 data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
-                intg_id: document.getElementById('integradorTarefa').value || null, 
+                intg_id: document.getElementById('integradorTarefa').value || null,
+                status_material: document.getElementById('statusMaterialTarefa').value || null,
+                relatorio_atividades: document.getElementById('relatorioAtividadesTarefa').value.trim() || null,
                 descricao: document.getElementById('descricaoTarefa').value.trim() || null
             })
         });
-        if (!response.ok) throw new Error('Erro ao adicionar');
+
+        if (!response.ok) throw new Error('Erro ao adicionar tarefa');
+        
+        const tarefaInserida = await response.json();
+        const novaTarefaId = tarefaInserida[0].id;
+
+        // Salva os materiais na materiaistbl se houver algum
+        const materiaisArray = converterTextoParaArrayMateriais(matTexto, novaTarefaId);
+        if (materiaisArray.length > 0) {
+            await fetch(`${SUPABASE_URL}/rest/v1/materiaistbl`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': SUPABASE_ANON_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(materiaisArray)
+            });
+        }
+
         await carregarTarefas();
-        alert('✅ Tarefa adicionada!');
+        alert('✅ Tarefa e materiais adicionados!');
         resetarFormularioAdicao();
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
@@ -1195,17 +1828,19 @@ function obterBadgePrazo(dataISO) {
 
 function resetarFormularioAdicao() {
     document.getElementById('tipoElemento').value = '';
-
     document.getElementById('nomeTarefa').value = '';
     document.getElementById('tipoTarefa').value = '';
     document.getElementById('statusTarefa').value = '';
+    document.getElementById('enderecoTarefa').value = '';
+    document.getElementById('dataInicioObraTarefa').value = '';
     document.getElementById('dataEsperadaTarefa').value = '';
     document.getElementById('integradorTarefa').value = '';
+    document.getElementById('statusMaterialTarefa').value = '';
+    document.getElementById('materiaisFaltandoTarefa').value = '';
+    document.getElementById('relatorioAtividadesTarefa').value = '';
     document.getElementById('descricaoTarefa').value = '';
-
     document.getElementById('nomeIntegrador').value = '';
     document.getElementById('ncpfIntegrador').value = '';
-
     atualizarFormulario();
 }
 
@@ -1239,7 +1874,10 @@ async function verificarEArquivarAutomatico() {
                             tipo: tarefa.tipo,
                             descricao: tarefa.descricao,
                             intg_fz: integradorNome,
-                            data_finalizado: tarefa.data_para_termino.split('T')[0]
+                            data_finalizado: tarefa.data_para_termino.split('T')[0],
+                            endereco: tarefa.endereco,
+                            data_inicio_obra: tarefa.data_inicio_obra,
+                            relatorio_atividades: tarefa.relatorio_atividades
                         })
                     });
 
@@ -1274,6 +1912,548 @@ function notificarSincronizacao() {
         paineis.forEach(p => p.classList.remove('pulse-update'));
     }, 1000);
 }
+
+// --- LÓGICA DA LISTA DINÂMICA DE PENDÊNCIAS COM TABELA RELACIONAL DE SUBPENDÊNCIAS ---
+let tarefaPendenciaEditando = null;
+
+function abrirModalPendencias(index) {
+    tarefaPendenciaEditando = index;
+    const tarefa = dadosTarefas[index];
+    const container = document.getElementById('listaPendenciasContainer');
+    container.innerHTML = ''; 
+
+    if (tarefa.pendenciastbl && tarefa.pendenciastbl.length > 0) {
+        tarefa.pendenciastbl.forEach(p => {
+            adicionarItemPendencia(p.texto_lista, p.data_lista || '', p.subpendtbl || []);
+        });
+    } else {
+        adicionarItemPendencia('', '', []);
+    }
+
+    document.getElementById('modalPendencias').classList.add('active');
+}
+
+function fecharModalPendencias() {
+    document.getElementById('modalPendencias').classList.remove('active');
+    tarefaPendenciaEditando = null;
+}
+
+function adicionarItemPendencia(texto = '', data = '', subsArray = []) {
+    const container = document.getElementById('listaPendenciasContainer');
+    
+    const row = document.createElement('div');
+    row.className = 'item-pendencia-row';
+    row.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0;';
+
+    const textoEscapado = texto ? texto.replace(/"/g, '&quot;') : '';
+
+    row.innerHTML = `
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" class="input-pendencia-texto" value="${textoEscapado}" placeholder="Digite a pendência principal..." style="flex: 2; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <input type="date" class="input-pendencia-data" value="${data}" style="flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.item-pendencia-row').remove()" title="Remover Pendência" style="padding: 4px 10px;">➖</button>
+        </div>
+        
+        <div class="subs-container" style="padding-left: 20px; display: flex; flex-direction: column; gap: 6px;"></div>
+        
+        <button type="button" onclick="adicionarSubItem(this)" style="align-self: flex-start; padding: 4px 8px; font-size: 0.85rem; border-radius: 4px; border: 1px solid #ccc; background-color: #f1f1f1; cursor: pointer; margin-left: 20px;">
+            ✖️ Adicionar Subpendência
+        </button>
+    `;
+
+    container.appendChild(row);
+
+    const subsContainer = row.querySelector('.subs-container');
+    if (Array.isArray(subsArray)) {
+        subsArray.forEach(s => {
+            adicionarSubItemRender(subsContainer, s.texto_sub, s.data_sub || '');
+        });
+    }
+}
+
+function adicionarSubItem(btn) {
+    const container = btn.previousElementSibling;
+    adicionarSubItemRender(container, '', '');
+}
+
+function adicionarSubItemRender(container, texto = '', data = '') {
+    const subRow = document.createElement('div');
+    subRow.className = 'item-subpendencia-row';
+    subRow.style.cssText = 'display: flex; gap: 8px; align-items: center; margin-top: 4px;';
+    
+    const textoEscapado = texto ? texto.replace(/"/g, '&quot;') : '';
+
+    subRow.innerHTML = `
+        <span style="color: #888; font-weight:bold;">↳</span>
+        <input type="text" class="input-sub-texto" value="${textoEscapado}" placeholder="Texto da subpendência..." style="flex: 2; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+        <input type="date" class="input-sub-data" value="${data}" style="flex: 1; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem;">
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.item-subpendencia-row').remove()" title="Remover subpendência" style="padding: 2px 8px; font-size: 0.8rem;">➖</button>
+    `;
+    container.appendChild(subRow);
+}
+
+async function salvarPendenciasModal() {
+    if (tarefaPendenciaEditando === null) return;
+    const tarefa = dadosTarefas[tarefaPendenciaEditando];
+    
+    const btnSalvar = document.querySelector('#modalPendencias .btn-success');
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = '💾 Salvando...';
+
+    const rows = document.querySelectorAll('#listaPendenciasContainer .item-pendencia-row');
+    const novasPendencias = [];
+
+    rows.forEach(row => {
+        const inputTexto = row.querySelector('.input-pendencia-texto');
+        const inputData = row.querySelector('.input-pendencia-data');
+        const texto = inputTexto ? inputTexto.value.trim() : '';
+        const data = inputData && inputData.value ? inputData.value : null;
+
+        if (texto !== '') {
+            const subsArray = [];
+            const subRows = row.querySelectorAll('.item-subpendencia-row');
+            subRows.forEach(sRow => {
+                const sTexto = sRow.querySelector('.input-sub-texto').value.trim();
+                const sData = sRow.querySelector('.input-sub-data').value;
+                if (sTexto) {
+                    subsArray.push({ texto_sub: sTexto, data_sub: sData || null });
+                }
+            });
+
+            novasPendencias.push({
+                tarefa_id: tarefa.id,
+                texto_lista: texto,
+                data_lista: data,
+                subs: subsArray
+            });
+        }
+    });
+
+    try {
+        await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?tarefa_id=eq.${tarefa.id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+
+        for (const pend of novasPendencias) {
+            const resPend = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl`, {
+                method: 'POST',
+                headers: { 
+                    'apikey': SUPABASE_ANON_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    tarefa_id: pend.tarefa_id,
+                    texto_lista: pend.texto_lista,
+                    data_lista: pend.data_lista
+                })
+            });
+
+            if (!resPend.ok) throw new Error('Erro ao salvar as novas pendências.');
+            
+            const insertedPend = await resPend.json();
+            const pendId = insertedPend[0].id;
+
+            if (pend.subs.length > 0) {
+                const subsDataToInsert = pend.subs.map(sub => ({
+                    pend_id: pendId,
+                    texto_sub: sub.texto_sub,
+                    data_sub: sub.data_sub
+                }));
+
+                await fetch(`${SUPABASE_URL}/rest/v1/subpendtbl`, {
+                    method: 'POST',
+                    headers: { 
+                        'apikey': SUPABASE_ANON_KEY, 
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(subsDataToInsert)
+                });
+            }
+        }
+
+        fecharModalPendencias();
+        await carregarTarefas();
+        mostrarDetalhesTarefa();
+        await carregarPagina1();
+        
+        alert('✅ Pendências e Subpendências atualizadas com sucesso!');
+    } catch (err) {
+        alert(`❌ Erro ao salvar pendências: ${err.message}`);
+    } finally {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = '💾 Salvar Pendências';
+    }
+}
+
+// Converte o texto das caixas de texto em itens para a materiaistbl
+function converterTextoParaArrayMateriais(texto, tarefaId = null) {
+    if (!texto) return [];
+    return texto.split('\n').map(linha => {
+        let l = linha.trim();
+        if (!l) return null;
+        
+        let status = false; // false = Faltando (F / 0)
+        let quant = 1;
+
+        if (l.toUpperCase().startsWith('D:')) {
+            status = true; // true = Disponível (D / 1)
+            l = l.substring(2).trim();
+        } else if (l.toUpperCase().startsWith('F:')) {
+            status = false;
+            l = l.substring(2).trim();
+        }
+
+        // Tenta capturar a quantidade do início da linha (ex: "2 Disjuntor" ou "3x DPS")
+        const matchQuant = l.match(/^(\d+)\s*x?\s+(.*)$/i);
+        if (matchQuant) {
+            quant = parseInt(matchQuant[1], 10);
+            l = matchQuant[2].trim();
+        }
+
+        // Caso a quantidade informada seja 0 ou negativa, salva como 1
+        if (isNaN(quant) || quant <= 0) {
+            quant = 1;
+        }
+
+        if (!l) return null;
+
+        const obj = {
+            nome_material: l,
+            quant_material: quant,
+            status_material: status
+        };
+
+        if (tarefaId) obj.tarefa_id = tarefaId;
+        return obj;
+    }).filter(Boolean);
+}
+
+// Converte os dados da materiaistbl de volta para formato de texto de edição
+function converterArrayMateriaisParaTexto(materiais) {
+    if (!Array.isArray(materiais) || materiais.length === 0) return '';
+    return materiais.map(m => {
+        const prefixo = (m.status_material === true || m.status_material === 1 || m.status_material === 'true') ? 'D:' : 'F:';
+        const q = (m.quant_material && parseInt(m.quant_material, 10) > 1) ? `${m.quant_material} ` : '';
+        return `${prefixo} ${q}${m.nome_material}`;
+    }).join('\n');
+}
+
+async function analisarPendencias() {
+    const containerResultado = document.getElementById('resultadoAnalisePendencias');
+    const divDetalhes = document.getElementById('detalhesPendenciasCategorizadas');
+    
+    if (containerResultado && containerResultado.style.display === 'block') {
+        containerResultado.style.display = 'none';
+        return;
+    }
+	
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome),subpendtbl(*)`, {
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}` 
+            }
+        });
+
+        if (!response.ok) throw new Error('Falha ao obter pendências do Supabase.');
+
+        const pendencias = await response.json();
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        const dentroEsperado = [];
+        const dentroLimite = [];
+        const foraLimite = [];
+
+        pendencias.forEach(p => {
+            const nomeTarefa = p.tarefas ? p.tarefas.nome : 'Tarefa Não Identificada';
+            const item = { ...p, nomeTarefa };
+
+            if (!p.data_lista) {
+                dentroEsperado.push({ ...item, diffDias: null });
+                return;
+            }
+
+            const [ano, mes, dia] = p.data_lista.split('T')[0].split('-');
+            const dataLista = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataLista.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias < 0) {
+                foraLimite.push({ ...item, diffDias });
+            } else if (diffDias <= 4) {
+                dentroLimite.push({ ...item, diffDias });
+            } else {
+                dentroEsperado.push({ ...item, diffDias });
+            }
+        });
+
+        // --- FILTRAGEM E CONSTRUÇÃO DA CATEGORIA "MATERIAIS ATRASADOS" ---
+        const tarefasMateriaisCriticos = dadosTarefas.filter(t => verificarAlertaMaterialEPrazo(t));
+        let blocoMateriaisHtml = '';
+
+        if (tarefasMateriaisCriticos.length > 0) {
+            const cardsMateriais = tarefasMateriaisCriticos.map(t => {
+                // Lista os materiais marcados como faltantes na tarefa
+                const materiaisFaltando = (Array.isArray(t.materiaistbl) ? t.materiaistbl : [])
+                    .filter(m => m && (m.status_material === false || m.status_material === 0));
+
+                const listaMatHtml = materiaisFaltando.map(m => {
+                    const qStr = (m.quant_material && m.quant_material > 1) ? `<b>(${m.quant_material}x)</b> ` : '';
+                    return `<li>❌ ${qStr}${m.nome_material}</li>`;
+                }).join('');
+
+                const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+                const dataTermino = new Date(ano, mes - 1, dia);
+                const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+                
+                let txtPrazo = '';
+                if (diffDias < 0) txtPrazo = `${Math.abs(diffDias)} dia(s) de atraso`;
+                else if (diffDias === 0) txtPrazo = 'Vence hoje!';
+                else txtPrazo = `Faltam ${diffDias} dia(s)`;
+
+                return `
+                    <div style="background: #ffffff; border-left: 5px solid #d32f2f; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                        <div>
+                            <div style="font-weight: bold; color: #b71c1c; font-size: 0.95rem;">
+                                🚨 ${t.nome}
+                            </div>
+                            <div style="font-size: 0.85rem; color: #555; margin-top: 4px;">
+                                <b>Data esperada:</b> ${formatarData(t.data_para_termino)} — <strong>${txtPrazo}</strong>
+                            </div>
+                            <div style="font-size: 0.82rem; color: #333; margin-top: 8px; background: #fff5f5; padding: 8px; border-radius: 4px; border: 1px dashed #ef9a9a;">
+                                <b>Materiais Faltando:</b>
+                                <ul style="list-style:none; padding-left:0; margin-top:4px;">${listaMatHtml}</ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            blocoMateriaisHtml = `
+                <div style="background: #fff0f0; border: 2px solid #000000; border-radius: 8px; padding: 15px;">
+                    <h4 style="color: #b71c1c; font-size: 1.1rem; border-bottom: 2px solid #b71c1c; padding-bottom: 6px; margin: 0;">
+                        ⚠️ Materiais Atrasados / Urgentes (${tarefasMateriaisCriticos.length})
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">
+                        ${cardsMateriais}
+                    </div>
+                </div>
+            `;
+        }
+
+        const renderizarGrupo = (itens, cor, emoji) => {
+            if (itens.length === 0) return '<p style="color: #777; font-size: 0.9rem; margin-top: 10px;">Nenhuma pendência nesta categoria.</p>';
+
+            const cards = itens.map(item => {
+                let txtPrazo = 'Sem data definida';
+                if (item.diffDias !== null) {
+                    if (item.diffDias < 0) txtPrazo = `${Math.abs(item.diffDias)} dia(s) de atraso`;
+                    else if (item.diffDias === 0) txtPrazo = 'Vence hoje!';
+                    else txtPrazo = `Faltam ${item.diffDias} dia(s)`;
+                }
+
+                let subTextoHtml = '';
+                if (item.subpendtbl && item.subpendtbl.length > 0) {
+                    const linhasSub = item.subpendtbl.map(s => {
+                        const sDataStr = s.data_sub ? ` (${formatarData(s.data_sub)})` : '';
+                        return `<li>➝ ${s.texto_sub}${sDataStr}</li>`;
+                    }).join('');
+
+                    subTextoHtml = `
+                        <div style="font-size: 0.8rem; color: #555; margin-top: 10px; background: #f8f9fa; padding: 8px 10px; border-radius: 4px; border: 1px solid #f0f0f0;">
+                            <b>Subpendências:</b><br>
+                            <ul style="list-style:none; padding-left:0; margin-top:4px;">${linhasSub}</ul>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div style="background: #ffffff; border-left: 5px solid ${cor}; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                        <div>
+                            <div style="font-weight: bold; color: #1a1a1a; font-size: 0.95rem;">
+                                ${emoji} ${item.texto_lista} 
+                                <span style="font-weight: normal; color: #666; font-size: 0.82rem;">( ${item.nomeTarefa})</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #555; margin-top: 6px;">
+                                <b>Data marcada:</b> ${item.data_lista ? formatarData(item.data_lista) : 'N/A'} — <strong>${txtPrazo}</strong>
+                            </div>
+                        </div>
+                        ${subTextoHtml}
+                    </div>
+                `;
+            }).join('');
+
+            return `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">${cards}</div>`;
+        };
+
+        divDetalhes.innerHTML = `
+            ${blocoMateriaisHtml}
+            <div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+                <h4 style="color: #c62828; font-size: 1.1rem; border-bottom: 2px solid #c62828; padding-bottom: 6px; margin: 0;">Atrasadas (${foraLimite.length})</h4>
+                ${renderizarGrupo(foraLimite, '#c62828', '♦️​')}
+            </div>
+            <div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+                <h4 style="color: #e65100; font-size: 1.1rem; border-bottom: 2px solid #e65100; padding-bottom: 6px; margin: 0;">Dentro do Limite — Até 4 dias (${dentroLimite.length})</h4>
+                ${renderizarGrupo(dentroLimite, '#e65100', '🔅')}
+            </div>
+            <div style="background: #fdfdfd; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px;">
+                <h4 style="color: #2e7d32; font-size: 1.1rem; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin: 0;">No Aguardo (${dentroEsperado.length})</h4>
+                ${renderizarGrupo(dentroEsperado, '#2e7d32', '〰️')}
+            </div>		
+        `;
+
+        containerResultado.style.display = 'block';
+    } catch (err) {
+        alert(`❌ Erro ao analisar pendências: ${err.message}`);
+        console.error(err);
+    }
+}
+
+async function analisarPendencias2() {
+    const containerAnalise = document.getElementById('gridAnalisePendenciasMini');
+	
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome)`, {
+            headers: { 
+                'apikey': SUPABASE_ANON_KEY, 
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}` 
+            }
+        });
+
+        if (!response.ok) throw new Error('Falha ao obter pendências do Supabase.');
+
+        const pendencias = await response.json();
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        let qtdDentroEsperado = 0;
+        let qtdDentroLimite = 0;
+        let qtdForaLimite = 0;
+
+        pendencias.forEach(p => {
+            if (!p.data_lista) {
+                qtdDentroEsperado++; 
+                return;
+            }
+            const [ano, mes, dia] = p.data_lista.split('T')[0].split('-');
+            const dataLista = new Date(ano, mes - 1, dia);
+            const diffDias = Math.round((dataLista.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (diffDias < 0) qtdForaLimite++;
+            else if (diffDias <= 4) qtdDentroLimite++;
+            else qtdDentroEsperado++;
+        });
+
+        containerAnalise.innerHTML = `
+            <div class="item-caixa-prazo-mini" style="background-color: #f0ad4e;">
+                <span class="qtd-mini">${qtdDentroLimite}</span>
+                <span class="label-mini">Pendências Urgentes</span>
+            </div>
+            <div class="item-caixa-prazo-mini" style="background-color: #d9534f;">
+                <span class="qtd-mini">${qtdForaLimite}</span>
+                <span class="label-mini">Pendências Perdidas</span>
+            </div>
+        `;
+        
+        containerAnalise.style.display = 'flex';
+    } catch (err) {
+        alert(`❌ Erro ao analisar pendências: ${err.message}`);
+        console.error(err);
+    }
+}
+
+async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
+    const tarefa = dadosTarefas[indexTarefa];
+    if (!tarefa) return alert("⚠️ Tarefa não encontrada!");
+
+    const pendencia = (tarefa.pendenciastbl || []).find(p => p.id == pendenciaId) || pendenciastbl.find(p => p.id == pendenciaId);
+    if (!pendencia || !pendencia.texto_lista) {
+        return alert("⚠️ Pendência não encontrada!");
+    }
+
+    if (!confirm(`Deseja enviar a pendência "${pendencia.texto_lista}" para o Relatório de Atividades?`)) {
+        return;
+    }
+
+    let dataFormatada = formatarDataCurta(pendencia.data_lista);
+
+    const textoPendencia = dataFormatada 
+        ? `${dataFormatada} - ${pendencia.texto_lista}` 
+        : pendencia.texto_lista;
+
+    const relatorioAtual = tarefa.relatorio_atividades || '';
+    const novoRelatorio = relatorioAtual 
+        ? `${relatorioAtual}\n${textoPendencia}` 
+        : `${textoPendencia}`;
+
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ relatorio_atividades: novoRelatorio })
+        });
+
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+
+        tarefa.relatorio_atividades = novoRelatorio;
+        mostrarDetalhesTarefa();
+        alert("✅ Pendência adicionada ao Relatório de Atividades!");
+    } catch (err) {
+        console.error("Erro ao atualizar o relatório:", err);
+        alert("❌ Falha ao enviar a pendência para o relatório no banco de dados.");
+    }
+}
+
+// Verifica se uma tarefa tem material faltando E prazo crítico (<= 8 dias)
+function verificarAlertaMaterialEPrazo(t) {
+    const s = (t.status || '').toLowerCase();
+    if (s.includes('conclu') || !t.data_para_termino) return false;
+
+    // 1. Verifica se existe algum material com status "Faltando" (false ou 0)
+    const temMaterialFaltando = (Array.isArray(t.materiaistbl) ? t.materiaistbl : [])
+        .some(m => m && (m.status_material === false || m.status_material === 0));
+
+    if (!temMaterialFaltando) return false;
+
+    // 2. Calcula a diferença de dias
+    const [ano, mes, dia] = t.data_para_termino.split('T')[0].split('-');
+    const dataTermino = new Date(ano, mes - 1, dia);
+    const hoje = new Date(); 
+    hoje.setHours(0, 0, 0, 0);
+
+    const diffDias = Math.round((dataTermino.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+    // diffDias <= 8 abrange "Prazo Próximo" (2 a 8 dias), "No Limite" (0 a 1 dia) e "Atrasado" (< 0 dias)
+    return diffDias <= 5;
+}
+
+// Atualiza a visibilidade e contagem do Banner no topo da Página 1
+function atualizarBannerAlertaMateriais() {
+    const tarefasComAlerta = dadosTarefas.filter(t => verificarAlertaMaterialEPrazo(t));
+    const banner = document.getElementById('bannerAlertaMateriais');
+    const qtdEl = document.getElementById('qtdAlertasMateriais');
+
+    if (banner && qtdEl) {
+        if (tarefasComAlerta.length > 0) {
+            qtdEl.textContent = tarefasComAlerta.length;
+            banner.classList.remove('hidden');
+        } else {
+            banner.classList.add('hidden');
+        }
+    }
+}
+
+
+
 </script>
 </body>
 </html>
