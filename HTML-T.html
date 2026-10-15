@@ -511,7 +511,9 @@ h2 { color: #333; font-size: 1.8rem; }
         </div>
 
         <div id="conteudoProtegido" class="app-layout">
-            <!-- Tarefas Em Andamento -->
+         
+
+		 <!-- Tarefas Em Andamento -->
             <div id="secaoTarefas" class="section area-tarefas">
                 <div class="section-header"><h2>📌 Tarefas em Andamento</h2></div>
                 <div class="seletor-container">
@@ -2391,7 +2393,8 @@ async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
         : `${textoPendencia}`;
 
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
+        // 1. Atualiza o relatório de atividades da tarefa
+        const responseRel = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
             method: 'PATCH',
             headers: {
                 'apikey': SUPABASE_ANON_KEY,
@@ -2402,14 +2405,33 @@ async function finalizarPendenciaParaRelatorio(pendenciaId, indexTarefa) {
             body: JSON.stringify({ relatorio_atividades: novoRelatorio })
         });
 
-        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        if (!responseRel.ok) throw new Error(`Erro ao atualizar relatório HTTP: ${responseRel.status}`);
 
-        tarefa.relatorio_atividades = novoRelatorio;
+        // 2. Remove a pendência da tabela no banco de dados (pendenciastbl)
+        const responseDel = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?id=eq.${pendenciaId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            }
+        });
+
+        if (!responseDel.ok) throw new Error(`Erro ao remover pendência HTTP: ${responseDel.status}`);
+
+        // 3. Sincroniza e atualiza os dados na tela
+        await carregarTarefas();
+        
+        // Re-seleciona a tarefa no dropdown para manter os detalhes abertos na tela
+        const selectTarefas = document.getElementById('selectTarefas');
+        if (selectTarefas) selectTarefas.value = indexTarefa;
+
         mostrarDetalhesTarefa();
-        alert("✅ Pendência adicionada ao Relatório de Atividades!");
+        await carregarPagina1();
+
+        alert("✅ Pendência anexada ao relatório com sucesso");
     } catch (err) {
-        console.error("Erro ao atualizar o relatório:", err);
-        alert("❌ Falha ao enviar a pendência para o relatório no banco de dados.");
+        console.error("Erro na operação:", err);
+        alert("❌ Falha ao processar a pendência no banco de dados.");
     }
 }
 
