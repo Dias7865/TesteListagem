@@ -9,6 +9,8 @@ DROP TABLE IF EXISTS intensidades CASCADE;
 DROP TABLE IF EXISTS tarefas CASCADE;
 DROP TABLE IF EXISTS trfsconcluidas CASCADE;
 DROP TABLE IF EXISTS pendenciastbl CASCADE;
+DROP TABLE IF EXISTS subpendtbl  CASCADE;
+DROP TABLE IF EXISTS materiaistbl CASCADE;
 
 -- Apagar funções
 DROP FUNCTION IF EXISTS trg_atualizar_intensidades() CASCADE;
@@ -55,7 +57,6 @@ CREATE TABLE tarefas (
     endereco text,
     data_inicio_obra date,
     status_material varchar(20) CHECK (status_material IN ('Falta', 'Arranjado')),
-    materiais jsonb DEFAULT '[]'::jsonb, -- Altera de materiais_faltando text[] para jsonb
     relatorio_atividades text
 );
 
@@ -85,13 +86,15 @@ CREATE TABLE subpendtbl (
     data_sub date
 );
 
-CREATE TABLE maeriaistbl (
+
+CREATE TABLE materiaistbl (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     tarefa_id uuid REFERENCES tarefas(id) ON DELETE CASCADE,
     nome_material text NOT NULL,
-    quant_material int,
-    status_material boolean
+    quant_material int DEFAULT 1,
+    status_material boolean NOT NULL DEFAULT false -- false = Faltando (0 / F), true = Disponível (1 / D)
 );
+
 
 
 
@@ -106,6 +109,7 @@ ALTER TABLE tarefas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trfsconcluidas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pendenciastbl ENABLE ROW LEVEL SECURITY;
 ALTER TABLE subpendtbl ENABLE ROW LEVEL SECURITY;
+ALTER TABLE materiaistbl ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: configuracoes
 CREATE POLICY "Bloquear leitura direta de configuracoes" ON configuracoes FOR SELECT USING (false);
@@ -142,6 +146,12 @@ CREATE POLICY "Permitir leitura pública de subpendtbl" ON subpendtbl FOR SELECT
 CREATE POLICY "Permitir inserção pública de subpendtbl" ON subpendtbl FOR INSERT WITH CHECK (true);
 CREATE POLICY "Permitir atualização pública de subpendtbl" ON subpendtbl FOR UPDATE USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir remoção pública de subpendtbl" ON subpendtbl FOR DELETE USING (true);
+
+-- Políticas: materiaistbl
+CREATE POLICY "Permitir leitura pública de materiaistbl" ON materiaistbl FOR SELECT USING (true);
+CREATE POLICY "Permitir inserção pública de materiaistbl" ON materiaistbl FOR INSERT WITH CHECK (true);
+CREATE POLICY "Permitir atualização pública de materiaistbl" ON materiaistbl FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir remoção pública de materiaistbl" ON materiaistbl FOR DELETE USING (true);
 
 
 
@@ -218,6 +228,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON trfsconcluidas TO anon;
 GRANT SELECT ON intensidades TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON pendenciastbl TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON subpendtbl TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON materiaistbl TO anon;
 
 -- Funções RPC
 GRANT EXECUTE ON FUNCTION verificar_senha(text) TO anon;
@@ -258,17 +269,6 @@ VALUES
   ('Frutaria do K196', 'Rateio', 'faltam dados', 'Rua do Comércio, 196 - Centro', '2026-10-05', '2026-11-25', (SELECT id FROM integradores WHERE nome = 'Amarante' LIMIT 1), 'Arranjado', '10/09/2026 - Minuta do contrato de rateio enviada via e-mail para aprovação', 'Configuração e envio de documentação para rateio de frutaria');
 
 
-UPDATE tarefas AS t
-SET materiais = v.materiais::jsonb
-FROM (VALUES 
-  ('Gráfica do D382', '[{"nome": "Disjuntor 63A", "status": "F"}, {"nome": "DPS Classe II", "status": "F"}, {"nome": "Cabo Verde 6mm²", "status": "D"}]'),
-  ('Marcenaria do E721', '[{"nome": "Transformador 112.5kVA", "status": "F"}, {"nome": "Chave Fusível 15kV", "status": "F"}]'),
-  ('Tornearia do F130', '[{"nome": "Inversor 10kW", "status": "F"}, {"nome": "Estrutura de Fixação", "status": "D"}]')
-) AS v(nome_tarefa, materiais)
-WHERE t.nome = v.nome_tarefa;
-
-
-
 
 
 -- Pendências de cada tarefa (Apenas para tarefas que NÃO estão concluídas)
@@ -282,6 +282,17 @@ VALUES
   ( (SELECT id FROM tarefas WHERE nome = 'Vidraçaria do H901' LIMIT 1), 'Comprar conectores MC4', '2026-10-10'),
   ( (SELECT id FROM tarefas WHERE nome = 'Auto Peças do J375' LIMIT 1), 'Validar dados de rateio', '2026-11-05'),
   ( (SELECT id FROM tarefas WHERE nome = 'Frutaria do K196' LIMIT 1), 'Assinar contrato de rateio', '2026-10-22');
+
+
+INSERT INTO materiaistbl (tarefa_id, nome_material, quant_material, status_material)
+VALUES 
+  ((SELECT id FROM tarefas WHERE nome = 'Gráfica do D382' LIMIT 1), 'Disjuntor 63A', 1, false),
+  ((SELECT id FROM tarefas WHERE nome = 'Gráfica do D382' LIMIT 1), 'DPS Classe II', 2, false),
+  ((SELECT id FROM tarefas WHERE nome = 'Gráfica do D382' LIMIT 1), 'Cabo Verde 6mm²', 1, true),
+  ((SELECT id FROM tarefas WHERE nome = 'Marcenaria do E721' LIMIT 1), 'Transformador 112.5kVA', 1, false),
+  ((SELECT id FROM tarefas WHERE nome = 'Marcenaria do E721' LIMIT 1), 'Chave Fusível 15kV', 3, false),
+  ((SELECT id FROM tarefas WHERE nome = 'Tornearia do F130' LIMIT 1), 'Inversor 10kW', 1, false),
+  ((SELECT id FROM tarefas WHERE nome = 'Tornearia do F130' LIMIT 1), 'Estrutura de Fixação', 4, true);
 
 
 
