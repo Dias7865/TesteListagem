@@ -360,14 +360,8 @@ h2 { color: #333; font-size: 1.8rem; }
 .alerta-banner-critico {
     background: #000000;
     color: #ffffff;
-    padding: 12px 20px;
-    border-radius: 10px;
-    border: 3px solid #ffeb3b;
-    margin-bottom: 15px;
-    font-weight: bold;
-    font-size: 1.05rem;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(183, 28, 28, 0.5);
+    border: 2px solid #ffeb3b;
+    box-shadow: 0 2px 8px rgba(183, 28, 28, 0.5);
     animation: piscarBanner 1.5s infinite alternate;
 }
 
@@ -447,16 +441,21 @@ h2 { color: #333; font-size: 1.8rem; }
 							<div class="loading">Carregando prazos...</div>
 						</div>
 						
-						<!-- BANNER DE ALERTA DE MATERIAIS FALTANDO EM PRAZO CRÍTICO -->
-						<div id="bannerAlertaMateriais" class="alerta-banner-critico hidden">
-							⚠️ <span id="qtdAlertasMateriais">0</span> tarefa(s) com <u>MATERIAL FALTANDO</u> em <u>PRAZO CRÍTICO</u>!
-						</div>
-						
-						<!-- Contêiner para os indicadores da Análise de Pendências -->
+						<!-- Contêiner para os indicadores da Análise de Pendências e Alerta de Materiais -->
 						<div id="gridAnalisePendenciasMini" class="grid-caixas-prazos-mini" style="display: none;">
-						
-						
-						
+							<div class="item-caixa-prazo-mini" style="background-color: #f0ad4e;">
+								<span id="qtdPendenciasUrgentes" class="qtd-mini">0</span>
+								<span class="label-mini">Pendências Urgentes</span>
+							</div>
+							<div class="item-caixa-prazo-mini" style="background-color: #d9534f;">
+								<span id="qtdPendenciasPerdidas" class="qtd-mini">0</span>
+								<span class="label-mini">Pendências Perdidas</span>
+							</div>
+							<!-- BANNER DE ALERTA DE MATERIAIS FALTANDO EM PRAZO CRÍTICO -->
+							<div id="bannerAlertaMateriais" class="item-caixa-prazo-mini alerta-banner-critico hidden">
+								<span id="qtdAlertasMateriais" class="qtd-mini">0</span>
+								<span class="label-mini">Materiais Críticos</span>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -655,7 +654,7 @@ h2 { color: #333; font-size: 1.8rem; }
         <button class="modal-close" onclick="fecharModalMateriais()">✕</button>
         <h3 id="tituloModalMateriais" style="margin-bottom: 20px; color: #333; font-size: 1.5rem;">📦 Materiais da Tarefa</h3>
         
-        <div id="listaMateriaisModalContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto; padding-right: 4px; margin-bottom: 15px;"></div>
+        <div id="listaMateriaisModalContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 4px; margin-bottom: 15px;"></div>
 
         <!-- Botões de Ação Dinâmica -->
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -1672,11 +1671,15 @@ function fecharModalEditTarefa() {
 
 async function salvarEdicaoTarefa(index) {
     const tarefa = dadosTarefas[index];
-    const nome = document.getElementById('editNomeTarefa').value.trim();
+    const elNome = document.getElementById('editNomeTarefa');
+    const nome = elNome ? elNome.value.trim() : '';
     if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
-    let statusVal = document.getElementById('editStatusTarefa').value || null;
-    let dataVal = document.getElementById('editDataEsperadaTarefa').value || null;
+    const elStatus = document.getElementById('editStatusTarefa');
+    let statusVal = elStatus ? elStatus.value || null : null;
+
+    const elDataExp = document.getElementById('editDataEsperadaTarefa');
+    let dataVal = elDataExp ? elDataExp.value || null : null;
 
     if (statusVal && statusVal.toLowerCase().includes('conclu')) {
         dataVal = obterDataHojeLocal();
@@ -1684,6 +1687,13 @@ async function salvarEdicaoTarefa(index) {
 
     const relatorioEl = document.getElementById('editRelatorioAtividadesTarefa');
     const relatorioVal = relatorioEl ? relatorioEl.value.trim() : null;
+
+    const elTipo = document.getElementById('editTipoTarefa');
+    const elEndereco = document.getElementById('editEnderecoTarefa');
+    const elDataInicio = document.getElementById('editDataInicioObraTarefa');
+    const elIntegrador = document.getElementById('editIntegradorTarefa');
+    const elStatusMat = document.getElementById('editStatusMaterialTarefa');
+    const elDescricao = document.getElementById('editDescricaoTarefa');
 
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?id=eq.${tarefa.id}`, {
@@ -1696,15 +1706,15 @@ async function salvarEdicaoTarefa(index) {
             },
             body: JSON.stringify({
                 nome: nome,
-                tipo: document.getElementById('editTipoTarefa').value.trim() || null,
+                tipo: elTipo ? elTipo.value.trim() || null : null,
                 status: statusVal,
-                endereco: document.getElementById('editEnderecoTarefa').value.trim() || null,
-                data_inicio_obra: document.getElementById('editDataInicioObraTarefa').value || null,
+                endereco: elEndereco ? elEndereco.value.trim() || null : null,
+                data_inicio_obra: elDataInicio ? elDataInicio.value || null : null,
                 data_para_termino: dataVal,
-                intg_id: document.getElementById('editIntegradorTarefa').value || null, 
-                status_material: document.getElementById('editStatusMaterialTarefa').value || null,
+                intg_id: elIntegrador ? elIntegrador.value || null : null, 
+                status_material: elStatusMat ? elStatusMat.value || null : null,
                 relatorio_atividades: relatorioVal || null,
-                descricao: document.getElementById('editDescricaoTarefa').value.trim() || null
+                descricao: elDescricao ? elDescricao.value.trim() || null : null
             })
         });
 
@@ -1730,10 +1740,22 @@ function atualizarFormulario() {
 }
 
 async function adicionarTarefa() {
-    const nome = document.getElementById('nomeTarefa').value.trim();
+    const elNome = document.getElementById('nomeTarefa');
+    const nome = elNome ? elNome.value.trim() : '';
     if (!nome) return alert('⚠️ Digite o nome da tarefa');
 
-    const matTexto = document.getElementById('materiaisFaltandoTarefa').value.trim();
+    const elMatTexto = document.getElementById('materiaisFaltandoTarefa');
+    const matTexto = elMatTexto ? elMatTexto.value.trim() : '';
+
+    const elTipo = document.getElementById('tipoTarefa');
+    const elStatus = document.getElementById('statusTarefa');
+    const elEndereco = document.getElementById('enderecoTarefa');
+    const elDataInicio = document.getElementById('dataInicioObraTarefa');
+    const elDataEsperada = document.getElementById('dataEsperadaTarefa');
+    const elIntegrador = document.getElementById('integradorTarefa');
+    const elStatusMat = document.getElementById('statusMaterialTarefa');
+    const elRelatorio = document.getElementById('relatorioAtividadesTarefa');
+    const elDescricao = document.getElementById('descricaoTarefa');
 
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas`, {
@@ -1746,15 +1768,15 @@ async function adicionarTarefa() {
             },
             body: JSON.stringify({
                 nome: nome,
-                tipo: document.getElementById('tipoTarefa').value.trim() || null,
-                status: document.getElementById('statusTarefa').value || null,
-                endereco: document.getElementById('enderecoTarefa').value.trim() || null,
-                data_inicio_obra: document.getElementById('dataInicioObraTarefa').value || null,
-                data_para_termino: document.getElementById('dataEsperadaTarefa').value || null,
-                intg_id: document.getElementById('integradorTarefa').value || null,
-                status_material: document.getElementById('statusMaterialTarefa').value || null,
-                relatorio_atividades: document.getElementById('relatorioAtividadesTarefa').value.trim() || null,
-                descricao: document.getElementById('descricaoTarefa').value.trim() || null
+                tipo: elTipo ? elTipo.value.trim() || null : null,
+                status: elStatus ? elStatus.value || null : null,
+                endereco: elEndereco ? elEndereco.value.trim() || null : null,
+                data_inicio_obra: elDataInicio ? elDataInicio.value || null : null,
+                data_para_termino: elDataEsperada ? elDataEsperada.value || null : null,
+                intg_id: elIntegrador ? elIntegrador.value || null : null,
+                status_material: elStatusMat ? elStatusMat.value || null : null,
+                relatorio_atividades: elRelatorio ? elRelatorio.value.trim() || null : null,
+                descricao: elDescricao ? elDescricao.value.trim() || null : null
             })
         });
 
@@ -1848,20 +1870,16 @@ function obterBadgePrazo(dataISO, status) {
 }
 
 function resetarFormularioAdicao() {
-    document.getElementById('tipoElemento').value = '';
-    document.getElementById('nomeTarefa').value = '';
-    document.getElementById('tipoTarefa').value = '';
-    document.getElementById('statusTarefa').value = '';
-    document.getElementById('enderecoTarefa').value = '';
-    document.getElementById('dataInicioObraTarefa').value = '';
-    document.getElementById('dataEsperadaTarefa').value = '';
-    document.getElementById('integradorTarefa').value = '';
-    document.getElementById('statusMaterialTarefa').value = '';
-    document.getElementById('materiaisFaltandoTarefa').value = '';
-    document.getElementById('relatorioAtividadesTarefa').value = '';
-    document.getElementById('descricaoTarefa').value = '';
-    document.getElementById('nomeIntegrador').value = '';
-    document.getElementById('ncpfIntegrador').value = '';
+    const ids = [
+        'tipoElemento', 'nomeTarefa', 'tipoTarefa', 'statusTarefa', 
+        'enderecoTarefa', 'dataInicioObraTarefa', 'dataEsperadaTarefa', 
+        'integradorTarefa', 'statusMaterialTarefa', 'materiaisFaltandoTarefa', 
+        'relatorioAtividadesTarefa', 'descricaoTarefa', 'nomeIntegrador', 'ncpfIntegrador'
+    ];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
     atualizarFormulario();
 }
 
@@ -2237,7 +2255,7 @@ async function analisarPendencias() {
                 else txtPrazo = `Faltam ${diffDias} dia(s)`;
 
                 return `
-                    <div style="background: #ffffff; border-left: 5px solid #d32f2f; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+                    <div style="background: #ffffff; border-left: 5px solid #000000; border-top: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
                         <div>
                             <div style="font-weight: bold; color: #b71c1c; font-size: 0.95rem;">
                                 🚨 ${t.nome}
@@ -2256,7 +2274,7 @@ async function analisarPendencias() {
 
             blocoMateriaisHtml = `
                 <div style="background: #fff0f0; border: 2px solid #000000; border-radius: 8px; padding: 15px;">
-                    <h4 style="color: #b71c1c; font-size: 1.1rem; border-bottom: 2px solid #b71c1c; padding-bottom: 6px; margin: 0;">
+                    <h4 style="color: #000000; font-size: 1.1rem; border-bottom: 2px solid #000000; padding-bottom: 6px; margin: 0;">
                         ⚠️ Materiais Atrasados / Urgentes (${tarefasMateriaisCriticos.length})
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 12px;">
@@ -2336,6 +2354,8 @@ async function analisarPendencias() {
 
 async function analisarPendencias2() {
     const containerAnalise = document.getElementById('gridAnalisePendenciasMini');
+    const elUrgentes = document.getElementById('qtdPendenciasUrgentes');
+    const elPerdidas = document.getElementById('qtdPendenciasPerdidas');
 	
     try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/pendenciastbl?select=*,tarefas(nome)`, {
@@ -2369,16 +2389,8 @@ async function analisarPendencias2() {
             else qtdDentroEsperado++;
         });
 
-        containerAnalise.innerHTML = `
-            <div class="item-caixa-prazo-mini" style="background-color: #f0ad4e;">
-                <span class="qtd-mini">${qtdDentroLimite}</span>
-                <span class="label-mini">Pendências Urgentes</span>
-            </div>
-            <div class="item-caixa-prazo-mini" style="background-color: #d9534f;">
-                <span class="qtd-mini">${qtdForaLimite}</span>
-                <span class="label-mini">Pendências Perdidas</span>
-            </div>
-        `;
+        if (elUrgentes) elUrgentes.textContent = qtdDentroLimite;
+        if (elPerdidas) elPerdidas.textContent = qtdForaLimite;
         
         containerAnalise.style.display = 'flex';
     } catch (err) {
