@@ -51,6 +51,7 @@ h2 { color: #333; font-size: 1.8rem; }
 .btn-warning { background: #e65100; }
 .btn-danger  { background: #c62828; }
 .btn-secondary { background: #616161; }
+.btn-whtr {background: #e8e8e8;}
 
 /* Botão repartido ao meio (Split Button) */
 .btn-split-container {
@@ -517,11 +518,15 @@ h2 { color: #333; font-size: 1.8rem; }
             <div id="secaoTarefas" class="section area-tarefas">
                 <div class="section-header"><h2>📌 Tarefas em Andamento</h2></div>
                 <div class="seletor-container">
-                    <label for="selectTarefas">Selecione uma tarefa:</label>
-                    <select id="selectTarefas" onchange="mostrarDetalhesTarefa()">
-                        <option value="">-- Escolha uma tarefa --</option>
-                    </select>
-                </div>
+					<label for="selectTarefas">Selecione uma tarefa:</label>
+					<div style="display: flex; gap: 8px; align-items: center;">
+						<button type="button" class="btn btn-whtr" onclick="mudarSelecao('selectTarefas', -1)" style="padding: 10px 14px; font-size: 1.1rem;" title="Tarefa anterior">◀</button>
+						<select id="selectTarefas" onchange="mostrarDetalhesTarefa()" style="flex: 1;">
+							<option value="">-- Escolha uma tarefa --</option>
+						</select>
+						<button type="button" class="btn btn-whtr" onclick="mudarSelecao('selectTarefas', 1)" style="padding: 10px 14px; font-size: 1.1rem;" title="Próxima tarefa">▶</button>
+					</div>
+				</div>
                 <div id="tarefasLoading" class="loading" style="display:none;">Carregando tarefas...</div>
                 <div id="tarefasError" class="error" style="display:none;"></div>
                 <div id="detalhesTarefa" class="detalhes-card" style="display:none;"></div>
@@ -601,11 +606,15 @@ h2 { color: #333; font-size: 1.8rem; }
         <div id="secaoConcluidas" class="section area-concluidas">
             <div class="section-header"><h2>✅ Histórico de Tarefas Concluídas</h2></div>
             <div class="seletor-container">
-                <label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
-                <select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()">
-                    <option value="">-- Escolha uma tarefa concluída --</option>
-                </select>
-            </div>
+				<label for="selectTrfsConcluidas">Selecione uma tarefa concluída:</label>
+				<div style="display: flex; gap: 8px; align-items: center;">
+					<button type="button" class="btn btn-whtr" onclick="mudarSelecao('selectTrfsConcluidas', -1)" style="padding: 10px 14px; font-size: 1.1rem;" title="Anterior no histórico">◀</button>
+					<select id="selectTrfsConcluidas" onchange="mostrarDetalhesTrfConcluida()" style="flex: 1;">
+						<option value="">-- Escolha uma tarefa concluída --</option>
+					</select>
+					<button type="button" class="btn btn-whtr" onclick="mudarSelecao('selectTrfsConcluidas', 1)" style="padding: 10px 14px; font-size: 1.1rem;" title="Próxima no histórico">▶</button>
+				</div>
+			</div>
             <div id="detalhesTrfConcluida" class="detalhes-card" style="display:none;"></div>
         </div>
     </div>
@@ -1096,24 +1105,32 @@ async function buscarDados(tabela) {
 
 async function carregarTarefas() {
     const select = document.getElementById('selectTarefas');
+    const valorAtual = select ? select.value : '';
+
     try {
-        // Busca tarefas -> pendenciastbl -> subpendtbl E materiaistbl
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*,subpendtbl(*)),materiaistbl(*)`, {
+        // Acrescentado &order=created_at.asc para manter a ordem estática de criação
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/tarefas?select=*,pendenciastbl(*,subpendtbl(*)),materiaistbl(*)&order=created_at.asc`, {
             headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
         });
         if (!response.ok) throw new Error(`Erro ${response.status}`);
         
         dadosTarefas = await response.json();
-        
         pendenciastbl = dadosTarefas.flatMap(t => t.pendenciastbl || []);
 
-        select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
-        dadosTarefas.forEach((t, i) => {
-            const opt = document.createElement('option');
-            opt.value = i; opt.textContent = t.nome;
-            select.appendChild(opt);
-        });
+        if (select) {
+            select.innerHTML = '<option value="">-- Escolha uma tarefa --</option>';
+            dadosTarefas.forEach((t, i) => {
+                const opt = document.createElement('option');
+                opt.value = i; 
+                opt.textContent = t.nome;
+                select.appendChild(opt);
+            });
 
+            // Preserva a seleção atual se ainda for válida após recarregar
+            if (valorAtual !== '' && valorAtual < dadosTarefas.length) {
+                select.value = valorAtual;
+            }
+        }
     } catch (err) { console.error(err); }
 }
 
@@ -1134,15 +1151,25 @@ async function carregarIntegradores() {
 // --- GERENCIAMENTO DE TRFSCONCLUIDAS ---
 async function carregarTrfsConcluidas() {
     const select = document.getElementById('selectTrfsConcluidas');
+    const valorAtual = select ? select.value : '';
+
     try {
-        dadosTrfsConcluidas = await buscarDados('trfsconcluidas');
-        select.innerHTML = '<option value="">-- Escolha uma tarefa concluída --</option>';
-        dadosTrfsConcluidas.forEach((item, idx) => {
-            const opt = document.createElement('option');
-            opt.value = idx;
-            opt.textContent = `${item.nome} (${formatarData(item.data_finalizado)})`;
-            select.appendChild(opt);
-        });
+        // Ordena por data de criação do histórico
+        dadosTrfsConcluidas = await buscarDados('trfsconcluidas?order=created_at.asc');
+        
+        if (select) {
+            select.innerHTML = '<option value="">-- Escolha uma tarefa concluída --</option>';
+            dadosTrfsConcluidas.forEach((item, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${item.nome} (${formatarData(item.data_finalizado)})`;
+                select.appendChild(opt);
+            });
+
+            if (valorAtual !== '' && valorAtual < dadosTrfsConcluidas.length) {
+                select.value = valorAtual;
+            }
+        }
     } catch (err) { console.error(err); }
 }
 
@@ -1357,18 +1384,18 @@ function mostrarDetalhesTarefa() {
         <p><span class="label">Integrador:</span> ${getIntegradorBadge(t.intg_id)}</p>
         <p><span class="label">Status:</span> ${getStatusBadge(t.status)}</p>
         <p><span class="label">Data de Início da Obra:</span> ${formatarData(t.data_inicio_obra)}</p>
-        <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino)}</p>
+        <p><span class="label">Data Esperada para Entrega:</span> ${formatarData(t.data_para_termino)} ${obterBadgePrazo(t.data_para_termino, t.status)}</p>
         <p><span class="label">Materiais Faltando:</span> ${listaMateriais}</p>
         <p><span class="label">Pendências a Resolver:</span> ${listaPendencias}</p>
         <p><span class="label">Relatório de Atividades:</span> ${listaRelatorio}</p>
         <p><span class="label2" style="margin-left: 30px;">Criado em:</span> ${new Date(t.created_at).toLocaleString('pt-BR')}</p>
         <div class="action-buttons">
-            <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Concluir & Arquivar</button>
+            <button class="btn btn-success" onclick="concluirEArquivarTarefa(${idx})">🧾 Arquivar Manualmente</button>
             <button class="btn btn-warning" onclick="abrirEdicaoTarefa(${idx})">✏️ Modificar Elemento</button>
             <button class="btn btn-secondary" onclick="abrirModalPendencias(${idx})">📝 Editar Pendências a Resolver</button>
             <div class="btn-split-container">
                 <button class="btn btn-danger btn-split-left" onclick="removerTarefa(${idx})">🗑️ Remover</button>
-                <button class="btn btn-secondary btn-split-right" onclick="abrirModalMateriais(${idx})">📦 Todos os Materiais</button>
+                <button class="btn btn-secondary btn-split-right" onclick="abrirModalMateriais(${idx})">📦 Ver Materiais</button>
             </div>
         </div>
     `;
@@ -1802,8 +1829,13 @@ async function removerIntegrador(index) {
     } catch (err) { alert(`❌ Erro: ${err.message}`); }
 }
 
-function obterBadgePrazo(dataISO) {
+function obterBadgePrazo(dataISO, status) {
     if (!dataISO) return '';
+    
+    // Se a tarefa estiver concluída, ignora e não exibe badge de prazo
+    const s = (status || '').toLowerCase();
+    if (s.includes('conclu')) return '';
+
     const [ano, mes, dia] = dataISO.split('T')[0].split('-');
     const dataTermino = new Date(ano, mes - 1, dia);
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
@@ -2461,7 +2493,28 @@ function atualizarBannerAlertaMateriais() {
     }
 }
 
+function mudarSelecao(selectId, direcao) {
+    const select = document.getElementById(selectId);
+    if (!select || select.options.length <= 1) return;
 
+    let novoIndex = select.selectedIndex + direcao;
+
+    // Cicla a seleção se chegar ao início ou ao final da lista
+    if (novoIndex < 0) {
+        novoIndex = select.options.length - 1;
+    } else if (novoIndex >= select.options.length) {
+        novoIndex = 0;
+    }
+
+    select.selectedIndex = novoIndex;
+
+    // Aciona a exibição dos detalhes de acordo com o seletor acionado
+    if (selectId === 'selectTarefas') {
+        mostrarDetalhesTarefa();
+    } else if (selectId === 'selectTrfsConcluidas') {
+        mostrarDetalhesTrfConcluida();
+    }
+}
 
 </script>
 </body>
